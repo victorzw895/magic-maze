@@ -1,9 +1,9 @@
-import React, { useEffect, memo } from 'react';
+import { memo } from 'react';
 import { useGame } from '../Contexts/GameContext';
-import { usePlayer } from '../Contexts/PlayerContext';
-import { firestore } from "../Firestore";
-import { useDocumentData } from 'react-firebase-hooks/firestore'
-import { DBPlayer, Room } from '../firestore-types';
+// import { usePlayer } from '../Contexts/PlayerContext';
+// import { firestore } from "../Firestore";
+// import { useDocumentData } from 'react-firebase-hooks/firestore'
+import { DBPlayer } from '../types';
 
 interface PlayerAreaProps {
   highlightNewTileArea: () => void,
@@ -52,7 +52,7 @@ const PlayerArea = memo(({highlightNewTileArea, player} : PlayerAreaProps) => {
             })
           }
           {
-            (!gameState.timerRunning) &&
+            (gameState.gamePaused) &&
             <div className="game-paused">
               <p>Timer has been hit! Time left remaining:
                 <span>{gameState.minutesLeft}</span>:

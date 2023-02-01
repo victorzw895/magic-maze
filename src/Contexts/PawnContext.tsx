@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { HeroPawn, heroName, heroWeapon, heroColor } from '../types';
-import { DBHeroPawn } from '../firestore-types';
+import { HeroPawn, heroName, heroWeapon, heroColor, DBHeroPawn } from '../types';
 
 const startPositions = [
   [1, 1],

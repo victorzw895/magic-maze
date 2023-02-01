@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { HeroPawn, heroName, heroWeapon, heroColor, Player, playerNumber, direction, Escalator } from '../types';
-import { DBPlayer } from '../firestore-types';
+import { heroColor, Player, playerNumber, direction, Escalator, DBPlayer } from '../types';
 
 type Action = {type: 'playerHeld', value: number | null, color: heroColor} | 
               {type: 'showMovableSpaces', value: direction[]} | 

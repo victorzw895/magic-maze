@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { Game, Player, playerNumber, direction, basicAbility } from '../types';
-import { DBPlayer } from '../firestore-types';
+import { Game, direction, basicAbility, DBPlayer } from '../types';
 
 type Action = {type: 'joinRoom', value: String} | 
               {type: 'toggleTimer', value: boolean} | 
@@ -15,7 +14,8 @@ type GameProviderProps = {children: React.ReactNode}
 const gameInitialState: Game = {
   roomId: "",
   // players: [],
-  // gameStarted: false
+  gameStarted: false,
+  gamePaused: false,
   timerRunning: false,
   minutesLeft: 3,
   secondsLeft: 20,
@@ -24,6 +24,7 @@ const gameInitialState: Game = {
   // heroesEscaped: []
 }
 
+// Set up player actions according to rule book
 const directions: direction[] = ["up", "right", "down", "left"];
 const secondSetDirections: direction[] = ["left", "right", "down", "up"];
 const players3Set = [["up", "right"], "down", "left"];
@@ -130,10 +131,11 @@ const gameReducer = (gameState: Game, action: any) => {
     case 'startGame': {
       // newState.players = assignRandomActions(newState.players);
       newState.timerRunning = true;
+      newState.gameStarted = true;
       return newState;
     }
     case 'timeLeft': {
-      console.log("update time left")
+      // console.log("update time left")
       newState.minutesLeft = action.minutes;
       newState.secondsLeft = action.seconds;
       // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
@@ -141,6 +143,7 @@ const gameReducer = (gameState: Game, action: any) => {
     }
     case 'toggleTimer': {
       newState.timerRunning = action.value;
+      newState.gamePaused = !newState.gamePaused;
       // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
       return newState;
     }

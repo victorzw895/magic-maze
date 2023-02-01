@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTimer } from 'react-timer-hook';
 import { useGame } from '../Contexts/GameContext';
 
@@ -36,24 +36,35 @@ const Timer = ({expiryTimestamp} : TimerProps) => {
   } = useTimer({ expiryTimestamp, onExpire: () => gameDispatch({type: "gameOver"}) });
   const startSeconds = 200;
 
-  const toggleTimer = () => {
-    if (isRunning) {
+  const toggleTimer = (pauseGame: boolean) => {
+    if (pauseGame) {
       pause();
-      console.log("here")
+      console.log("toggle timer here")
       gameDispatch({type: "timeLeft", minutes, seconds})
     }
     else {
       let restartTime = startSeconds - ((minutes * 60) + seconds)
       const time = new Date();
       time.setSeconds(time.getSeconds() + restartTime);
-      console.log(restartTime)
+      console.log("restartTime")
       restart(time)
     }
   }
 
   useEffect(() => {
-    toggleTimer()
-  }, [gameState.timerRunning])
+    toggleTimer(gameState.gamePaused)
+  }, [gameState.gamePaused])
+
+  useEffect(() => {
+    if (gameState.gameStarted && !isRunning) {
+      start();
+    }
+  }, [gameState.gameStarted])
+
+  // from db to Pause game
+  useEffect(() => {
+
+  })
 
 
   return (

@@ -1,19 +1,20 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import { useState, ChangeEvent, useEffect } from 'react';
 import cryptoRandomString from 'crypto-random-string';
+import { useDB } from '../Contexts/DBContext';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { usePlayer, PlayerFactory, PlayerFactoryType } from '../Contexts/PlayerContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
 import { Stack, Button, TextField, List, ListItem, Paper } from '@mui/material';
-import { Player } from '../types';
-import { Room, DBPlayer } from '../firestore-types';
+import { Room, DBPlayer } from '../types';
 import { getDoc, setDoc } from "firebase/firestore"; 
-import { firestore, gamesRef } from "../Firestore";
+import { gamesRef } from "../Firestore";
 import { useDocumentData } from 'react-firebase-hooks/firestore'
 import { allTiles } from '../Data/all-tiles-data';
 
 const Lobby = () => {
+  const { dbState, dbDispatch } = useDB();
   const { gameState, gameDispatch } = useGame();
-  const { playerState, playerDispatch } = usePlayer();
+  const { playerDispatch } = usePlayer();
   const [playerName, setPlayerName] = useState("");
   const [isHost, setIsHost] = useState(false);
   const [promptCode, setPromptCode] = useState(false);
@@ -25,7 +26,6 @@ const Lobby = () => {
   const [room] = useDocumentData(gameDoc);
 
   const { players } = room || {}
-
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -125,11 +125,13 @@ const Lobby = () => {
       ...firstTile,
       gridPosition: [8, 8]
     }
+    // console.log(initTile);
     await setDoc(
       gamesRef.doc(gameState.roomId), 
       { 
         players: dbPlayers, 
         gameStarted: true,
+        gamePaused: false,
         tiles: [initTile],
         pawns: pawnDBInitialState
       },

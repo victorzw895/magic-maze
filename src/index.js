@@ -7,13 +7,16 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { GameProvider} from './Contexts/GameContext';
+import { DBProvider} from './Contexts/DBContext';
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <GameProvider>
-      <App />
-    </GameProvider>
+    <DBProvider>
+      <GameProvider>
+        <App />
+      </GameProvider>
+    </DBProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

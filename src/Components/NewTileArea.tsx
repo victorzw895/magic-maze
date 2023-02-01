@@ -1,5 +1,5 @@
-import React, { MouseEvent, useEffect } from 'react';
-import { TileInterface } from '../types';
+import React, { MouseEvent } from 'react';
+import { DBTile } from '../types';
 import { tileWallSize, spaceSize } from '../constants';
 import { generateTile } from '../Contexts/TilesContext';
 import { useGame } from '../Contexts/GameContext';
@@ -8,7 +8,7 @@ import { firestore } from "../Firestore";
 
 
 interface NewTileAreaProps {
-  tile: TileInterface,
+  tile: DBTile,
   clearHighlightAreas: (gridPosition: number[]) => void,
 }
 
@@ -21,9 +21,9 @@ const areEqual = (prevProps: NewTileAreaProps, nextProps: NewTileAreaProps) => {
 
 const NewTileArea = React.memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
   const { gridPosition, placementDirection } = tile;
-  const { gameState, gameDispatch } = useGame();
+  const { gameState } = useGame();
 
-  const addNewTile = async (newTile: TileInterface) => {
+  const addNewTile = async (newTile: DBTile) => {
     const docRef = doc(firestore, "games", gameState.roomId);
     const docSnap = await getDoc(docRef);
 
@@ -39,7 +39,7 @@ const NewTileArea = React.memo(({tile, clearHighlightAreas}: NewTileAreaProps) =
 
   const placeNewTile = (e: MouseEvent<HTMLDivElement>) => {
     if (placementDirection) {
-      addNewTile({gridPosition, placementDirection} as TileInterface);
+      addNewTile({gridPosition, placementDirection} as DBTile);
     }
 
     clearHighlightAreas(gridPosition);

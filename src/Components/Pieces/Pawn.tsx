@@ -1,29 +1,28 @@
-import React, { MouseEvent, useEffect } from 'react';
-import { heroColor, HeroPawn, TileInterface, direction, Space as SpaceType, Escalator } from '../../types';
-import { Room, DBHeroPawn } from '../../firestore-types';
+import { MouseEvent, useEffect } from 'react';
+import { heroColor, direction, Escalator, Room, DBHeroPawn, DBTile, Space } from '../../types';
 import { tileWallSize, spaceSize } from '../../constants';
 import { usePawn, BlockedPositions } from '../../Contexts/PawnContext';
 import { usePlayer } from '../../Contexts/PlayerContext';
 import { useGame } from '../../Contexts/GameContext';
 import { setDoc } from "firebase/firestore"; 
-import { firestore, gamesRef } from "../../Firestore";
+import { gamesRef } from "../../Firestore";
 import { useDocumentData } from 'react-firebase-hooks/firestore'
-
 
 interface pawnProps {
   color: heroColor,
 }
 
 const Pawn = ({color}: pawnProps) => {
-  const { gameState, gameDispatch } = useGame();
+  const { gameState } = useGame();
   const { playerState, playerDispatch } = usePlayer();
-  const { pawnState, pawnDispatch } = usePawn();
+  const { pawnDispatch } = usePawn();
 
   const [room] = useDocumentData(gamesRef.doc(gameState.roomId));
 
   const { pawns, players }: Room = room || {}
 
   // Recalculate blocked position and showMovable when other player moves pawns
+  // NOTE: BUG: Need to recalculate when pawn held and add new tile
   useEffect(() => {
     (async() => {
       if (room && pawns) {
@@ -79,7 +78,7 @@ const Pawn = ({color}: pawnProps) => {
     "left": -1
   }
 
-  const getExtraDirectionalSpaces = (tileFound: TileInterface, pawn: DBHeroPawn, direction: direction) => {
+  const getExtraDirectionalSpaces = (tileFound: DBTile, pawn: DBHeroPawn, direction: direction) => {
     let extraSpaces;
     if (direction === "up" || direction === "down") {
       extraSpaces = Object.values(tileFound.spaces!).map((row) => row.filter((col, colIndex) => colIndex === pawn.position[0] + directionPositionValue[direction])).flat(1)
@@ -103,7 +102,7 @@ const Pawn = ({color}: pawnProps) => {
     return;
   }
 
-  const filterRowsOfTargetDirection = (currentTile: TileInterface, pawn: DBHeroPawn, direction: direction) => {
+  const filterRowsOfTargetDirection = (currentTile: DBTile, pawn: DBHeroPawn, direction: direction) => {
     let remainingRows
 
     if (direction === "left" || direction === "right") {
@@ -121,7 +120,7 @@ const Pawn = ({color}: pawnProps) => {
     }
   }
 
-  const filterSpacesFromRows = (rows: SpaceType[][], pawn: DBHeroPawn, direction: direction) => {
+  const filterSpacesFromRows = (rows: Space[][], pawn: DBHeroPawn, direction: direction) => {
     if (!rows) return;
 
     let remainingSpaces
@@ -504,7 +503,7 @@ const Pawn = ({color}: pawnProps) => {
             {/* {console.log('rendering pawn')} */}
           <div 
             className={`pawn ${color}`} 
-            onClick={gameState.gameOver || room.heroesEscaped.includes(color) ? () => {} : gameState.timerRunning ? _handleClick : () => {}}
+            onClick={gameState.gameOver || room.heroesEscaped.includes(color) ? () => {} : !gameState.gamePaused ? _handleClick : () => {}}
             style={{
               gridColumnStart: pawns[color]?.position[0] + 1,
               gridRowStart: pawns[color]?.position[1] + 1,

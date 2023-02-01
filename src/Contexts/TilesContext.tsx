@@ -1,18 +1,18 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { HeroPawn, heroName, heroWeapon, heroColor, TileInterface, direction, Space } from '../types';
+import { direction, DBTile, Space } from '../types';
 
 import { allTiles } from '../Data/all-tiles-data';
 
 
-type Action = {type: 'initTile', value: TileInterface} | 
-              {type: 'addTile', value: TileInterface} | undefined;
+type Action = {type: 'initTile', value: DBTile} | 
+              {type: 'addTile', value: DBTile} | undefined;
 type Dispatch = (action: Action) => void;
 
 type TilesProviderProps = {children: React.ReactNode}
 
-const tilesInitialState: TileInterface[] = []
+const tilesInitialState: DBTile[] = []
 
-const TilesContext = createContext<{tilesState: TileInterface[]; tilesDispatch: Dispatch} | undefined>(undefined);
+const TilesContext = createContext<{tilesState: DBTile[]; tilesDispatch: Dispatch} | undefined>(undefined);
 
 type directionValuesType = {
   up: number,
@@ -88,7 +88,7 @@ const updateSpaceDirections = (spaces: Space[][], rotationValue: number) => {
   ))
 }
 
-// const updateTileDirections = (newTile: TileInterface, rotationValue: number) => {
+// const updateTileDirections = (newTile: DBTile, rotationValue: number) => {
 //   if (newTile.entryDirection) {
 //     newTile.entryDirection = getUpdatedDirectionValue(newTile.entryDirection, rotationValue)
 //   }
@@ -98,12 +98,12 @@ const updateSpaceDirections = (spaces: Space[][], rotationValue: number) => {
 //   return newTile;
 // }
 
-export const generateTile = (newTileState: TileInterface) => {
+export const generateTile = (newTileState: DBTile) => {
   const newId = availableTiles.pop();
-  const tile = allTiles.find(tile => tile.id === newId?.toString()) as TileInterface;
+  const tile = allTiles.find(tile => tile.id === newId?.toString()) as DBTile;
   if (!tile) return;
   const { gridPosition, placementDirection} = newTileState
-  const newTile: TileInterface = {...tile, gridPosition, placementDirection};
+  const newTile: DBTile = {...tile, gridPosition, placementDirection};
   const tileSpaces = Object.values(newTile.spaces!)
   const rotationValue = calculateRotation(newTile.placementDirection!, newTile.entryDirection!);
 
@@ -138,7 +138,7 @@ export const generateTile = (newTileState: TileInterface) => {
   }};
 }
 
-const tilesReducer = (tilesState: TileInterface[], action: any) => {
+const tilesReducer = (tilesState: DBTile[], action: any) => {
 
   switch (action.type) {
     case 'initTile': {
@@ -146,10 +146,10 @@ const tilesReducer = (tilesState: TileInterface[], action: any) => {
     }
     case 'addTile': {
       const newId = availableTiles.pop();
-      const tile = allTiles.find(tile => tile.id === newId?.toString()) as TileInterface;
+      const tile = allTiles.find(tile => tile.id === newId?.toString()) as DBTile;
       if (!tile) return [...tilesState];
       const { gridPosition, placementDirection} = action.value
-      const newTile: TileInterface = {...tile, gridPosition, placementDirection};
+      const newTile: DBTile = {...tile, gridPosition, placementDirection};
       const tileSpaces = Object.values(newTile.spaces!)
       const rotationValue = calculateRotation(newTile.placementDirection!, newTile.entryDirection!);
 

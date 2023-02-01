@@ -1,15 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Tile from './Tile';
 import NewTileArea from './NewTileArea';
 import Pawn from './Pieces/Pawn';
 import PlayerArea from './PlayerArea';
-import { TileInterface, HeroPawn, ExplorationSpace } from '../types';
-import { DBTile, DBHeroPawn, DBPawns, Room } from '../firestore-types';
+import { ExplorationSpace, DBTile, DBHeroPawn, Room } from '../types';
 import './Board.scss';
 import { useGame } from '../Contexts/GameContext';
 import { usePlayer } from '../Contexts/PlayerContext';
 import Draggable from 'react-draggable';
-import { firestore, gamesRef } from "../Firestore";
+import { gamesRef } from "../Firestore";
 import { useDocumentData } from 'react-firebase-hooks/firestore'
 import Timer from './Timer';
 
@@ -27,18 +26,19 @@ const time = new Date();
 
 const Board = () => {
   const draggableNodeRef = useRef(null);
-  const { gameState, gameDispatch } = useGame();
-  const { playerState, playerDispatch } = usePlayer();
+  const { gameState } = useGame();
+  const { playerState } = usePlayer();
 
   const [room] = useDocumentData(gamesRef.doc(gameState.roomId));
 
   const { pawns, tiles, players }: Room = room || {}
 
-  const [availableArea, setAvailableArea] = useState<TileInterface[]>(startTiles() as TileInterface[]);
+  const [availableArea, setAvailableArea] = useState<DBTile[]>(startTiles() as DBTile[]);
 
   useEffect(() => {
     // IDEALLY on game start
     // maybe move timer to firestore ???
+    console.log("start timer?")
     time.setSeconds(time.getSeconds() + 200);
   }, [])
 
@@ -81,7 +81,7 @@ const Board = () => {
 
     const highlightAreas = Object.values(pawns).map(pawn => {
       return getExplorationTile(pawn, pawn.position[0], pawn.position[1]) 
-    }).filter(gridPos => gridPos) as TileInterface[]
+    }).filter(gridPos => gridPos) as DBTile[]
 
     // adding placementDirection value to tiles that need to be highlighted
     highlightAreas.forEach(newArea => {
@@ -101,8 +101,18 @@ const Board = () => {
       return {gridPosition: area.gridPosition}
     })
 
-    setAvailableArea(resetAreas as TileInterface[]);
+    setAvailableArea(resetAreas as DBTile[]);
   }, [availableArea])
+
+  const getCurrentPlayer = () => {
+    const currentPlayer = players.find(player => player.number === playerState.number)!
+    return currentPlayer
+  }
+  
+  const getPlayerHeldPawn = () => {
+    const pawnHeld = Object.values(pawns).find((pawn: DBHeroPawn) => pawn.playerHeld && pawn.playerHeld === playerState.number);
+    return pawnHeld;
+  }
 
   return (
     <div className="Board">
@@ -123,7 +133,13 @@ const Board = () => {
           })}
           {tiles && tiles.length > 0 && tiles.map((newTile, tileIndex) => {
             return (
-              <Tile key={tileIndex} tileIndex={tileIndex} tileData={newTile} />
+              <Tile 
+                key={tileIndex} 
+                tileIndex={tileIndex} 
+                tileData={newTile} 
+                playerHeldPawn={getPlayerHeldPawn()}
+                currentPlayer={getCurrentPlayer()}
+                />
             )
           })}
           <Pawn color="yellow" />

@@ -1,11 +1,9 @@
-import React, { useEffect, useState, memo } from 'react';
+import { useEffect, useState, memo } from 'react';
 import { useGame } from '../Contexts/GameContext';
 import { usePlayer } from '../Contexts/PlayerContext';
-import { Space as SpaceType, heroColor, TeleporterSpace, HeroPawn, Escalator, TimerSpace, WeaponSpace, ExitSpace } from '../types';
+import { heroColor, TeleporterSpace, Escalator, TimerSpace, WeaponSpace, ExitSpace, Space as SpaceType } from '../types';
 import { setDoc, doc, getDoc } from "firebase/firestore"; 
 import { firestore } from "../Firestore";
-import { useDocumentData } from 'react-firebase-hooks/firestore'
-import { positions } from '@mui/system';
 
 interface SpaceProps {
   spaceData: SpaceType,
@@ -18,17 +16,35 @@ interface SpaceProps {
   tileIndex: number
 }
 
-// const areEqual = (prevProps: SpaceProps, nextProps: SpaceProps) => {
-//   if (prevProps.showMovableArea !== nextProps.showMovableArea) {
-//         return false
-//   }
-//   return true
-// }
+const areEqual = (prevProps: SpaceProps, nextProps: SpaceProps) => {
+  if (prevProps.colorSelected !== nextProps.colorSelected) {
+    if (prevProps.showMovableArea !== nextProps.showMovableArea) {
+      // console.log("************************ showMovableArea")
+      return false
+    }
+  }
+  if (prevProps.highlightTeleporter !== nextProps.highlightTeleporter) {
+    if (nextProps.spaceData.type === "teleporter") {
+      // console.log("************************ highlightTeleporter")
+      return false
+    }
+  }
+  if (prevProps.highlightEscalator !== nextProps.highlightEscalator) {
+    if (nextProps.spaceData.details?.hasEscalator) {
+      // console.log("************************ highlightEscalator")
+      return false
+    }
+  }
+
+  
+  // console.log("would have rendered Space")
+  return true
+}
 
 
-const Space = ({spaceData, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex}: SpaceProps) => {
+const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex}: SpaceProps) => {
   const { gameState, gameDispatch } = useGame();
-  const { playerState, playerDispatch } = usePlayer();
+  const { playerDispatch } = usePlayer();
 
   const gamesRef = firestore.collection('games')
 
@@ -41,14 +57,13 @@ const Space = ({spaceData, showMovableArea, spacePosition, colorSelected, gridPo
   const isTimer = spaceData.type === "timer";
 
   const hasWeapon = spaceData.type === "weapon";
-  const weaponColor = hasWeapon ? (spaceData.details as WeaponSpace).color : "";
 
   const isExit = spaceData.type === "exit";
-  const exitColor = isExit ? (spaceData.details as ExitSpace).color : "";
 
   const [showTeleport, setShowTeleport] = useState(false)
   const [showEscalator, setShowEscalator] = useState(false);
 
+  // BUG: NEED TO FINE TUNE teleport and escalator
   useEffect(() => {
     (async () => {
       if (!isTeleporter) return;
@@ -56,16 +71,17 @@ const Space = ({spaceData, showMovableArea, spacePosition, colorSelected, gridPo
         let isOccupied = false;
         const docSnap = await getDoc(doc(gamesRef, gameState.roomId));
         if (docSnap.exists()) {
-          const pawn: any = Object.values(docSnap.data().pawns).some((pawn: any) => {
+          isOccupied = Object.values(docSnap.data().pawns).some((pawn: any) => {
             if (pawn.gridPosition[0] === gridPosition[0] && pawn.gridPosition[1] === gridPosition[1]) {
               if (pawn.position[0] === spacePosition[0] && pawn.position[1] === spacePosition[1]) {
-                isOccupied = true;
                 return true;
               }
             }
             return false
           })
         }
+        console.log(docSnap.exists())
+        console.log(spacePosition, gridPosition, isOccupied)
         setShowTeleport(!isOccupied)
       }
       else {
@@ -78,7 +94,7 @@ const Space = ({spaceData, showMovableArea, spacePosition, colorSelected, gridPo
   useEffect(() => {
     (async () => {
       if (!isEscalator) return;
-      console.log("should only be for spaces that are escalators", spaceData)
+      // console.log("should only be for spaces that are escalators", spaceData)
       if (highlightEscalator.length) {
         const escalator = highlightEscalator.find(escalator => escalator.escalatorName === escalatorName);
         if (escalator && escalator.gridPosition && escalator.position && escalator.escalatorName) {
@@ -186,9 +202,9 @@ const Space = ({spaceData, showMovableArea, spacePosition, colorSelected, gridPo
       onClick={showMovableArea || showTeleport || showEscalator ? movePawn : () => {}}
     >
       <div className={teleporterColor}></div>
-      {console.log("re rendering space")}
+      {/* {console.log("re rendering space")} */}
     </div>
   )
-}
+}, areEqual)
 
 export default Space

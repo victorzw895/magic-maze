@@ -24,7 +24,8 @@ export interface Game {
   // weaponsStolen: heroColor[],
   // heroesEscaped: heroColor[]
   // players: Player[],
-  // gameStarted: boolean
+  gameStarted: boolean
+  gamePaused: boolean
 }
 
 export interface Escalator {
@@ -34,18 +35,10 @@ export interface Escalator {
 }
 
 export interface Player {
-  // DB
-  // name: string,
-  // playerDirections: direction[],
-  // playerAbilities: basicAbility[],
-  // LOCAL
   number: playerNumber,
   showMovableDirections: direction[],
   showTeleportSpaces: heroColor | null,
   showEscalatorSpaces: Escalator[]
-  // playerPawnHeld: heroColor | null, // unused
-  // placeTile: () => void,
-  // pingPlayer: ((number: playerNumber) => void) | null,
 }
 
 type BlockedPosition = {
@@ -67,22 +60,71 @@ export interface HeroPawn {
   }
 }
 
-export interface TileInterface {
+// DB Types ///////////////////////////////////////////
+
+// export interface SandTimer {
+//   timeLimit: number,
+//   pause: boolean,
+//   flip: () => void,
+//   swapActions: () => void
+// }
+
+export interface DBPawns {
+  green: DBHeroPawn,
+  yellow: DBHeroPawn,
+  orange: DBHeroPawn,
+  purple: DBHeroPawn,
+}
+
+export interface Room {
+  // timerRunning: boolean
+  // minutesLeft: number,
+  // gameOver: boolean,
+  gamePaused: boolean,
+  gameStarted: boolean,
+  timeLeft: number,
+  weaponsStolen: heroColor[],
+  heroesEscaped: heroColor[],
+  players: DBPlayer[],
+  tiles: DBTile[],
+  pawns: DBPawns,
+}
+
+
+export interface DBPlayer {
+  name: string,
+  number: playerNumber,
+  playerDirections: direction[],
+  playerAbilities: basicAbility[],
+  pinged: boolean
+}
+
+
+export interface DBHeroPawn {
+  color: heroColor,
+  playerHeld: playerNumber | null,
+  position: number[],
+  gridPosition: number[],
+  ability: string,
+  canUseAbility: boolean,
+}
+
+export interface DBTile {
   id: string,
-  // width: number,
-  // height: number,
-  rotation?: number,
-  spaces?: {
+  gridPosition: number[],
+  spaces: {
     0: Space[],
     1: Space[],
     2: Space[],
     3: Space[]
   },
-  gridPosition: number[],
+  rotation?: number,
   placementDirection?: direction,
   entryDirection?: direction,
   entrySide?: direction
 }
+
+type SpaceTypeName = "timer" | "teleporter" | "exploration" | "special" | "weapon" | "exit" | "blank" | "barrier"
 
 export interface Space {
   type: SpaceTypeName,
@@ -90,15 +132,12 @@ export interface Space {
 }
 
 interface SpaceDetails {
-  isOccupied?: boolean,
+  // isOccupied?: boolean,
   sideWalls?: direction[],
   hasEscalator?: boolean,
-  // useEscalator?: () => void,
   escalatorName?: string,
   isEntry?: boolean
 }
-
-type SpaceTypeName = "timer" | "teleporter" | "exploration" | "special" | "weapon" | "exit" | "blank" | "barrier"
 
 export interface TimerSpace extends SpaceDetails {
   isDisabled: boolean

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Board from './Components/Board';
 import './App.css';
 import { PawnProvider } from './Contexts/PawnContext';
@@ -7,10 +7,14 @@ import { TilesProvider } from './Contexts/TilesContext';
 import { useGame } from './Contexts/GameContext';
 import Lobby from './Components/Lobby';
 import { firestore } from "./Firestore";
+import { onSnapshot } from "firebase/firestore";
 import { useDocumentData } from 'react-firebase-hooks/firestore'
+import { Stack, Button, TextField, List, ListItem, Paper } from '@mui/material';
+import { useDB } from './Contexts/DBContext';
 
 function App() {
-  const { gameState, gameDispatch } = useGame();
+  const { dbState, dbDispatch } = useDB();
+  const { gameState } = useGame();
   const gamesRef = firestore.collection('games')
 
   const [gameDoc, setGameDoc] = useState(null);
@@ -22,6 +26,14 @@ function App() {
       setGameDoc(gamesRef.doc(gameState.roomId))
     }
   }, [gameState.roomId])
+
+  useEffect(() => {
+    if (gameDoc) {
+      onSnapshot(gameDoc, doc => {
+        dbDispatch({type: "update", value: doc.data()})
+      })
+    }
+  }, [gameDoc])
 
   return (
     <div className="MMApp">
