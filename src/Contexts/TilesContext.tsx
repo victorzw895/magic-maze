@@ -3,7 +3,6 @@ import { direction, DBTile, Space } from '../types';
 
 import { allTiles } from '../Data/all-tiles-data';
 
-
 type Action = {type: 'initTile', value: DBTile} | 
               {type: 'addTile', value: DBTile} | undefined;
 type Dispatch = (action: Action) => void;

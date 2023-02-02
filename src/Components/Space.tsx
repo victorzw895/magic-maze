@@ -148,6 +148,7 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
           if (gameState.timerRunning) {
             gameDispatch({type: "toggleTimer", value: !gameState.timerRunning})
             newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
+            newRoomValue.gamePaused = true;
           }
         }
 
@@ -165,6 +166,7 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
         await setDoc(
           gamesRef.doc(gameState.roomId), 
           {
+            gamePaused: newRoomValue.gamePaused,
             pawns: newRoomValue.pawns, 
             tiles: newRoomValue.tiles,
             weaponsStolen: newRoomValue.weaponsStolen,

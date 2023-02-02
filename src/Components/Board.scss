@@ -159,6 +159,9 @@
   background-color: rgba(172, 227, 208, 0.8);
   width: 100vw;
   height: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .game-paused {

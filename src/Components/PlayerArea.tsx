@@ -35,19 +35,50 @@ const PlayerArea = memo(({highlightNewTileArea, player} : PlayerAreaProps) => {
         <>
           {
             player.playerDirections.map(direction => {
-              return <div key={direction}>{direction}</div>
+              return (
+                <img 
+                  draggable={false}
+                  src={`/${direction}.png`} 
+                  alt={direction} 
+                  style={{
+                    width: '80px',
+                    margin: '0 30px'
+                  }}
+                    />
+              )
             })
           }
           {
             player.playerAbilities.map(ability => {
               if (ability === "explore") {
-                return <button key={ability} onClick={() => highlightNewTileArea()}>Add Tile</button>
-              }
-              else if (ability === "teleport") {
-                return <div key={ability}>Teleport</div>
+                // DECISION: use button, or image?
+                // return <button key={ability} onClick={() => highlightNewTileArea()}>Add Tile</button>
+                return (
+                  <img 
+                    draggable={false}
+                    key={ability}
+                    onClick={() => highlightNewTileArea()}
+                    src={`/${ability}.png`} 
+                    alt={ability} 
+                    style={{
+                      width: '80px',
+                      margin: '0 30px'
+                    }}
+                      />
+                )
               }
               else {
-                return <div key={ability}>Escalator</div>
+                return (
+                  <img 
+                    draggable={false}
+                    src={`/${ability}.png`} 
+                    alt={ability} 
+                    style={{
+                      width: '80px',
+                      margin: '0 30px'
+                    }}
+                      />
+                )
               }
             })
           }
