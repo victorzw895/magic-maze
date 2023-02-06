@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
 import { useTimer } from 'react-timer-hook';
 import { useGame } from '../Contexts/GameContext';
+import { setDoc, doc, getDoc } from "firebase/firestore"; 
+import { useDocumentData } from 'react-firebase-hooks/firestore'
+import { firestore, gamesRef } from "../Firestore";
 
 interface TimerProps {
   expiryTimestamp: Date
@@ -26,6 +29,8 @@ interface TimerProps {
 
 const Timer = ({expiryTimestamp} : TimerProps) => {
   const { gameState, gameDispatch } = useGame();
+  const [room] = useDocumentData(gamesRef.doc(gameState.roomId));
+
   const {
     seconds,
     minutes,
@@ -40,7 +45,6 @@ const Timer = ({expiryTimestamp} : TimerProps) => {
     if (pauseGame) {
       pause();
       console.log("toggle timer here")
-      gameDispatch({type: "timeLeft", minutes, seconds})
     }
     else {
       let restartTime = startSeconds - ((minutes * 60) + seconds)
@@ -51,9 +55,6 @@ const Timer = ({expiryTimestamp} : TimerProps) => {
     }
   }
 
-  useEffect(() => {
-    toggleTimer(gameState.gamePaused)
-  }, [gameState.gamePaused])
 
   useEffect(() => {
     if (gameState.gameStarted && !isRunning) {
@@ -62,10 +63,16 @@ const Timer = ({expiryTimestamp} : TimerProps) => {
   }, [gameState.gameStarted])
 
   // from db to Pause game
+  // this toggles pause on timer, missing game pause.
+  // for accuracy, best to move timer into firebase
   useEffect(() => {
-
-  })
-
+    (async () => {
+      if (!room) return;
+      console.log('there is a room', room)
+      console.log('room?.gamePaused !== gameState.gamePaused', room?.gamePaused, gameState.gamePaused)
+      toggleTimer(room.gamePaused);
+    })()
+  }, [room?.gamePaused])
 
   return (
     <div className="timer">

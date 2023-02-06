@@ -1,8 +1,9 @@
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useGame } from '../Contexts/GameContext';
 // import { usePlayer } from '../Contexts/PlayerContext';
-// import { firestore } from "../Firestore";
-// import { useDocumentData } from 'react-firebase-hooks/firestore'
+import { setDoc, doc, getDoc } from "firebase/firestore"; 
+import { useDocumentData } from 'react-firebase-hooks/firestore'
+import { firestore, gamesRef } from "../Firestore";
 import { DBPlayer } from '../types';
 
 interface PlayerAreaProps {
@@ -23,10 +24,29 @@ const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
 // memo this might not be necessary
 const PlayerArea = memo(({highlightNewTileArea, player} : PlayerAreaProps) => {
   const { gameState, gameDispatch } = useGame();
+  const [gamePaused, setGamePaused] = useState(false);
+  const [room] = useDocumentData(gamesRef.doc(gameState.roomId));
 
-  const _handleContinueGame = () => {
-    gameDispatch({type: "toggleTimer", value: !gameState.timerRunning})
+  const _handleContinueGame = async () => {
+    await setDoc(
+      gamesRef.doc(gameState.roomId), 
+      { 
+        gamePaused: false,
+      },
+      {merge: true}
+    )
+    setGamePaused(false);
   }
+
+  useEffect(() => {
+    (async () => {
+      if (!room) return;
+      console.log('there is a room', room)
+      if (room?.gamePaused !== gamePaused) {
+        setGamePaused(true);
+      }
+    })()
+  }, [room?.gamePaused])
 
   return (
     <div className="player-area">
@@ -37,6 +57,7 @@ const PlayerArea = memo(({highlightNewTileArea, player} : PlayerAreaProps) => {
             player.playerDirections.map(direction => {
               return (
                 <img 
+                  key={direction}
                   draggable={false}
                   src={`/${direction}.png`} 
                   alt={direction} 
@@ -70,6 +91,7 @@ const PlayerArea = memo(({highlightNewTileArea, player} : PlayerAreaProps) => {
               else {
                 return (
                   <img 
+                    key={ability}
                     draggable={false}
                     src={`/${ability}.png`} 
                     alt={ability} 
@@ -83,7 +105,7 @@ const PlayerArea = memo(({highlightNewTileArea, player} : PlayerAreaProps) => {
             })
           }
           {
-            (gameState.gamePaused) &&
+            (gamePaused) &&
             <div className="game-paused">
               <p>Timer has been hit! Time left remaining:
                 <span>{gameState.minutesLeft}</span>:

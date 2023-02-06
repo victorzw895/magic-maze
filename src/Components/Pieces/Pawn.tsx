@@ -511,6 +511,7 @@ const Pawn = ({color}: pawnProps) => {
             }}
           >
             <img 
+              key={`${color}-pawn`}
               draggable={false}
               src={`/${color}-pawn.svg`} 
               alt={`${color}-piece`} 

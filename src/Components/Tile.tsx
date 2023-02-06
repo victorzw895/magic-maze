@@ -278,6 +278,7 @@ const Tile = memo(({startTile, id, tileIndex, tileData, playerHeldPawn, currentP
             )
           })}
           <img 
+            key={tileData.id}
             draggable={false}
             src={`/${tileData.id}.jpg`} alt={`tile-${tileData.id}`}
             style={{

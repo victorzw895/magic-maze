@@ -27,13 +27,15 @@ function App() {
     }
   }, [gameState.roomId])
 
-  useEffect(() => {
-    if (gameDoc) {
-      onSnapshot(gameDoc, doc => {
-        dbDispatch({type: "update", value: doc.data()})
-      })
-    }
-  }, [gameDoc])
+  // is this causing device to crash?
+  // what was this for again??
+  // useEffect(() => {
+  //   if (gameDoc) {
+  //     onSnapshot(gameDoc, doc => {
+  //       dbDispatch({type: "update", value: doc.data()})
+  //     })
+  //   }
+  // }, [gameDoc])
 
   return (
     <div className="MMApp">

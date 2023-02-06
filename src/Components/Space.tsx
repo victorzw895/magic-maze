@@ -145,11 +145,9 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
         };
         if (isTimer && !(spaceData.details as TimerSpace).isDisabled) {
           // pause and update db with pause
-          if (gameState.timerRunning) {
-            gameDispatch({type: "toggleTimer", value: !gameState.timerRunning})
-            newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
-            newRoomValue.gamePaused = true;
-          }
+          console.log('Stepping on timer', spaceData.details, gameState.timerRunning)
+          newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
+          newRoomValue.gamePaused = true;
         }
 
         if (hasWeapon && !(spaceData.details as WeaponSpace).weaponStolen && (spaceData.details as WeaponSpace).color === colorSelected) {
