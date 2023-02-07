@@ -35,7 +35,7 @@ export interface Escalator {
 }
 
 export interface Player {
-  number: playerNumber,
+  number: playerNumber,  // TODO remove, can use values straight from DB
   showMovableDirections: direction[],
   showTeleportSpaces: heroColor | null,
   showEscalatorSpaces: Escalator[]

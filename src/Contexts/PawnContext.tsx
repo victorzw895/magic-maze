@@ -41,11 +41,11 @@ export const PawnFactory = (color: heroColor, startPosition?: number[]) => {
   }
 
   const localPawnState: HeroPawn = {
-    heroName: heroName as heroName,
-    color,
+    heroName: heroName as heroName, // TODO: unnecessary? 
+    color, // TODO remove, can use values straight from DB
     height: 46.25,
     width: 46.25,
-    weapon: weapon as heroWeapon,
+    weapon: weapon as heroWeapon, 
     blockedPositions: {
       up: {
         position: null,

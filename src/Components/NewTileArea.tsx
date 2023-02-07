@@ -4,8 +4,8 @@ import { tileWallSize, spaceSize } from '../constants';
 import { generateTile } from '../Contexts/TilesContext';
 import { useGame } from '../Contexts/GameContext';
 import { setDoc, doc, getDoc } from "firebase/firestore"; 
-import { firestore } from "../Firestore";
-
+import { firestore, gamesRef } from "../Firestore";
+import { useDocumentData } from 'react-firebase-hooks/firestore'
 
 interface NewTileAreaProps {
   tile: DBTile,
@@ -22,6 +22,8 @@ const areEqual = (prevProps: NewTileAreaProps, nextProps: NewTileAreaProps) => {
 const NewTileArea = React.memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
   const { gridPosition, placementDirection } = tile;
   const { gameState } = useGame();
+
+  const [room] = useDocumentData(gamesRef.doc(gameState.roomId));
 
   const addNewTile = async (newTile: DBTile) => {
     const docRef = doc(firestore, "games", gameState.roomId);
@@ -51,7 +53,7 @@ const NewTileArea = React.memo(({tile, clearHighlightAreas}: NewTileAreaProps) =
 
   return (
     <div className={`tile new-tile-area ${placementDirection ? placementDirection : "placeholder"}`}
-      onClick={(e) => placeNewTile(e)}
+      onClick={room?.gamePaused ? () => {} : (e) => placeNewTile(e)} // TODO: disable if game paused
       style={
         {
           gridColumnStart: gridPosition[0], 

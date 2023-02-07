@@ -14,9 +14,9 @@ type GameProviderProps = {children: React.ReactNode}
 const gameInitialState: Game = {
   roomId: "",
   // players: [],
-  gameStarted: false,
-  gamePaused: false,
-  timerRunning: false,
+  gameStarted: false, // TODO remove, can use values straight from DB
+  gamePaused: false, // TODO remove, can use values straight from DB
+  timerRunning: false, // TODO maybe not necessary
   minutesLeft: 3,
   secondsLeft: 20,
   gameOver: false,

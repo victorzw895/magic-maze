@@ -200,6 +200,7 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
     <div 
       className={`space ${showMovableArea ? "active" : ""} ${showTeleport ? "teleporter" : ""} ${showEscalator ? "escalator" : ""}`}
       onClick={showMovableArea || showTeleport || showEscalator ? movePawn : () => {}}
+       // TODO: disable if game paused
     >
       <div className={teleporterColor}></div>
       {/* {console.log("re rendering space")} */}

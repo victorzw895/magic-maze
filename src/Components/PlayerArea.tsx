@@ -42,8 +42,11 @@ const PlayerArea = memo(({highlightNewTileArea, player} : PlayerAreaProps) => {
     (async () => {
       if (!room) return;
       console.log('there is a room', room)
-      if (room?.gamePaused !== gamePaused) {
+      if (room?.gamePaused) {
         setGamePaused(true);
+      }
+      else {
+        setGamePaused(false);
       }
     })()
   }, [room?.gamePaused])
@@ -78,7 +81,7 @@ const PlayerArea = memo(({highlightNewTileArea, player} : PlayerAreaProps) => {
                   <img 
                     draggable={false}
                     key={ability}
-                    onClick={() => highlightNewTileArea()}
+                    onClick={room?.gamePaused ? () => {} : highlightNewTileArea} // TODO: disable if game paused
                     src={`/${ability}.png`} 
                     alt={ability} 
                     style={{
@@ -111,7 +114,7 @@ const PlayerArea = memo(({highlightNewTileArea, player} : PlayerAreaProps) => {
                 <span>{gameState.minutesLeft}</span>:
                 <span>{gameState.secondsLeft.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}</span>
               </p>
-              <button onClick={_handleContinueGame}>Continue</button>
+              <button onClick={_handleContinueGame}>Continue</button> {/* TODO show only for player who paused game*/}
             </div>
           }
           {

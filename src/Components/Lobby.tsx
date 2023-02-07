@@ -50,6 +50,7 @@ const Lobby = () => {
     await setDoc(gamesRef.doc(newGameCode), {
       players: [dbPlayer],
       gameStarted: false,
+      gamePaused: false,
       weaponsStolen: [],
       heroesEscaped: []
       }
@@ -131,7 +132,6 @@ const Lobby = () => {
       { 
         players: dbPlayers, 
         gameStarted: true,
-        gamePaused: false,
         tiles: [initTile],
         pawns: pawnDBInitialState
       },

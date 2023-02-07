@@ -503,7 +503,8 @@ const Pawn = ({color}: pawnProps) => {
             {/* {console.log('rendering pawn')} */}
           <div 
             className={`pawn ${color}`} 
-            onClick={gameState.gameOver || room.heroesEscaped.includes(color) ? () => {} : !gameState.gamePaused ? _handleClick : () => {}}
+             // TODO: disable if game paused  double check
+            onClick={gameState.gameOver || room.heroesEscaped.includes(color) ? () => {} : !room.gamePaused ? _handleClick : () => {}}
             style={{
               gridColumnStart: pawns[color]?.position[0] + 1,
               gridRowStart: pawns[color]?.position[1] + 1,
