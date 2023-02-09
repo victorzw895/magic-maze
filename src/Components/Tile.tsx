@@ -35,10 +35,10 @@ const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
   }
   
   return true
-  // return false
 }
 
 const Tile = memo(({startTile, id, tileIndex, tileData, playerHeldPawn, currentPlayer}: tileProps) => {
+  // console.count("would have rendered Tile") // 26 on show, 16
 
   const { playerState } = usePlayer();
 
@@ -268,8 +268,8 @@ const Tile = memo(({startTile, id, tileIndex, tileData, playerHeldPawn, currentP
                       colorSelected={playerHeldPawn ? playerHeldPawn.color : null}
                       spacePosition={[colIndex, rowIndex]} 
                       gridPosition={[...tileData.gridPosition]}
-                      highlightTeleporter={playerState.showTeleportSpaces}
-                      highlightEscalator={playerState.showEscalatorSpaces}
+                      highlightTeleporter={space.type === 'teleporter' ? playerState.showTeleportSpaces: null}
+                      highlightEscalator={space.details?.hasEscalator ? playerState.showEscalatorSpaces: []}
                       tileIndex={tileIndex}
                     />
                   )

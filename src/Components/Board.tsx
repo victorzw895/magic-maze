@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import Tile from './Tile';
+import React, { useCallback, useEffect, useRef, useState, ReactNode } from 'react';
+import Tiles from './Tiles';
 import NewTileArea from './NewTileArea';
 import Pawn from './Pieces/Pawn';
 import PlayerArea from './PlayerArea';
@@ -24,7 +24,8 @@ const startTiles = () => {
 
 const time = new Date();
 
-const Board = () => {
+
+const BoardComponent = ({children}: {children: ReactNode}) => {
   const draggableNodeRef = useRef(null);
   const { gameState } = useGame();
   const { playerState } = usePlayer();
@@ -41,7 +42,6 @@ const Board = () => {
     console.log("start timer?")
     time.setSeconds(time.getSeconds() + 200);
   }, [])
-
 
   const getExplorationTile = (pawn: DBHeroPawn, pawnColIndex: number, pawnRowIndex: number) => {
     const currentTile = tiles.find(tile => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1])
@@ -104,16 +104,6 @@ const Board = () => {
     setAvailableArea(resetAreas as DBTile[]);
   }, [availableArea])
 
-  const getCurrentPlayer = () => {
-    const currentPlayer = players.find(player => player.number === playerState.number)!
-    return currentPlayer
-  }
-  
-  const getPlayerHeldPawn = () => {
-    const pawnHeld = Object.values(pawns).find((pawn: DBHeroPawn) => pawn.playerHeld && pawn.playerHeld === playerState.number);
-    return pawnHeld;
-  }
-
   return (
     <div className="Board">
       <Timer expiryTimestamp={time} />
@@ -131,27 +121,26 @@ const Board = () => {
                 />
             )
           })}
-          {tiles && tiles.length > 0 && tiles.map((newTile, tileIndex) => {
-            return (
-              <Tile 
-                key={tileIndex} 
-                tileIndex={tileIndex} 
-                tileData={newTile} 
-                playerHeldPawn={getPlayerHeldPawn()}
-                currentPlayer={getCurrentPlayer()}
-                />
-            )
-          })}
-          <Pawn color="yellow" />
-          <Pawn color="orange"/>
-          <Pawn color="green"/>
-          <Pawn color="purple"/>
+          {children}
         </div>
       </Draggable>
       <PlayerArea highlightNewTileArea={highlightNewTileArea} player={players?.find(player => player.number === playerState.number)!} />
     </div>
-  )
-}
+  );
+};
+
+
+const Board = () => {
+  return (
+    <BoardComponent>
+      <Tiles />
+      <Pawn color="yellow" />
+      <Pawn color="orange"/>
+      <Pawn color="green"/>
+      <Pawn color="purple"/>
+    </BoardComponent>
+  );
+};
 
 // Board.whyDidYouRender = true
 

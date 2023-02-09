@@ -1,4 +1,4 @@
-import { MouseEvent, useEffect } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import { heroColor, direction, Escalator, Room, DBHeroPawn, DBTile, Space } from '../../types';
 import { tileWallSize, spaceSize } from '../../constants';
 import { usePawn, BlockedPositions } from '../../Contexts/PawnContext';
@@ -7,6 +7,7 @@ import { useGame } from '../../Contexts/GameContext';
 import { setDoc } from "firebase/firestore"; 
 import { gamesRef } from "../../Firestore";
 import { useDocumentData } from 'react-firebase-hooks/firestore'
+import isEqual from 'lodash/isEqual';
 
 interface pawnProps {
   color: heroColor,
@@ -58,7 +59,6 @@ const Pawn = ({color}: pawnProps) => {
   
           newRoomValue.pawns[playerHeldPawn.color].blockedPositions = blockedDirections;
   
-          playerDispatch({type: "showMovableSpaces", value: currentPlayer.playerDirections})
           await setDoc(
             gamesRef.doc(gameState.roomId), 
             { 
@@ -373,10 +373,9 @@ const Pawn = ({color}: pawnProps) => {
     return firstBlocked;
   }
 
-  const toggleMovableSpaces = async () => {
+  const showAvailableActions = () => {
     const pawnColor = room.pawns[color];
     const newRoomValue = {...room}
-    const pawnPosition = pawnColor.position;
     const currentPlayer = newRoomValue.players.find((player: any) => player.number === playerState.number)
     const playerDirections = currentPlayer.playerDirections;
 
@@ -399,26 +398,7 @@ const Pawn = ({color}: pawnProps) => {
       },
     }
 
-    if (!pawnColor.playerHeld) {
-      const newRoomValue = {...room};
-
-      Object.values(newRoomValue.pawns).forEach((pawn: any) => {
-        if (pawn.playerHeld === currentPlayer.number) {
-          pawn.playerHeld = null;
-          playerDispatch({type: "showMovableSpaces", value: []})
-          // teleport
-          if (currentPlayer.playerAbilities.includes("teleport")) {
-            playerDispatch({type: "showTeleportSpaces", color: null})
-          }
-          // escalator
-          if (currentPlayer.playerAbilities.includes("escalator")) {
-            playerDispatch({type: "showEscalatorSpaces", value: []})
-          }
-        }
-      })
-
-      newRoomValue.pawns[color].playerHeld = currentPlayer.number;
-
+    if (pawnColor.playerHeld && pawnColor.playerHeld === currentPlayer.number) {
       // get pawn position
       // get player direction
       // showArea for spaces in player direction from pawn position
@@ -429,21 +409,16 @@ const Pawn = ({color}: pawnProps) => {
         blockedDirections[direction].gridPosition = blockedSpace.gridPosition
         if (currentPlayer.playerAbilities.includes("escalator")) {
           const escalatorSpace = getEscalatorSpace(pawnColor, direction);
-          escalatorSpaces.push(escalatorSpace);
+          if (
+            isEqual(escalatorSpace.gridPosition, pawnColor.gridPosition) && 
+            isEqual(escalatorSpace.position, pawnColor.position)
+          ) {
+            escalatorSpaces.push(escalatorSpace);
+          }
         }
       })
 
-      // NOT SAVING blockedPositions on DB
-      // newRoomValue.pawns[color].blockedPositions = blockedDirections;
-
       pawnDispatch({type: "addBlockedPositions", value: blockedDirections, color});
-      await setDoc(
-        gamesRef.doc(gameState.roomId), 
-        { 
-          pawns: newRoomValue.pawns
-        },
-        {merge: true}
-      )
       playerDispatch({type: "showMovableSpaces", value: playerDirections})
       // teleport
       if (currentPlayer.playerAbilities.includes("teleport")) {
@@ -454,9 +429,44 @@ const Pawn = ({color}: pawnProps) => {
         playerDispatch({type: "showEscalatorSpaces", value: escalatorSpaces})
       }
     }
-    else if (pawnColor.playerHeld && pawnColor.playerHeld === currentPlayer.number) {
+  }
+
+  useEffect(() => {
+    (() => {
+      if (!room) return;
+      showAvailableActions()
+    })()
+  }, [room?.pawns[color].playerHeld, room?.tiles]) // + re-run useEffect when new tile added to room.tiles
+
+
+  const toggleMovableSpaces = async () => {
+    if (!room) return;
+    const pawnColor = room.pawns[color];
+    const newRoomValue = {...room}
+    const currentPlayer = newRoomValue.players.find((player: any) => player.number === playerState.number)
+
+    if (!pawnColor.playerHeld) {
+      const newRoomValue = {...room};
+
+      Object.values(newRoomValue.pawns).forEach((pawn: any) => {
+        if (pawn.color === color) {
+          pawn.playerHeld = currentPlayer.number
+        } 
+        else if (pawn.playerHeld === currentPlayer.number) {
+          pawn.playerHeld = null;
+        }
+      })
+
+      await setDoc(
+        gamesRef.doc(gameState.roomId), 
+        { 
+          pawns: newRoomValue.pawns
+        },
+        {merge: true}
+      )
+    }
+    else if (pawnColor.playerHeld === currentPlayer.number) {
       newRoomValue.pawns[color].playerHeld = null;
-      // newRoomValue.pawns[color].blockedPositions = blockedDirections;
   
       await setDoc(
         gamesRef.doc(gameState.roomId), 
@@ -465,20 +475,12 @@ const Pawn = ({color}: pawnProps) => {
         },
         {merge: true}
       )
-
-      playerDispatch({type: "showMovableSpaces", value: []})
-      // teleport
-      if (currentPlayer.playerAbilities.includes("teleport")) {
-        playerDispatch({type: "showTeleportSpaces", color: null})
-      }
-      // escalator
-      if (currentPlayer.playerAbilities.includes("escalator")) {
-        playerDispatch({type: "showEscalatorSpaces", value: []})
-      }
     }
   }
 
-  const _handleClick = async (e: MouseEvent<HTMLDivElement>) => {
+
+
+  const _handleClick = (e: MouseEvent<HTMLDivElement>) => {
     toggleMovableSpaces();
   }
 

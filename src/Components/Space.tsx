@@ -4,6 +4,7 @@ import { usePlayer } from '../Contexts/PlayerContext';
 import { heroColor, TeleporterSpace, Escalator, TimerSpace, WeaponSpace, ExitSpace, Space as SpaceType } from '../types';
 import { setDoc, doc, getDoc } from "firebase/firestore"; 
 import { firestore } from "../Firestore";
+import isEqual from 'lodash/isEqual';
 
 interface SpaceProps {
   spaceData: SpaceType,
@@ -17,27 +18,25 @@ interface SpaceProps {
 }
 
 const areEqual = (prevProps: SpaceProps, nextProps: SpaceProps) => {
-  if (prevProps.colorSelected !== nextProps.colorSelected) {
-    if (prevProps.showMovableArea !== nextProps.showMovableArea) {
-      // console.log("************************ showMovableArea")
-      return false
-    }
+  if (!isEqual(prevProps.spaceData, nextProps.spaceData)) {
+    return false
+  }
+  if (!isEqual(prevProps.spacePosition, nextProps.spacePosition)) {
+    return false
+  }
+  if (prevProps.showMovableArea !== nextProps.showMovableArea) {
+    return false
   }
   if (prevProps.highlightTeleporter !== nextProps.highlightTeleporter) {
-    if (nextProps.spaceData.type === "teleporter") {
-      // console.log("************************ highlightTeleporter")
       return false
-    }
   }
-  if (prevProps.highlightEscalator !== nextProps.highlightEscalator) {
-    if (nextProps.spaceData.details?.hasEscalator) {
-      // console.log("************************ highlightEscalator")
+  if (!isEqual(prevProps.highlightEscalator, nextProps.highlightEscalator)) {
       return false
-    }
   }
-
-  
-  // console.log("would have rendered Space")
+  if (prevProps.colorSelected !== nextProps.colorSelected) {
+      return false
+  }
+  // console.count('Space re-render');
   return true
 }
 
@@ -80,21 +79,18 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
             return false
           })
         }
-        console.log(docSnap.exists())
-        console.log(spacePosition, gridPosition, isOccupied)
-        setShowTeleport(!isOccupied)
+        setShowTeleport(!!colorSelected && !isOccupied)
       }
       else {
         setShowTeleport(false)
       }
     })()
-  }, [highlightTeleporter])
+  }, [highlightTeleporter, colorSelected])
 
 
   useEffect(() => {
     (async () => {
       if (!isEscalator) return;
-      // console.log("should only be for spaces that are escalators", spaceData)
       if (highlightEscalator.length) {
         const escalator = highlightEscalator.find(escalator => escalator.escalatorName === escalatorName);
         if (escalator && escalator.gridPosition && escalator.position && escalator.escalatorName) {
@@ -113,7 +109,7 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
                     return false
                   })
                 }
-                setShowEscalator(!isOccupied)
+                setShowEscalator(!!colorSelected && !isOccupied)
               }
             }
           }
@@ -123,7 +119,7 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
         setShowEscalator(false)
       }
     })()
-  }, [highlightEscalator])
+  }, [highlightEscalator, colorSelected])
 
   // add into movePawn click, if space is timer, pause timer!
   const movePawn = async () => {
@@ -179,26 +175,10 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
     }
   }
 
-  // const isTeleporterOccupied = async () => {
-  //   const docSnap = await getDoc(doc(gamesRef, gameState.roomId));
-  //   let spaceOccupied = false;
-
-  //   if (docSnap.exists()) {
-  //     Object.values(docSnap.data().pawns).some((pawn: any) => {
-  //       if (pawn.gridPosition[0] === gridPosition[0] && pawn.gridPosition[1] === gridPosition[1]) {
-  //         if (pawn.position[0] === spacePosition[0] && pawn.position[1] === spacePosition[1]) {
-  //           return true;
-  //         }
-  //       }
-  //       return false;
-  //     })
-  //   }
-  //   return spaceOccupied;
-  // }
 
   return (
     <div 
-      className={`space ${showMovableArea ? "active" : ""} ${showTeleport ? "teleporter" : ""} ${showEscalator ? "escalator" : ""}`}
+      className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}`}
       onClick={showMovableArea || showTeleport || showEscalator ? movePawn : () => {}}
        // TODO: disable if game paused
     >
