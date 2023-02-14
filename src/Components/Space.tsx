@@ -1,63 +1,73 @@
 import { useEffect, useState, memo } from 'react';
 import { useGame } from '../Contexts/GameContext';
-import { usePlayer } from '../Contexts/PlayerContext';
-import { heroColor, TeleporterSpace, Escalator, TimerSpace, WeaponSpace, ExitSpace, Space as SpaceType } from '../types';
-import { setDoc, doc, getDoc } from "firebase/firestore"; 
-import { firestore } from "../Firestore";
+// import { usePlayerDispatch } from '../Contexts/PlayerContext';
+import { heroColor, Escalator, SpaceTypeName } from '../types';
+import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
+import { Dispatch } from '../Contexts/PlayerContext';
 
 interface SpaceProps {
-  spaceData: SpaceType,
+  spaceType: SpaceTypeName,
+  spaceColor: heroColor | undefined,
+  spaceHasEscalator: boolean | undefined,
+  spaceEscalatorName: string | undefined,
+  spaceIsDisabled: boolean | undefined,
+  spaceWeaponStolen: boolean | undefined,
   showMovableArea: boolean,
   spacePosition: number[],
   colorSelected: heroColor | null,
   gridPosition: number[],
   highlightTeleporter: heroColor | null,
   highlightEscalator: Escalator[],
-  tileIndex: number
+  tileIndex: number,
+  playerDispatch: Dispatch
 }
 
 const areEqual = (prevProps: SpaceProps, nextProps: SpaceProps) => {
-  if (!isEqual(prevProps.spaceData, nextProps.spaceData)) {
-    return false
-  }
-  if (!isEqual(prevProps.spacePosition, nextProps.spacePosition)) {
-    return false
-  }
-  if (prevProps.showMovableArea !== nextProps.showMovableArea) {
-    return false
-  }
-  if (prevProps.highlightTeleporter !== nextProps.highlightTeleporter) {
-      return false
-  }
-  if (!isEqual(prevProps.highlightEscalator, nextProps.highlightEscalator)) {
-      return false
-  }
-  if (prevProps.colorSelected !== nextProps.colorSelected) {
-      return false
-  }
+  // const {spaceData, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex} = prevProps;
+  // const {nextSpaceData, nextShowMovableArea, nextSpacePosition, nextColorSelected, nextGridPosition, nextHighlightTeleporter, nextHighlightEscalator, nextTileIndex} = nextProps;
+  // if (!isEqual(prevProps.spaceData, nextProps.spaceData)) {
+  //   return false
+  // }
+  // if (!isEqual(prevProps.spacePosition, nextProps.spacePosition)) {
+  //   return false
+  // }
+  // if (prevProps.showMovableArea !== nextProps.showMovableArea) {
+  //   return false
+  // }
+  // if (prevProps.highlightTeleporter !== nextProps.highlightTeleporter) {
+  //     return false
+  // }
+  // if (!isEqual(prevProps.highlightEscalator, nextProps.highlightEscalator)) {
+  //     return false
+  // }
+  // if (prevProps.colorSelected !== nextProps.colorSelected) {
+  //     return false
+  // }
   // console.count('Space re-render');
-  return true
+  // return true
+  // console.log(prevProps, nextProps, isEqual(prevProps, nextProps))
+  return isEqual(prevProps, nextProps);
 }
 
 
-const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex}: SpaceProps) => {
-  const { gameState, gameDispatch } = useGame();
-  const { playerDispatch } = usePlayer();
+const Space = memo(({spaceType, spaceColor, spaceHasEscalator, spaceEscalatorName, spaceIsDisabled, spaceWeaponStolen, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex, playerDispatch}: SpaceProps) => {
+  // console.count('Re-render space');
+  console.log('Space', {spaceType, spaceColor, spaceHasEscalator, spaceEscalatorName, spaceIsDisabled, spaceWeaponStolen, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex, playerDispatch})
+  const { gameState } = useGame();
+  // const playerDispatch = usePlayerDispatch(); // TODO this causing re-render
 
-  const gamesRef = firestore.collection('games')
+  const isTeleporter = spaceType === "teleporter";
+  const teleporterColor = isTeleporter ? spaceColor : "";
 
-  const isTeleporter = spaceData.type === "teleporter";
-  const teleporterColor = isTeleporter ? (spaceData.details as TeleporterSpace).color : "";
+  const isEscalator = spaceHasEscalator;
+  const escalatorName = isEscalator ? spaceEscalatorName : "";
 
-  const isEscalator = spaceData.details?.hasEscalator;
-  const escalatorName = isEscalator ? spaceData.details?.escalatorName : "";
+  const isTimer = spaceType === "timer";
 
-  const isTimer = spaceData.type === "timer";
+  const hasWeapon = spaceType === "weapon";
 
-  const hasWeapon = spaceData.type === "weapon";
-
-  const isExit = spaceData.type === "exit";
+  const isExit = spaceType === "exit";
 
   const [showTeleport, setShowTeleport] = useState(false)
   const [showEscalator, setShowEscalator] = useState(false);
@@ -68,7 +78,7 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
       if (!isTeleporter) return;
       if (highlightTeleporter === teleporterColor) {
         let isOccupied = false;
-        const docSnap = await getDoc(doc(gamesRef, gameState.roomId));
+        const docSnap = await getDoc(gameState.roomId);
         if (docSnap.exists()) {
           isOccupied = Object.values(docSnap.data().pawns).some((pawn: any) => {
             if (pawn.gridPosition[0] === gridPosition[0] && pawn.gridPosition[1] === gridPosition[1]) {
@@ -98,7 +108,7 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
             if (escalator.position[0] !== spacePosition[0] || escalator.position[1] !== spacePosition[1]) {
               if (escalator.escalatorName === escalatorName) {
                 let isOccupied = false;
-                const docSnap = await getDoc(doc(gamesRef, gameState.roomId));
+                const docSnap = await getDoc(gameState.roomId);
                 if (docSnap.exists()) {
                   isOccupied = Object.values(docSnap.data().pawns).some((pawn: any) => {
                     if (pawn.gridPosition[0] === gridPosition[0] && pawn.gridPosition[1] === gridPosition[1]) {
@@ -123,7 +133,7 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
 
   // add into movePawn click, if space is timer, pause timer!
   const movePawn = async () => {
-    const docSnap = await getDoc(doc(gamesRef, gameState.roomId));
+    const docSnap = await getDoc(gameState.roomId);
 
     if (docSnap.exists()) {
       const newRoomValue = {...docSnap.data()}
@@ -139,26 +149,26 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
           right: {position: null, gridPosition: null},
           left: {position: null, gridPosition: null},
         };
-        if (isTimer && !(spaceData.details as TimerSpace).isDisabled) {
+        if (isTimer && !spaceIsDisabled) {
           // pause and update db with pause
-          console.log('Stepping on timer', spaceData.details, gameState.timerRunning)
+          // console.log('Stepping on timer', spaceData.details, gameState.timerRunning)
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
           newRoomValue.gamePaused = true;
         }
 
-        if (hasWeapon && !(spaceData.details as WeaponSpace).weaponStolen && (spaceData.details as WeaponSpace).color === colorSelected) {
+        if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.weaponStolen = true;
           newRoomValue.weaponsStolen = [...newRoomValue.weaponsStolen, colorSelected]
         }
 
-        if (isExit && !(spaceData.details as ExitSpace).color && (spaceData.details as ExitSpace).color === colorSelected) {
+        if (isExit && !spaceColor && spaceColor === colorSelected) {
           if (newRoomValue.weaponsStolen.length === 4) {
             newRoomValue.heroesEscaped = [...newRoomValue.heroesEscaped, colorSelected]
           }
         }
 
         await setDoc(
-          gamesRef.doc(gameState.roomId), 
+          gameState.roomId, 
           {
             gamePaused: newRoomValue.gamePaused,
             pawns: newRoomValue.pawns, 
@@ -166,7 +176,6 @@ const Space = memo(({spaceData, showMovableArea, spacePosition, colorSelected, g
             weaponsStolen: newRoomValue.weaponsStolen,
             heroesEscaped: newRoomValue.heroesEscaped
           },
-          {merge: true}
         )
         playerDispatch({type: "showMovableSpaces", value: []})
         playerDispatch({type: "showTeleportSpaces", color: null})

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { Game, direction, basicAbility, DBPlayer } from '../types';
+import { firestore, getDocRef, gamesRef } from "../Firestore";
+import { setDoc, doc, getDoc, getFirestore } from "firebase/firestore"; 
 
 type Action = {type: 'joinRoom', value: String} | 
               {type: 'toggleTimer', value: boolean} | 
@@ -12,7 +14,10 @@ type Dispatch = (action: Action) => void;
 type GameProviderProps = {children: React.ReactNode}
 
 const gameInitialState: Game = {
+  // roomId: "PKHRP",
   roomId: "",
+  docRef: null,
+  // Maybe add: gameRef
   // players: [],
   gameStarted: false, // TODO remove, can use values straight from DB
   gamePaused: false, // TODO remove, can use values straight from DB
@@ -120,11 +125,13 @@ const gameReducer = (gameState: Game, action: any) => {
       // ]
       // newState.players = players;
       newState.roomId = action.value;
+      newState.docRef = doc(gamesRef, action.value);
       // newState.players.push(PlayerFactory(0, action.playerName))
       return newState;
     }
     case 'joinRoom': {
       newState.roomId = action.value;
+      newState.docRef = doc(gamesRef, action.value);
       // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
       return newState;
     }

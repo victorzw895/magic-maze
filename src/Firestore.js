@@ -1,8 +1,6 @@
 // Import the functions you need from the SDKs you need
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
-// import { initializeApp } from "firebase/app";
-// import { getFirestore } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+import { getFirestore, doc, collection } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -17,7 +15,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-export const firebaseApp = firebase.initializeApp(firebaseConfig);
-export const firestore = firebaseApp.firestore();
-export const gamesRef = firestore.collection('games');
-// export const db = getFirestore();
+export const firebaseApp = initializeApp(firebaseConfig);
+export const firestore = getFirestore(firebaseApp);
+
+export const gamesRef = collection(firestore, 'games');

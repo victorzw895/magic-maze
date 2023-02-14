@@ -1,382 +1,84 @@
-import { MouseEvent, useEffect, useState } from 'react';
-import { heroColor, direction, Escalator, Room, DBHeroPawn, DBTile, Space } from '../../types';
+import { useEffect, useState } from 'react';
+import { heroColor, direction, Escalator, Room } from '../../types';
 import { tileWallSize, spaceSize } from '../../constants';
 import { usePawn, BlockedPositions } from '../../Contexts/PawnContext';
-import { usePlayer } from '../../Contexts/PlayerContext';
+import { usePlayerState, usePlayerDispatch } from '../../Contexts/PlayerContext';
 import { useGame } from '../../Contexts/GameContext';
-import { setDoc } from "firebase/firestore"; 
-import { gamesRef } from "../../Firestore";
-import { useDocumentData } from 'react-firebase-hooks/firestore'
+import { useDocData, setDoc } from '../../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
+import { 
+  getEscalatorSpace,
+  getFirstBlockedSpace
+} from '../../Helpers/PawnMethods';
 
 interface pawnProps {
   color: heroColor,
 }
 
 const Pawn = ({color}: pawnProps) => {
+  // const [state, forceRerender] = useState(0); // TODO remove for testing re-render
   const { gameState } = useGame();
-  const { playerState, playerDispatch } = usePlayer();
+  const playerState = usePlayerState();
+  const playerDispatch = usePlayerDispatch();
   const { pawnDispatch } = usePawn();
 
-  const [room] = useDocumentData(gamesRef.doc(gameState.roomId));
+  const [room, loading] = useDocData(gameState.roomId);
 
-  const { pawns, players }: Room = room || {}
+  const { pawns, players, tiles }: Room = room
 
-  // Recalculate blocked position and showMovable when other player moves pawns
-  // NOTE: BUG: Need to recalculate when pawn held and add new tile
-  useEffect(() => {
-    (async() => {
-      if (room && pawns) {
-        const currentPlayer = players.find((player: any) => player.number === playerState.number)!
-        const playerHeldPawn: any = Object.values(pawns).find((pawn: any) => pawn.playerHeld === currentPlayer.number)
-        if (playerHeldPawn) {
-          const newRoomValue = {...room};
+  // // Recalculate blocked position and showMovable when other player moves pawns
+  // // NOTE: BUG: Need to recalculate when pawn held and add new tile
+  // // useEffect(() => {
+  // //   (async() => {
+  // //     if (room && pawns) {
+  // //       const currentPlayer = players.find((player: any) => player.number === playerState.number)!
+  // //       const playerHeldPawn: DBHeroPawn = Object.values(pawns).find((pawn: DBHeroPawn) => pawn.playerHeld === currentPlayer.number)
+  // //       if (playerHeldPawn) {
+  // //         const roomPawns = pawns;
   
-          const blockedDirections: BlockedPositions = {
-            up: {
-              position: null,
-              gridPosition: null
-            },
-            right: {
-              position: null,
-              gridPosition: null
-            },
-            left: {
-              position: null,
-              gridPosition: null
-            },
-            down: {
-              position: null,
-              gridPosition: null
-            },
-          }
+  // //         // const blockedDirections: BlockedPositions = {
+  // //         //   up: {
+  // //         //     position: null,
+  // //         //     gridPosition: null
+  // //         //   },
+  // //         //   right: {
+  // //         //     position: null,
+  // //         //     gridPosition: null
+  // //         //   },
+  // //         //   left: {
+  // //         //     position: null,
+  // //         //     gridPosition: null
+  // //         //   },
+  // //         //   down: {
+  // //         //     position: null,
+  // //         //     gridPosition: null
+  // //         //   },
+  // //         // }
   
-          currentPlayer.playerDirections.forEach((direction: direction) => {
-            const blockedSpace = getFirstBlockedSpace(playerHeldPawn, direction);
-            blockedDirections[direction].position = blockedSpace.position
-            blockedDirections[direction].gridPosition = blockedSpace.gridPosition
-          })
+  // //         // currentPlayer.playerDirections.forEach((direction: direction) => {
+  // //         //   const blockedSpace = getFirstBlockedSpace(playerHeldPawn, direction);
+  // //         //   blockedDirections[direction].position = blockedSpace.position
+  // //         //   blockedDirections[direction].gridPosition = blockedSpace.gridPosition
+  // //         // })
   
-          newRoomValue.pawns[playerHeldPawn.color].blockedPositions = blockedDirections;
+  // //         // roomPawns[playerHeldPawn.color].blockedPositions = blockedDirections;
   
-          await setDoc(
-            gamesRef.doc(gameState.roomId), 
-            { 
-              pawns: newRoomValue.pawns
-            },
-            {merge: true}
-          )
-        }
-      }
-    })()
-  }, [room?.pawns[color].position[0], room?.pawns[color].position[1]])
+  // //         // await setDoc(
+  // //         //   gameState.roomId, 
+  // //         //   { 
+  // //         //     pawns: roomPawns
+  // //         //   },
+  // //         // )
+  // //       }
+  // //     }
+  // //   })()
+  // // }, [room?.pawns[color].position[0], room?.pawns[color].position[1]])
   
-  const directionPositionValue = {
-    "up": -1,
-    "right": 1,
-    "down": 1,
-    "left": -1
-  }
-
-  const getExtraDirectionalSpaces = (tileFound: DBTile, pawn: DBHeroPawn, direction: direction) => {
-    let extraSpaces;
-    if (direction === "up" || direction === "down") {
-      extraSpaces = Object.values(tileFound.spaces!).map((row) => row.filter((col, colIndex) => colIndex === pawn.position[0] + directionPositionValue[direction])).flat(1)
-    }
-    else if (direction === "left" || direction === "right") {
-      extraSpaces = Object.values(tileFound.spaces!).filter((row, rowIndex) => rowIndex === pawn.position[1] - directionPositionValue[direction]).flat(1)
-    }
-    return extraSpaces
-  }
-
-  const findDirectionAdjacentTile = (pawn: DBHeroPawn, alignmentPositionConstant: "row" | "col", direction: direction) => {
-    const positionConstantValue = alignmentPositionConstant === "col" ? 0 : 1;
-    const positionVariantValue = alignmentPositionConstant === "col" ? 1 : 0;
-    if (room.tiles.length > 1) {
-      const tileFound = room.tiles.find((tile: any) => 
-        tile.gridPosition[positionConstantValue] === pawn.gridPosition[positionConstantValue] &&
-        tile.gridPosition[positionVariantValue] - directionPositionValue[direction] === pawn.gridPosition[positionVariantValue]
-      )
-      return tileFound
-    }
-    return;
-  }
-
-  const filterRowsOfTargetDirection = (currentTile: DBTile, pawn: DBHeroPawn, direction: direction) => {
-    let remainingRows
-
-    if (direction === "left" || direction === "right") {
-      remainingRows = Object.values(currentTile.spaces!).filter((row, rowIndex) => rowIndex === pawn.position[1])
-    }
-    else if (direction === "up") {
-      remainingRows = Object.values(currentTile.spaces!).filter((row, rowIndex) => rowIndex < pawn.position[1])
-    }
-    else if (direction === "down") {
-      remainingRows = Object.values(currentTile.spaces!).filter((row, rowIndex) => rowIndex > pawn.position[1])
-    }
-    
-    if (remainingRows) {
-      return remainingRows;
-    }
-  }
-
-  const filterSpacesFromRows = (rows: Space[][], pawn: DBHeroPawn, direction: direction) => {
-    if (!rows) return;
-
-    let remainingSpaces
-
-    if (direction === "up" || direction === "down") {
-      remainingSpaces = rows.map((row, rowIndex) => row.filter((col, colIndex) => colIndex === pawn.position[0]))
-    }
-    else if (direction === "right") {
-      remainingSpaces = rows.map((row, rowIndex) => row.filter((col, colIndex) => colIndex > pawn.position[0]))
-    }
-    else if (direction === "left") {
-      remainingSpaces = rows.map((row, rowIndex) => row.filter((col, colIndex) => colIndex < pawn.position[0]))
-    }
-    
-    if (remainingSpaces) {
-      return remainingSpaces.flat(1);
-    }
-  }
-
-  const getAllDirectionalSpaces = (pawn: DBHeroPawn, direction: direction) => {
-    const directionalSpaces = [];
-    const currentTile = room.tiles.find((tile: any) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
-    const rows = filterRowsOfTargetDirection(currentTile!, pawn, direction) || [];
-    const spaces = filterSpacesFromRows(rows, pawn, direction) || [];
-
-    let adjacentTileFound;
-    let extraSpaces = [];
-    
-    if (
-      (direction === "up" && pawn.position[0] === 2) ||
-      (direction === "down" && pawn.position[0] === 1)
-    ) {
-      adjacentTileFound = findDirectionAdjacentTile(pawn, "col", direction);
-    }
-    else if (
-      (direction === "left" && pawn.position[1] === 1) ||
-      (direction === "right" && pawn.position[1] === 2)
-    ) {
-      adjacentTileFound = findDirectionAdjacentTile(pawn, "row", direction);
-    }
-
-    if (adjacentTileFound) {
-      extraSpaces.push(...getExtraDirectionalSpaces(adjacentTileFound, pawn, direction) || []);
-    }
-
-
-    if (direction === "right" || direction === "down") {
-      directionalSpaces.push(...spaces, ...extraSpaces);
-    }
-    else if (direction === "up" || direction === "left") {
-      directionalSpaces.push(...spaces.reverse(), ...extraSpaces.reverse());
-    }
-    return directionalSpaces;
-  }
-
-  const isSpaceOccupied = (tileGridPosition: number[], colIndex: number, rowIndex: number) => {
-    return Object.values(room.pawns).some((pawn: any) => {
-      if (pawn.gridPosition[0] !== tileGridPosition[0] || pawn.gridPosition[1] !== tileGridPosition[1]) {
-        return false;
-      }
-      return pawn.position[0] === colIndex && pawn.position[1] === rowIndex;
-    })
-  }
-
-  // Alter so it doesnt show if has blocked
-  const getEscalatorSpace = (pawn: DBHeroPawn, direction: direction) => {
-    const pawnPosition = pawn.position;
-    const startCol = pawnPosition[0];
-    const startRow = pawnPosition[1];
-    let escalatorSpacePosition = null;
-    let escalatorGridPosition = null;
-    let escalatorName = null;
-
-    const currentTile = room.tiles.find((tile: any) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
-    if (currentTile) {
-      const tileRow = Object.values(currentTile.spaces!).find((row, rowIndex) => rowIndex === startRow);
-      const currentSpace = (tileRow as any).find((col: any, colIndex: number) => colIndex === startCol);
-      if (currentSpace && currentSpace.details?.hasEscalator) {
-        escalatorSpacePosition = [startCol, startRow];
-        escalatorGridPosition = currentTile.gridPosition;
-        escalatorName = currentSpace.details?.escalatorName;
-      }
-    }
-
-    const allSpaces = getAllDirectionalSpaces(pawn, direction);
-    const spacesInCurrentTile = allSpaces.length < 4 ? allSpaces.length : allSpaces.length - 4;
-    
-    let startIndexAlignment = 0;
-    let changeInRow = false;
-    let readArrayBackwards = false;
-    let wallDirection: direction = "up"
-
-    if (direction === "up") {
-      startIndexAlignment = startRow - 1;
-      readArrayBackwards = true;
-      changeInRow = true;
-      wallDirection = "down"
-    }
-    else if (direction === "down") {
-      startIndexAlignment = startRow + 1;
-      changeInRow = true;
-      wallDirection = "up"
-    }
-    else if (direction === "right") {
-      startIndexAlignment = startCol + 1;
-      wallDirection = "left"
-    }
-    else if (direction === "left") {
-      startIndexAlignment = startCol - 1;
-      readArrayBackwards = true;
-      wallDirection = "right"
-    }
-
-    for (let i = 0; i <= allSpaces.length - 1; i++) {
-      const indexInCurrentTile = readArrayBackwards ? startIndexAlignment - i : startIndexAlignment + i;
-      const indexInAdjacentTile = readArrayBackwards ? allSpaces.length - 1 - i : i - spacesInCurrentTile;
-
-      const changeIndex = i < spacesInCurrentTile ? indexInCurrentTile : indexInAdjacentTile; // col for left
-      let colIndex = changeInRow ? pawn.position[0] : changeIndex;
-      let rowIndex = changeInRow ? changeIndex : pawn.position[1];
-
-      let gridChangeIndex = 0 // 0 option for current tile
-      let gridColIndex = pawn.gridPosition[0];
-      let gridRowIndex = pawn.gridPosition[1];
-
-      if (i >= spacesInCurrentTile) {
-        gridChangeIndex = readArrayBackwards ? -1 : 1;        
-        if (changeInRow) {
-          colIndex = colIndex + gridChangeIndex;
-          gridRowIndex = pawn.gridPosition[1] + gridChangeIndex;
-        }
-        else {
-          rowIndex = rowIndex - gridChangeIndex;
-          gridColIndex = pawn.gridPosition[0] + gridChangeIndex;
-        }
-      }
-      
-      if (allSpaces[i].details?.sideWalls?.includes(wallDirection) || allSpaces[i].type === "barrier") {
-        break;
-      }
-      else if (isSpaceOccupied([gridColIndex, gridRowIndex], colIndex, rowIndex)) { // NOTE colIndex and rowIndex need to change
-        break;
-      }
-      else if (allSpaces[i].details?.hasEscalator && !allSpaces[i].details?.sideWalls?.includes(wallDirection)) {
-        escalatorSpacePosition = [colIndex , rowIndex];
-        escalatorGridPosition = [gridColIndex, gridRowIndex];
-        escalatorName = allSpaces[i].details?.escalatorName;
-        break;
-      }
-    }
-
-    const escalatorSpace = {
-      position: escalatorSpacePosition,
-      gridPosition: escalatorGridPosition,
-      escalatorName
-    }
-
-    return escalatorSpace
-  }
-
-  const getFirstBlockedSpace = (pawn: DBHeroPawn, direction: direction) => {
-    const pawnPosition = pawn.position;
-    const startCol = pawnPosition[0];
-    const startRow = pawnPosition[1];
-
-    let firstBlockedSpacePosition = null;
-    let blockedSpaceGridPosition = null;
-
-    const currentTile = room.tiles.find((tile: any) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
-    if (currentTile) {
-      const tileRow = Object.values(currentTile.spaces!).find((row, rowIndex) => rowIndex === startRow);
-      const currentSpace = (tileRow as any).find((col: any, colIndex: number) => colIndex === startCol);
-      if (currentSpace && currentSpace.details?.sideWalls?.includes(direction)) {
-        firstBlockedSpacePosition = [startCol, startRow];
-        blockedSpaceGridPosition = currentTile.gridPosition;
-      }
-    }
-
-    const allSpaces = getAllDirectionalSpaces(pawn, direction);
-
-    const spacesInCurrentTile = allSpaces.length < 4 ? allSpaces.length : allSpaces.length - 4;
-    
-    let startIndexAlignment = 0;
-    let changeInRow = false;
-    let readArrayBackwards = false;
-    let wallDirection: direction = "up"
-
-    if (direction === "up") {
-      startIndexAlignment = startRow - 1;
-      readArrayBackwards = true;
-      changeInRow = true;
-      wallDirection = "down"
-    }
-    else if (direction === "down") {
-      startIndexAlignment = startRow + 1;
-      changeInRow = true;
-      wallDirection = "up"
-    }
-    else if (direction === "right") {
-      startIndexAlignment = startCol + 1;
-      wallDirection = "left"
-    }
-    else if (direction === "left") {
-      startIndexAlignment = startCol - 1;
-      readArrayBackwards = true;
-      wallDirection = "right"
-    }
-
-    for (let i = 0; i <= allSpaces.length - 1; i++) {
-      const indexInCurrentTile = readArrayBackwards ? startIndexAlignment - i : startIndexAlignment + i;
-      const indexInAdjacentTile = readArrayBackwards ? allSpaces.length - 1 - i : i - spacesInCurrentTile;
-
-      const changeIndex = i < spacesInCurrentTile ? indexInCurrentTile : indexInAdjacentTile; // col for left
-      let colIndex = changeInRow ? pawn.position[0] : changeIndex;
-      let rowIndex = changeInRow ? changeIndex : pawn.position[1];
-
-      let gridChangeIndex = 0 // 0 option for current tile
-      let gridColIndex = pawn.gridPosition[0];
-      let gridRowIndex = pawn.gridPosition[1];
-
-      if (i >= spacesInCurrentTile) {
-        gridChangeIndex = readArrayBackwards ? -1 : 1;        
-        if (changeInRow) {
-          colIndex = colIndex + gridChangeIndex;
-          gridRowIndex = pawn.gridPosition[1] + gridChangeIndex;
-        }
-        else {
-          rowIndex = rowIndex - gridChangeIndex;
-          gridColIndex = pawn.gridPosition[0] + gridChangeIndex;
-        }
-      }
-      
-      if (allSpaces[i].details?.sideWalls?.includes(wallDirection) || allSpaces[i].type === "barrier") {
-        firstBlockedSpacePosition = [colIndex , rowIndex];
-        blockedSpaceGridPosition = [gridColIndex, gridRowIndex];
-        break;
-      }
-      else if (isSpaceOccupied([gridColIndex, gridRowIndex], colIndex, rowIndex)) { // NOTE colIndex and rowIndex need to change
-        firstBlockedSpacePosition = [colIndex, rowIndex];
-        blockedSpaceGridPosition = [gridColIndex, gridRowIndex];
-        break;
-      }
-    }
-
-    const firstBlocked = {
-      position: firstBlockedSpacePosition,
-      gridPosition: blockedSpaceGridPosition
-    }
-
-    return firstBlocked;
-  }
 
   const showAvailableActions = () => {
-    const pawnColor = room.pawns[color];
-    const newRoomValue = {...room}
-    const currentPlayer = newRoomValue.players.find((player: any) => player.number === playerState.number)
+    const pawnColor = pawns[color];
+    const currentPlayer = players.find((player: any) => player.number === playerState.number)
+    if (!currentPlayer) return;
     const playerDirections = currentPlayer.playerDirections;
 
     const blockedDirections: BlockedPositions = {
@@ -404,19 +106,23 @@ const Pawn = ({color}: pawnProps) => {
       // showArea for spaces in player direction from pawn position
       const escalatorSpaces: Escalator[] = [];
       playerDirections.forEach((direction: direction) => {
-        const blockedSpace = getFirstBlockedSpace(pawnColor, direction);
+        const blockedSpace = getFirstBlockedSpace(tiles, pawns, pawnColor, direction);
         blockedDirections[direction].position = blockedSpace.position
         blockedDirections[direction].gridPosition = blockedSpace.gridPosition
-        if (currentPlayer.playerAbilities.includes("escalator")) {
-          const escalatorSpace = getEscalatorSpace(pawnColor, direction);
-          if (
-            isEqual(escalatorSpace.gridPosition, pawnColor.gridPosition) && 
-            isEqual(escalatorSpace.position, pawnColor.position)
-          ) {
-            escalatorSpaces.push(escalatorSpace);
-          }
-        }
+        console.log('blockedDirections', blockedDirections);
       })
+
+      if (currentPlayer.playerAbilities.includes("escalator")) {
+        // CHEAT, TODO, need to fix getEscalatorSpace method
+        // Yielding same value regardless of direction, 4th arg
+        const escalatorSpace = getEscalatorSpace(tiles, pawns, pawnColor, 'up');
+        if (
+          isEqual(escalatorSpace.gridPosition, pawnColor.gridPosition) && 
+          isEqual(escalatorSpace.position, pawnColor.position)
+        ) {
+          escalatorSpaces.push(escalatorSpace);
+        }
+      }
 
       pawnDispatch({type: "addBlockedPositions", value: blockedDirections, color});
       playerDispatch({type: "showMovableSpaces", value: playerDirections})
@@ -426,6 +132,7 @@ const Pawn = ({color}: pawnProps) => {
       }
       // escalator
       if (escalatorSpaces.length) {
+        console.log('dispatch escalator', escalatorSpaces)
         playerDispatch({type: "showEscalatorSpaces", value: escalatorSpaces})
       }
     }
@@ -441,14 +148,14 @@ const Pawn = ({color}: pawnProps) => {
 
   const toggleMovableSpaces = async () => {
     if (!room) return;
-    const pawnColor = room.pawns[color];
-    const newRoomValue = {...room}
-    const currentPlayer = newRoomValue.players.find((player: any) => player.number === playerState.number)
+    const roomPawns = pawns;
+    const pawnColor = roomPawns[color];
+    const currentPlayer = players.find((player: any) => player.number === playerState.number)
 
+    if (!currentPlayer) return;
     if (!pawnColor.playerHeld) {
-      const newRoomValue = {...room};
 
-      Object.values(newRoomValue.pawns).forEach((pawn: any) => {
+      Object.values(roomPawns).forEach((pawn: any) => {
         if (pawn.color === color) {
           pawn.playerHeld = currentPlayer.number
         } 
@@ -458,40 +165,35 @@ const Pawn = ({color}: pawnProps) => {
       })
 
       await setDoc(
-        gamesRef.doc(gameState.roomId), 
+        gameState.roomId, 
         { 
-          pawns: newRoomValue.pawns
+          pawns: roomPawns
         },
-        {merge: true}
       )
     }
     else if (pawnColor.playerHeld === currentPlayer.number) {
-      newRoomValue.pawns[color].playerHeld = null;
+      roomPawns[color].playerHeld = null;
   
       await setDoc(
-        gamesRef.doc(gameState.roomId), 
+        gameState.roomId, 
         { 
-          pawns: newRoomValue.pawns
+          pawns: roomPawns
         },
-        {merge: true}
       )
     }
-  }
-
-
-
-  const _handleClick = (e: MouseEvent<HTMLDivElement>) => {
-    toggleMovableSpaces();
+    // forceRerender(state + 1)
   }
 
   const getDisplacementValue = (positionValue: number) => {
     return tileWallSize - ((Math.abs(8 - positionValue) * 2) * spaceSize)
   }
 
+  // console.count(`Pawn ReRender ${color}`)
+ 
   return (
     <>
       {
-        room ? <div className="pawn-grid"
+        !loading && <div className="pawn-grid"
           style={{
             gridColumnStart: pawns[color]?.gridPosition[0],
             gridRowStart: pawns[color]?.gridPosition[1],
@@ -506,7 +208,7 @@ const Pawn = ({color}: pawnProps) => {
           <div 
             className={`pawn ${color}`} 
              // TODO: disable if game paused  double check
-            onClick={gameState.gameOver || room.heroesEscaped.includes(color) ? () => {} : !room.gamePaused ? _handleClick : () => {}}
+            onClick={gameState.gameOver || room.heroesEscaped.includes(color) ? () => {} : !room.gamePaused ? toggleMovableSpaces : () => {}}
             style={{
               gridColumnStart: pawns[color]?.position[0] + 1,
               gridRowStart: pawns[color]?.position[1] + 1,
@@ -519,22 +221,22 @@ const Pawn = ({color}: pawnProps) => {
               src={`/${color}-pawn.svg`} 
               alt={`${color}-piece`} 
               style={{
-                border: `${pawns[color]?.playerHeld ? 
-                            (pawns[color]?.playerHeld === playerState.number ?
-                              "2px solid blue" 
-                                : 
-                              "2px solid grey")
-                            :
-                            ""}`
+                border: 
+                  `${pawns[color]?.playerHeld ? 
+                    (pawns[color]?.playerHeld === playerState.number ?
+                      "2px solid blue" 
+                        : 
+                      "2px solid grey")
+                    :
+                    ""}`
                 }}/>
           </div>
         </div>
-          :
-        <>
-        </>
       }
     </>
   )
 }
+
+Pawn.whyDidYouRender = true;
 
 export default Pawn;

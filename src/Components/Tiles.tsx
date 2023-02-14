@@ -1,28 +1,28 @@
+import { useCallback } from 'react';
 import Tile from './Tile';
 import { DBHeroPawn, Room } from '../types';
 import './Board.scss';
 import { useGame } from '../Contexts/GameContext';
-import { usePlayer } from '../Contexts/PlayerContext';
-import { gamesRef } from "../Firestore";
-import { useDocumentData } from 'react-firebase-hooks/firestore'
+import { usePlayerState } from '../Contexts/PlayerContext';
+import { useDocData } from '../utils/useFirestore';
 
 const Tiles = () => {
   const { gameState } = useGame();
-  const { playerState } = usePlayer();
+  const playerState = usePlayerState();
 
-  const [room] = useDocumentData(gamesRef.doc(gameState.roomId));
+  const [room] = useDocData(gameState.roomId);
 
-  const { pawns, tiles, players }: Room = room || {}
+  const { pawns, tiles, players }: Room = room
 
-  const getCurrentPlayer = () => {
+  const getCurrentPlayer = useCallback(() => {
     const currentPlayer = players.find(player => player.number === playerState.number)!
     return currentPlayer
-  }
+  }, [players])
   
-  const getPlayerHeldPawn = () => {
+  const getPlayerHeldPawn = useCallback(() => {
     const pawnHeld = Object.values(pawns).find((pawn: DBHeroPawn) => pawn.playerHeld && pawn.playerHeld === playerState.number);
     return pawnHeld;
-  }
+  }, [pawns])
 
   return (
     <>
@@ -34,7 +34,7 @@ const Tiles = () => {
             tileData={newTile} 
             playerHeldPawn={getPlayerHeldPawn()}
             currentPlayer={getCurrentPlayer()}
-            />
+          />
         )
       })}
     </>

@@ -1,3 +1,5 @@
+import { DocumentReference } from "firebase/firestore"; 
+
 export type heroColor = "yellow" | "purple" | "green" | "orange"
 export type heroName = "Barbarian" | "Mage" | "Elf" | "Dwarf"
 export type heroWeapon = "sword" | "vial" | "bow" | "axe"
@@ -21,6 +23,7 @@ export interface Game {
   minutesLeft: number,
   secondsLeft: number,
   gameOver: boolean,
+  docRef: DocumentReference<any> | null,
   // weaponsStolen: heroColor[],
   // heroesEscaped: heroColor[]
   // players: Player[],
@@ -124,7 +127,7 @@ export interface DBTile {
   entrySide?: direction
 }
 
-type SpaceTypeName = "timer" | "teleporter" | "exploration" | "special" | "weapon" | "exit" | "blank" | "barrier"
+export type SpaceTypeName = "timer" | "teleporter" | "exploration" | "special" | "weapon" | "exit" | "blank" | "barrier"
 
 export interface Space {
   type: SpaceTypeName,

@@ -1,52 +1,46 @@
-import { memo, useEffect } from 'react';
+import { memo } from 'react';
 import Space from './Space';
-import { direction, HeroPawn, Room, DBTile, DBHeroPawn, DBPlayer } from '../types';
+import { direction, HeroPawn, DBTile, DBHeroPawn, DBPlayer, TeleporterSpace, ExplorationSpace, WeaponSpace, ExitSpace, TimerSpace } from '../types';
 import { tileWallSize, spaceSize } from '../constants';
 import { usePawn } from '../Contexts/PawnContext';
-import { useGame } from '../Contexts/GameContext';
-import { usePlayer } from '../Contexts/PlayerContext';
-// import { useTiles } from '../Contexts/TilesContext';
-import { gamesRef } from "../Firestore";
-import { useDocumentData } from 'react-firebase-hooks/firestore'
-
+import { usePlayerState, usePlayerDispatch } from '../Contexts/PlayerContext';
+import isEqual from 'lodash/isEqual';
 
 interface tileProps {
-  startTile?: boolean | undefined,
   id?: string,
   tileData: DBTile,
   tileIndex: number,
   playerHeldPawn: DBHeroPawn,
-  currentPlayer: DBPlayer
+  currentPlayer: DBPlayer,
 }
 
 const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
-  if (!prevProps.playerHeldPawn || !nextProps.playerHeldPawn) {
-    return false;
-  }
-  if (prevProps.playerHeldPawn.gridPosition[0] !== nextProps.playerHeldPawn.gridPosition[0] ||
-      prevProps.playerHeldPawn.gridPosition[1] !== nextProps.playerHeldPawn.gridPosition[1]) {
-        return false;
-      }
-  else {
-    if (prevProps.playerHeldPawn.position[0] !== nextProps.playerHeldPawn.position[0] ||
-        prevProps.playerHeldPawn.position[1] !== nextProps.playerHeldPawn.position[1]) {
-        return false
-      }
-  }
+  // console.log(prevProps, nextProps)
+  // TODO FIX
+  // if (!prevProps.playerHeldPawn || !nextProps.playerHeldPawn) {
+  //   return false;
+  // }
+  // if (prevProps.playerHeldPawn.gridPosition[0] !== nextProps.playerHeldPawn.gridPosition[0] ||
+  //     prevProps.playerHeldPawn.gridPosition[1] !== nextProps.playerHeldPawn.gridPosition[1]) {
+  //       return false;
+  //     }
+  // else {
+  //   if (prevProps.playerHeldPawn.position[0] !== nextProps.playerHeldPawn.position[0] ||
+  //       prevProps.playerHeldPawn.position[1] !== nextProps.playerHeldPawn.position[1]) {
+  //       return false
+  //     }
+  // }
   
-  return true
+  // return true
+
+  return isEqual(prevProps, nextProps);
 }
 
-const Tile = memo(({startTile, id, tileIndex, tileData, playerHeldPawn, currentPlayer}: tileProps) => {
-  // console.count("would have rendered Tile") // 26 on show, 16
-
-  const { playerState } = usePlayer();
+const Tile = memo(({id, tileIndex, tileData, playerHeldPawn, currentPlayer}: tileProps) => {
+  const playerState = usePlayerState();
+  const playerDispatch = usePlayerDispatch(); // TODO this causing re-render
 
   const { pawnState } = usePawn();
-
-  const { gameState } = useGame();
-
-  // const gamesRef = firestore.collection('games')
 
   const tileHasBlockedSpace = (tileData: DBTile, direction: direction, pawnHeld: HeroPawn) => {
     // console.log("tilehas blocked space")
@@ -59,7 +53,6 @@ const Tile = memo(({startTile, id, tileIndex, tileData, playerHeldPawn, currentP
             }
       }
     }
-    // console.log('false', pawnHeld)
     return false;
   }
 
@@ -258,19 +251,35 @@ const Tile = memo(({startTile, id, tileIndex, tileData, playerHeldPawn, currentP
 
                       highlightSpace = !rowBlocked
                     }
+                    
                   }
+
+                  const {type, details} = space;
+                  const playerHeldPawnColor = playerHeldPawn?.color;
+                  const highlightTeleporter = type === 'teleporter' && (details as TeleporterSpace).color === playerHeldPawnColor;
+                  const highlightEscalator = details?.hasEscalator && playerState.showEscalatorSpaces.length;
 
                   return (
                     <Space 
+                      {
+                        ...{
+                          spaceType: type,
+                          spaceColor: (details as TeleporterSpace | ExplorationSpace | WeaponSpace | ExitSpace)?.color,
+                          spaceHasEscalator: details?.hasEscalator,
+                          spaceEscalatorName: details?.escalatorName,
+                          spaceIsDisabled: (details as TimerSpace)?.isDisabled,
+                          spaceWeaponStolen: (details as WeaponSpace)?.weaponStolen,
+                        }
+                      }
+                      playerDispatch={playerDispatch}
                       key={`space${rowIndex}-${colIndex} ${highlightSpace ? "highlight" : ""}`} 
-                      spaceData={space} 
-                      showMovableArea={highlightSpace} 
-                      colorSelected={playerHeldPawn ? playerHeldPawn.color : null}
                       spacePosition={[colIndex, rowIndex]} 
                       gridPosition={[...tileData.gridPosition]}
-                      highlightTeleporter={space.type === 'teleporter' ? playerState.showTeleportSpaces: null}
-                      highlightEscalator={space.details?.hasEscalator ? playerState.showEscalatorSpaces: []}
                       tileIndex={tileIndex}
+                      showMovableArea={highlightSpace} 
+                      colorSelected={(highlightSpace || highlightTeleporter || highlightEscalator) && playerHeldPawn ? playerHeldPawn.color : null}
+                      highlightTeleporter={highlightTeleporter ? playerState.showTeleportSpaces: null}
+                      highlightEscalator={highlightEscalator ? playerState.showEscalatorSpaces: []}
                     />
                   )
                 })}

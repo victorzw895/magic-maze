@@ -3,9 +3,8 @@ import { DBTile } from '../types';
 import { tileWallSize, spaceSize } from '../constants';
 import { generateTile } from '../Contexts/TilesContext';
 import { useGame } from '../Contexts/GameContext';
-import { setDoc, doc, getDoc } from "firebase/firestore"; 
-import { firestore, gamesRef } from "../Firestore";
-import { useDocumentData } from 'react-firebase-hooks/firestore'
+import { setDoc, getDoc, useDocData } from '../utils/useFirestore';
+import isEqual from 'lodash/isEqual';
 
 interface NewTileAreaProps {
   tile: DBTile,
@@ -13,28 +12,23 @@ interface NewTileAreaProps {
 }
 
 const areEqual = (prevProps: NewTileAreaProps, nextProps: NewTileAreaProps) => {
-  if (prevProps.tile.placementDirection === nextProps.tile.placementDirection) {
-        return true
-      }
-  return false
+  return isEqual(prevProps, nextProps);
 }
 
 const NewTileArea = React.memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
   const { gridPosition, placementDirection } = tile;
   const { gameState } = useGame();
 
-  const [room] = useDocumentData(gamesRef.doc(gameState.roomId));
+  const [room] = useDocData(gameState.roomId);
 
   const addNewTile = async (newTile: DBTile) => {
-    const docRef = doc(firestore, "games", gameState.roomId);
-    const docSnap = await getDoc(docRef);
+    const docSnap = await getDoc(gameState.roomId);
 
     if (docSnap.exists()) {
       const tile = generateTile(newTile);
       await setDoc(
-        docRef, 
+        gameState.roomId, 
         {tiles: [...docSnap.data().tiles, tile]},
-        {merge: true}
       )
     }
   }

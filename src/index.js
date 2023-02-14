@@ -6,17 +6,17 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { GameProvider} from './Contexts/GameContext';
-import { DBProvider} from './Contexts/DBContext';
+import { GameProvider } from './Contexts/GameContext';
+import { Provider } from './Contexts/DBContext';
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <DBProvider>
+    <Provider>
       <GameProvider>
-        <App />
+          <App />
       </GameProvider>
-    </DBProvider>
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

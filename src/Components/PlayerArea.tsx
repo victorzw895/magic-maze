@@ -1,55 +1,30 @@
-import { memo, useEffect, useState } from 'react';
+import { memo } from 'react';
 import { useGame } from '../Contexts/GameContext';
-// import { usePlayer } from '../Contexts/PlayerContext';
-import { setDoc, doc, getDoc } from "firebase/firestore"; 
-import { useDocumentData } from 'react-firebase-hooks/firestore'
-import { firestore, gamesRef } from "../Firestore";
 import { DBPlayer } from '../types';
+import isEqual from 'lodash/isEqual';
+import { setDoc } from '../utils/useFirestore';
 
 interface PlayerAreaProps {
   highlightNewTileArea: () => void,
+  gamePaused: boolean,
   player: DBPlayer
 }
 
 const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
-  if (JSON.stringify(prevProps.player) === JSON.stringify(nextProps.player)) {
-    return true
-  }
-  else if (prevProps.highlightNewTileArea === nextProps.highlightNewTileArea) {
-    return true
-  }
-  return false
+  return isEqual(prevProps, nextProps);
 }
 
-// memo this might not be necessary
-const PlayerArea = memo(({highlightNewTileArea, player} : PlayerAreaProps) => {
-  const { gameState, gameDispatch } = useGame();
-  const [gamePaused, setGamePaused] = useState(false);
-  const [room] = useDocumentData(gamesRef.doc(gameState.roomId));
+// TODO memo this might not be necessary
+const PlayerArea = memo(({highlightNewTileArea, gamePaused, player} : PlayerAreaProps) => {
+  const { gameState } = useGame();
 
   const _handleContinueGame = async () => {
-    await setDoc(
-      gamesRef.doc(gameState.roomId), 
+    await setDoc(gameState.roomId, 
       { 
         gamePaused: false,
-      },
-      {merge: true}
+      }
     )
-    setGamePaused(false);
   }
-
-  useEffect(() => {
-    (async () => {
-      if (!room) return;
-      console.log('there is a room', room)
-      if (room?.gamePaused) {
-        setGamePaused(true);
-      }
-      else {
-        setGamePaused(false);
-      }
-    })()
-  }, [room?.gamePaused])
 
   return (
     <div className="player-area">
@@ -81,7 +56,7 @@ const PlayerArea = memo(({highlightNewTileArea, player} : PlayerAreaProps) => {
                   <img 
                     draggable={false}
                     key={ability}
-                    onClick={room?.gamePaused ? () => {} : highlightNewTileArea} // TODO: disable if game paused
+                    onClick={gamePaused ? () => {} : highlightNewTileArea} // TODO: disable if game paused
                     src={`/${ability}.png`} 
                     alt={ability} 
                     style={{

@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { heroColor, Player, playerNumber, direction, Escalator, DBPlayer } from '../types';
 
-type Action = {type: 'playerHeld', value: number | null, color: heroColor} | 
+export type Action = {type: 'playerHeld', value: number | null, color: heroColor} | 
               {type: 'showMovableSpaces', value: direction[]} | 
               {type: 'showEscalatorSpaces', value: Escalator[]} | 
               {type: 'showTeleportSpaces', color: heroColor | null} | 
               {type: 'setPlayer', value: Player} | undefined;
-type Dispatch = (action: Action) => void;
+export type Dispatch = (action: Action) => void;
 
 type PlayerProviderProps = {children: React.ReactNode}
 
@@ -26,7 +26,7 @@ export const PlayerFactory = (playerName: string, currentPlayers: number) => {
   const dbPlayerState: DBPlayer = {
     name: playerName,
     number: currentPlayers + 1 as playerNumber,
-    playerDirections: [],
+    playerDirections: [], 
     playerAbilities: [],
     pinged: false
   }
@@ -46,7 +46,8 @@ const playerInitialState: Player = {
   showEscalatorSpaces: []
 }
 
-const PlayerContext = createContext<{playerState: Player; playerDispatch: Dispatch} | undefined>(undefined);
+const PlayerStateContext = createContext<Player | undefined>(undefined);
+const PlayerDispatchContext = createContext<Dispatch | undefined>(undefined);
 
 const playerReducer = (playerState: Player, action: any) => {
   let newState = {...playerState};
@@ -84,17 +85,30 @@ const playerReducer = (playerState: Player, action: any) => {
 const PlayerProvider = ({children}: PlayerProviderProps) => {
 
   const [playerState, playerDispatch] = useReducer(playerReducer, playerInitialState);
-  const value = {playerState, playerDispatch};
 
-  return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>
+  return (
+    <PlayerStateContext.Provider value={playerState}>
+      <PlayerDispatchContext.Provider value={playerDispatch}>
+        {children}
+      </PlayerDispatchContext.Provider>
+    </PlayerStateContext.Provider>
+  )
 }
 
-const usePlayer = () => {
-  const context = useContext(PlayerContext)
+const usePlayerState = () => {
+  const context = useContext(PlayerStateContext)
   if (context === undefined) {
-    throw new Error('usePlayer must be used within a PlayerProvider');
+    throw new Error('usePlayerState must be used within a PlayerStateContext');
   }
   return context;
 }
 
-export { PlayerProvider, usePlayer };
+const usePlayerDispatch = () => {
+  const context = useContext(PlayerDispatchContext)
+  if (context === undefined) {
+    throw new Error('usePlayerDispatch must be used within a PlayerDispatchContext');
+  }
+  return context;
+}
+
+export { PlayerProvider, usePlayerState, usePlayerDispatch };

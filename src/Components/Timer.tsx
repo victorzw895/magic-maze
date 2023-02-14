@@ -1,17 +1,16 @@
 import { useEffect } from 'react';
 import { useTimer } from 'react-timer-hook';
 import { useGame } from '../Contexts/GameContext';
-import { setDoc, doc, getDoc } from "firebase/firestore"; 
-import { useDocumentData } from 'react-firebase-hooks/firestore'
-import { gamesRef } from "../Firestore";
+import { useDocData } from "../utils/useFirestore"; 
 
 interface TimerProps {
   expiryTimestamp: Date
 }
 
 const Timer = ({expiryTimestamp} : TimerProps) => {
+  // console.count('Render timer') // 28 times
   const { gameState, gameDispatch } = useGame();
-  const [room] = useDocumentData(gamesRef.doc(gameState.roomId));
+  const [room] = useDocData(gameState.roomId);
 
   const {
     seconds,
@@ -20,12 +19,14 @@ const Timer = ({expiryTimestamp} : TimerProps) => {
     pause,
     restart
   } = useTimer({ expiryTimestamp, onExpire: () => gameDispatch({type: "gameOver"}) });
+  // autoStart: false after attaching start() to waiting room start
+  // } = useTimer({ expiryTimestamp, autoStart: false, onExpire: () => gameDispatch({type: "gameOver"}) });
   const startSeconds = 200;
 
   const toggleTimer = (pauseGame: boolean) => {
     if (pauseGame) {
       pause();
-      // TODO: Game Paused at 'minutes' 'seconds', Time remaining when resuming: restart time
+      // TODO: Notification Game Paused at 'minutes' 'seconds', Time remaining when resuming: restart time
       console.log("toggle timer here", seconds, minutes)
     }
     else {

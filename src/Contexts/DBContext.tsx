@@ -1,86 +1,71 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useContext, useEffect, useReducer, useState } from 'react';
+import { useDocumentData, useDocument } from 'react-firebase-hooks/firestore'
 import { Room } from '../types';
+import { useGame } from '../Contexts/GameContext';
+import { firestore, getDocRef, gamesRef } from "../Firestore";
+import { setDoc, doc, getDoc, getFirestore, DocumentData, DocumentReference } from "firebase/firestore"; 
 
-type Action = {type: 'update', value: String} | undefined;
+type Action = {type: 'update', value: string} | undefined;
+// type Dispatch = (document: any, roomId?: string) => Promise<void>
 type Dispatch = (action: Action) => void;
 
 type DBProviderProps = {children: React.ReactNode}
 
-const dbInitialState: Room = {
-  gameStarted: false,
-  gamePaused: false,
-  timeLeft: 200,
-  weaponsStolen: [],
-  heroesEscaped: [],
-  players: [],
-  tiles: [],
-  pawns: {
-    green: {
-      color: "green",
-      playerHeld: null,
-      position: [],
-      gridPosition: [],
-      ability: "",
-      canUseAbility: false,
-    },
-    yellow: {
-      color: "yellow",
-      playerHeld: null,
-      position: [],
-      gridPosition: [],
-      ability: "",
-      canUseAbility: false,
-    },
-    orange: {
-      color: "orange",
-      playerHeld: null,
-      position: [],
-      gridPosition: [],
-      ability: "",
-      canUseAbility: false,
-    },
-    purple: {
-      color: "purple",
-      playerHeld: null,
-      position: [],
-      gridPosition: [],
-      ability: "",
-      canUseAbility: false,
-    }
-  },
+
+const DocRefStateContext = createContext<DocumentReference<any> | null | undefined>(undefined);
+const DocRefDispatchContext = createContext<Dispatch | undefined>(undefined);
+
+export const getDocSnap = async (roomId: string) => {
+  const gamesDocRef = doc(gamesRef, roomId);
+  const docSnap = await getDoc(gamesDocRef);
+  
+  return docSnap;
 }
 
-const DBContext = createContext<{dbState: Room; dbDispatch: Dispatch} | undefined>(undefined);
+const docRefReducer = (docRefState: DocumentReference<any> | null, action: any) => {
+  let newState = docRefState;
 
-const dbReducer = (dbState: Room, action: any) => {
-  // let newState = {...dbState};
-
-  switch (action.type) {
+  switch (action?.type) {
     case 'update': {
-      if (!action.value) return dbState;
-      const { gameStarted, timeLeft, weaponsStolen, heroesEscaped, players, tiles, pawns } = action.value;
-      const newState = {...dbState, gameStarted, timeLeft, weaponsStolen, heroesEscaped, players, tiles, pawns}
-      return newState;
+      if (!action.value) return newState;
+      return doc(gamesRef, action.value);
     }
     default: {
-      throw new Error(`Unhandled action type: ${action.type}`)
+      throw new Error(`Unhandled action type: ${action?.type}`)
     }
   }
 }
 
-const DBProvider = ({children}: DBProviderProps) => {
-  const [dbState, dbDispatch] = useReducer(dbReducer, dbInitialState);
-  const value = {dbState, dbDispatch};
 
-  return <DBContext.Provider value={value}>{children}</DBContext.Provider>
+const Provider = ({children}: DBProviderProps) => {
+  const [docRef, setDocRef] = useReducer(docRefReducer, null);
+
+  // const docRefProviderValue = { docRef, setDocRef };
+
+  return (
+    <DocRefStateContext.Provider value={docRef}>
+      <DocRefDispatchContext.Provider value={setDocRef}>
+        {children}
+      </DocRefDispatchContext.Provider>
+    </DocRefStateContext.Provider>
+  )
 }
 
-const useDB = () => {
-  const context = useContext(DBContext)
+
+const useDocRef = () => {
+  const context = useContext(DocRefStateContext)
   if (context === undefined) {
-    throw new Error('useDB must be used within a DBProvider');
+    throw new Error('useDocRef must be used within a DocRefContext');
   }
   return context;
 }
 
-export { DBProvider, useDB };
+const useDocRefDispatch = () => {
+  const context = useContext(DocRefDispatchContext)
+  if (context === undefined) {
+    throw new Error('useDocRef must be used within a DocRefContext');
+  }
+  return context;
+}
+
+export { Provider, useDocRef, useDocRefDispatch };

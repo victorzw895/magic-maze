@@ -14,13 +14,13 @@
     "@types/react": "^17.0.19",
     "@types/react-dom": "^17.0.9",
     "crypto-random-string": "^4.0.0",
-    "firebase": "^9.0.1",
+    "firebase": "^9.17.1",
     "lodash": "^4.17.21",
     "node-sass": "^6.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-draggable": "^4.4.4",
-    "react-firebase-hooks": "^3.0.4",
+    "react-firebase-hooks": "^5.1.1",
     "react-scripts": "4.0.3",
     "react-timer-hook": "^3.0.5",
     "typescript": "^4.4.2",
@@ -52,6 +52,6 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.191",
-    "@welldone-software/why-did-you-render": "^6.2.1"
+    "@welldone-software/why-did-you-render": "^7.0.1"
   }
 }
