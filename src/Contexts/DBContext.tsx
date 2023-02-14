@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useReducer, useState } fro
 import { useDocumentData, useDocument } from 'react-firebase-hooks/firestore'
 import { Room } from '../types';
 import { useGame } from '../Contexts/GameContext';
-import { firestore, getDocRef, gamesRef } from "../Firestore";
+import { firestore, gamesRef } from "../Firestore";
 import { setDoc, doc, getDoc, getFirestore, DocumentData, DocumentReference } from "firebase/firestore"; 
 
 type Action = {type: 'update', value: string} | undefined;

@@ -13,7 +13,7 @@ import useHighlightArea from '../utils/useHighlightArea';
 import Timer from './Timer';
 
 
-const BoardComponent = ({boardPieces, children}: {boardPieces: ReactNode, children: ReactNode}) => {
+const BoardComponent = ({timer, children}: {timer: ReactNode, children: ReactNode}) => {
   const draggableNodeRef = useRef(null);
   const { gameState } = useGame();
   const playerState = usePlayerState();
@@ -34,7 +34,7 @@ const BoardComponent = ({boardPieces, children}: {boardPieces: ReactNode, childr
 
   return (
     <>
-      {children}
+      {timer}
       <Draggable
         nodeRef={draggableNodeRef}
         defaultPosition={{x: 0, y: 0}}
@@ -49,7 +49,7 @@ const BoardComponent = ({boardPieces, children}: {boardPieces: ReactNode, childr
                 />
             )
           })}
-          {boardPieces}
+          {children}
         </div>
       </Draggable>
       <PlayerArea gamePaused={gamePaused} highlightNewTileArea={highlightNewTileArea} player={players?.find(player => player.number === playerState.number)!} />
@@ -71,17 +71,18 @@ const Board = () => {
   return (
     <div className="Board">
       <BoardComponent
-        boardPieces={
-          <>
-            <Tiles />
-            <Pawn color="yellow" />
-            <Pawn color="orange"/>
-            <Pawn color="green"/>
-            <Pawn color="purple"/>
-          </>
-        }
+        // boardPieces={
+        //   <>
+            
+        //   </>
+        // }
+        timer={<Timer expiryTimestamp={time} />}
       >
-        <Timer expiryTimestamp={time} />
+        <Tiles />
+        <Pawn color="yellow" />
+        <Pawn color="orange"/>
+        <Pawn color="green"/>
+        <Pawn color="purple"/>
       </BoardComponent>
     </div>
   );
