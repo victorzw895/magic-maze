@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { Game, direction, basicAbility, DBPlayer } from '../types';
-import { firestore, getDocRef, gamesRef } from "../Firestore";
+import { gamesRef } from "../Firestore";
 import { setDoc, doc, getDoc, getFirestore } from "firebase/firestore"; 
 
 type Action = {type: 'joinRoom', value: String} | 
