@@ -53,7 +53,7 @@ const areEqual = (prevProps: SpaceProps, nextProps: SpaceProps) => {
 
 const Space = memo(({spaceType, spaceColor, spaceHasEscalator, spaceEscalatorName, spaceIsDisabled, spaceWeaponStolen, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex, playerDispatch}: SpaceProps) => {
   // console.count('Re-render space');
-  console.log('Space', {spaceType, spaceColor, spaceHasEscalator, spaceEscalatorName, spaceIsDisabled, spaceWeaponStolen, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex, playerDispatch})
+  console.log('Space render', {spaceType, spaceColor, spaceHasEscalator, spaceEscalatorName, spaceIsDisabled, spaceWeaponStolen, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex, playerDispatch})
   const { gameState } = useGame();
   // const playerDispatch = usePlayerDispatch(); // TODO this causing re-render
 

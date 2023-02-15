@@ -3,14 +3,19 @@ import { useTimer } from 'react-timer-hook';
 import { useGame } from '../Contexts/GameContext';
 import { useDocData } from "../utils/useFirestore"; 
 
-interface TimerProps {
-  expiryTimestamp: Date
-}
 
-const Timer = ({expiryTimestamp} : TimerProps) => {
-  // console.count('Render timer') // 28 times
+const Timer = () => {
+  console.count('Render timer') // 28 times
   const { gameState, gameDispatch } = useGame();
   const [room] = useDocData(gameState.roomId);
+  const time = new Date();
+
+  useEffect(() => {
+    // IDEALLY on game start
+    // maybe move timer to firestore ???
+    console.log("start timer?")
+    time.setSeconds(time.getSeconds() + 200);
+  }, [])
 
   const {
     seconds,
@@ -18,10 +23,11 @@ const Timer = ({expiryTimestamp} : TimerProps) => {
     start,
     pause,
     restart
-  } = useTimer({ expiryTimestamp, onExpire: () => gameDispatch({type: "gameOver"}) });
+  // } = useTimer({ expiryTimestamp: time, onExpire: () => gameDispatch({type: "gameOver"}) });
   // autoStart: false after attaching start() to waiting room start
-  // } = useTimer({ expiryTimestamp, autoStart: false, onExpire: () => gameDispatch({type: "gameOver"}) });
+  } = useTimer({ expiryTimestamp: time, autoStart: false, onExpire: () => gameDispatch({type: "gameOver"}) });
   const startSeconds = 200;
+
 
   const toggleTimer = (pauseGame: boolean) => {
     if (pauseGame) {
@@ -31,15 +37,15 @@ const Timer = ({expiryTimestamp} : TimerProps) => {
     }
     else {
       const restartTime = startSeconds - ((minutes * 60) + seconds);
-      if (restartTime === startSeconds) {
-        start();
-        console.log('start')
-      } else {
-        const time = new Date();
-        time.setSeconds(time.getSeconds() + restartTime);
-        console.log("restartTime", restartTime)
-        restart(time)
-      }
+      // if (restartTime === startSeconds) {
+      //   start();
+      //   console.log('start')
+      // } else {
+      //   const time = new Date();
+      //   time.setSeconds(time.getSeconds() + restartTime);
+      //   console.log("restartTime", restartTime)
+      //   restart(time)
+      // }
     }
   }
 

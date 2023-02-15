@@ -207,7 +207,7 @@ export const getEscalatorSpace = (tiles: DBTile[], pawns: DBPawns, pawn: DBHeroP
     escalatorName
   }
 
-  return escalatorSpace
+  return escalatorName && escalatorSpace
 }
 
 export const getFirstBlockedSpace = (tiles: DBTile[], pawns: DBPawns,  pawn: DBHeroPawn, direction: direction) => {

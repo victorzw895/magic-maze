@@ -258,7 +258,7 @@ const Tile = memo(({id, tileIndex, tileData, playerHeldPawn, currentPlayer}: til
                   const playerHeldPawnColor = playerHeldPawn?.color;
                   const highlightTeleporter = type === 'teleporter' && (details as TeleporterSpace).color === playerHeldPawnColor;
                   const highlightEscalator = details?.hasEscalator && playerState.showEscalatorSpaces.length;
-
+                  
                   return (
                     <Space 
                       {
@@ -274,7 +274,7 @@ const Tile = memo(({id, tileIndex, tileData, playerHeldPawn, currentPlayer}: til
                       playerDispatch={playerDispatch}
                       key={`space${rowIndex}-${colIndex} ${highlightSpace ? "highlight" : ""}`} 
                       spacePosition={[colIndex, rowIndex]} 
-                      gridPosition={[...tileData.gridPosition]}
+                      gridPosition={tileData.gridPosition}
                       tileIndex={tileIndex}
                       showMovableArea={highlightSpace} 
                       colorSelected={(highlightSpace || highlightTeleporter || highlightEscalator) && playerHeldPawn ? playerHeldPawn.color : null}

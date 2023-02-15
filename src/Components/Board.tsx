@@ -1,9 +1,9 @@
-import { useEffect, useRef, ReactNode } from 'react';
+import { useEffect, useRef, ReactNode, memo, useCallback } from 'react';
 import Tiles from './Tiles';
 import NewTileArea from './NewTileArea';
 import Pawn from './Pieces/Pawn';
 import PlayerArea from './PlayerArea';
-import { Room } from '../types';
+import { Room, DBTile } from '../types';
 import './Board.scss';
 import { useGame } from '../Contexts/GameContext';
 import { usePlayerState } from '../Contexts/PlayerContext';
@@ -11,7 +11,7 @@ import Draggable from 'react-draggable';
 import { useDocData } from '../utils/useFirestore';
 import useHighlightArea from '../utils/useHighlightArea';
 import Timer from './Timer';
-
+import isEqual from 'lodash/isEqual';
 
 const BoardComponent = ({timer, children}: {timer: ReactNode, children: ReactNode}) => {
   const draggableNodeRef = useRef(null);
@@ -20,21 +20,13 @@ const BoardComponent = ({timer, children}: {timer: ReactNode, children: ReactNod
 
   const [room] = useDocData(gameState.roomId);
 
-  const { pawns, tiles, players, gamePaused }: Room = room
+  const { players, gamePaused, gameStarted }: Room = room
 
-  const [availableArea, highlightNewTileArea, clearHighlightAreas] = useHighlightArea(tiles, pawns);
-
-
-  // useEffect(() => {
-  //   // IDEALLY on game start
-  //   // maybe move timer to firestore ???
-  //   console.log("start timer?")
-  //   time.setSeconds(time.getSeconds() + 200);
-  // }, [])
+  const [availableArea, highlightNewTileArea, clearHighlightAreas] = useHighlightArea(gameState.roomId);
 
   return (
     <>
-      {timer}
+      {gameStarted ? timer : <></>}
       <Draggable
         nodeRef={draggableNodeRef}
         defaultPosition={{x: 0, y: 0}}
@@ -46,7 +38,9 @@ const BoardComponent = ({timer, children}: {timer: ReactNode, children: ReactNod
                 key={`${newTileArea.gridPosition[0]}-${newTileArea.gridPosition[1]}`} 
                 tile={newTileArea} 
                 clearHighlightAreas={clearHighlightAreas} 
+                gamePaused={gamePaused}
                 />
+              
             )
           })}
           {children}
@@ -57,26 +51,12 @@ const BoardComponent = ({timer, children}: {timer: ReactNode, children: ReactNod
   );
 };
 
-const time = new Date();
-
 
 const Board = () => {
-
-  useEffect(() => {
-    // IDEALLY on game start
-    // maybe move timer to firestore ???
-    time.setSeconds(time.getSeconds() + 200);
-  }, [])
-
   return (
     <div className="Board">
       <BoardComponent
-        // boardPieces={
-        //   <>
-            
-        //   </>
-        // }
-        timer={<Timer expiryTimestamp={time} />}
+        timer={<Timer />}
       >
         <Tiles />
         <Pawn color="yellow" />

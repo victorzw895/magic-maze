@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState, ReactNode } from 'react';
 import { ExplorationSpace, DBTile, DBHeroPawn, DBPawns, Room } from '../types';
+import { getDoc } from '../utils/useFirestore';
 
 const startTiles = () => {
   const tiles = []
@@ -11,10 +12,11 @@ const startTiles = () => {
   return tiles;
 }
 
-const useHighlightArea = (tiles:  DBTile[], pawns: DBPawns): [ DBTile[], () => void, (gridPosition: number[]) => void] => {
+const useHighlightArea = (roomId: string): [ DBTile[], () => void, () => void] => {
   const [availableArea, setAvailableArea] = useState<DBTile[]>(startTiles() as DBTile[]);
+  // const [room, setRoom] = useState({});
 
-  const getExplorationTile = (pawn: DBHeroPawn, pawnColIndex: number, pawnRowIndex: number) => {
+  const getExplorationTile = (tiles: DBTile[], pawn: DBHeroPawn, pawnColIndex: number, pawnRowIndex: number) => {
     const currentTile = tiles.find(tile => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1])
     if (currentTile) {
       const pawnRow = Object.values(currentTile.spaces).filter((row, rowIndex) => rowIndex === pawnRowIndex).flat(1)
@@ -47,11 +49,16 @@ const useHighlightArea = (tiles:  DBTile[], pawns: DBPawns): [ DBTile[], () => v
     }
   }
 
-  const highlightNewTileArea = () => {
+  const highlightNewTileArea = async () => {
+    const docSnap = await getDoc(roomId);
+    if (!docSnap.exists()) return;
+
+    const {pawns, tiles} = docSnap.data() as Room;
+
     const placeholderTiles = [...availableArea];
 
     const highlightAreas = Object.values(pawns).map(pawn => {
-      return getExplorationTile(pawn, pawn.position[0], pawn.position[1]) 
+      return getExplorationTile(tiles, pawn, pawn.position[0], pawn.position[1]) 
     }).filter(gridPos => gridPos) as DBTile[]
 
     // adding placementDirection value to tiles that need to be highlighted
@@ -65,15 +72,13 @@ const useHighlightArea = (tiles:  DBTile[], pawns: DBPawns): [ DBTile[], () => v
     setAvailableArea(placeholderTiles);
   }
 
-  const clearHighlightAreas = useCallback((gridPosition: number[]) => {
-    const remainingAvailable = availableArea.filter(area => area.gridPosition[0] !== gridPosition[0] || area.gridPosition[1] !== gridPosition[1]);
-    
-    const resetAreas = remainingAvailable.map(area => {
+  const clearHighlightAreas = useCallback(() => {
+    const resetAreas = availableArea.map(area => {
       return {gridPosition: area.gridPosition}
     })
 
     setAvailableArea(resetAreas as DBTile[]);
-  }, [availableArea])
+  }, [])
 
   return [availableArea, highlightNewTileArea, clearHighlightAreas];
 };

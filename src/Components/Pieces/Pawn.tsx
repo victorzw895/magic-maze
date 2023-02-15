@@ -109,20 +109,20 @@ const Pawn = ({color}: pawnProps) => {
         const blockedSpace = getFirstBlockedSpace(tiles, pawns, pawnColor, direction);
         blockedDirections[direction].position = blockedSpace.position
         blockedDirections[direction].gridPosition = blockedSpace.gridPosition
-        console.log('blockedDirections', blockedDirections);
+        if (currentPlayer.playerAbilities.includes("escalator")) {
+          const escalatorSpace = getEscalatorSpace(tiles, pawns, pawnColor, direction);
+          if (
+            escalatorSpace &&
+            isEqual(escalatorSpace.gridPosition, pawnColor.gridPosition) && 
+            isEqual(escalatorSpace.position, pawnColor.position)
+          ) {
+          escalatorSpaces.push(escalatorSpace);
+          }
+        }
       })
 
-      if (currentPlayer.playerAbilities.includes("escalator")) {
-        // CHEAT, TODO, need to fix getEscalatorSpace method
-        // Yielding same value regardless of direction, 4th arg
-        const escalatorSpace = getEscalatorSpace(tiles, pawns, pawnColor, 'up');
-        if (
-          isEqual(escalatorSpace.gridPosition, pawnColor.gridPosition) && 
-          isEqual(escalatorSpace.position, pawnColor.position)
-        ) {
-          escalatorSpaces.push(escalatorSpace);
-        }
-      }
+      
+      console.log('escalator spaces', escalatorSpaces)
 
       pawnDispatch({type: "addBlockedPositions", value: blockedDirections, color});
       playerDispatch({type: "showMovableSpaces", value: playerDirections})
