@@ -40,6 +40,7 @@ const Lobby = () => {
 
     playerDispatch({type: "setPlayer", value: player});
 
+    // TODO move initialValue into a constants file
     await setDoc(newGameCode, {
       players: [dbPlayer],
       gameStarted: false,

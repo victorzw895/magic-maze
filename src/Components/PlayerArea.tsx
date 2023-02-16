@@ -7,15 +7,19 @@ import { setDoc } from '../utils/useFirestore';
 interface PlayerAreaProps {
   highlightNewTileArea: () => void,
   gamePaused: boolean,
-  player: DBPlayer
+  player: DBPlayer | undefined
 }
 
 const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
   return isEqual(prevProps, nextProps);
 }
 
-// TODO memo this might not be necessary
+// TODO, this component only needs to re-render if highlightNewTileArea or gamePaused changes.
+// player object is pretty much static. Should only update if pinged value is updated
+// probably remove player from props.
+// get docSnap and 
 const PlayerArea = memo(({highlightNewTileArea, gamePaused, player} : PlayerAreaProps) => {
+  // console.log('re render player area', {highlightNewTileArea, gamePaused, player})
   const { gameState } = useGame();
 
   const _handleContinueGame = async () => {

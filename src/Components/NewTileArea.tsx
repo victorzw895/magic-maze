@@ -8,7 +8,7 @@ import isEqual from 'lodash/isEqual';
 
 interface NewTileAreaProps {
   tile: DBTile,
-  clearHighlightAreas: (gridPosition: number[]) => void,
+  clearHighlightAreas: () => void,
   gamePaused: boolean,
 }
 
@@ -16,10 +16,7 @@ const areEqual = (prevProps: NewTileAreaProps, nextProps: NewTileAreaProps) => {
   return isEqual(prevProps, nextProps);
 }
 
-// TODO clearHighlightAreas causes all new areas to re render
 const NewTileArea = React.memo(({tile, clearHighlightAreas, gamePaused}: NewTileAreaProps) => {
-  console.count('render new tiles')
-  // console.count('new tile area')
   const { gridPosition, placementDirection } = tile;
   const { gameState } = useGame();
 
@@ -40,7 +37,7 @@ const NewTileArea = React.memo(({tile, clearHighlightAreas, gamePaused}: NewTile
       addNewTile({gridPosition, placementDirection} as DBTile);
     }
 
-    clearHighlightAreas(gridPosition);
+    clearHighlightAreas();
   }
 
   const getDisplacementValue = (positionValue: number) => {
