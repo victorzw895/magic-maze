@@ -1,13 +1,16 @@
-import { memo } from 'react';
+import { memo, ReactNode } from 'react';
 import { useGame } from '../Contexts/GameContext';
 import { DBPlayer } from '../types';
 import isEqual from 'lodash/isEqual';
 import { setDoc } from '../utils/useFirestore';
+import { usePlayerState } from '../Contexts/PlayerContext';
+import PlayerAreaDisabled from './PlayerAreaDisabled';
+import { useDocData, getDoc } from '../utils/useFirestore';
 
 interface PlayerAreaProps {
   highlightNewTileArea: () => void,
-  gamePaused: boolean,
-  player: DBPlayer | undefined
+  // gamePaused: boolean,
+  children: ReactNode
 }
 
 const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
@@ -18,25 +21,21 @@ const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
 // player object is pretty much static. Should only update if pinged value is updated
 // probably remove player from props.
 // get docSnap and 
-const PlayerArea = memo(({highlightNewTileArea, gamePaused, player} : PlayerAreaProps) => {
-  // console.log('re render player area', {highlightNewTileArea, gamePaused, player})
+const PlayerArea = memo(({highlightNewTileArea} : PlayerAreaProps) => {
+  console.log('re render player area', {highlightNewTileArea})
   const { gameState } = useGame();
+  const playerState = usePlayerState();
+  // const [room] = useDocData(gameState.roomId);
 
-  const _handleContinueGame = async () => {
-    await setDoc(gameState.roomId, 
-      { 
-        gamePaused: false,
-      }
-    )
-  }
+  // const {gamePaused} = room;
 
   return (
     <div className="player-area">
       {
-        player &&
+        playerState.number &&
         <>
           {
-            player.playerDirections.map(direction => {
+            playerState.playerDirections.map(direction => {
               return (
                 <img 
                   key={direction}
@@ -52,7 +51,7 @@ const PlayerArea = memo(({highlightNewTileArea, gamePaused, player} : PlayerArea
             })
           }
           {
-            player.playerAbilities.map(ability => {
+            playerState.playerAbilities.map(ability => {
               if (ability === "explore") {
                 // DECISION: use button, or image?
                 // return <button key={ability} onClick={() => highlightNewTileArea()}>Add Tile</button>
@@ -60,7 +59,7 @@ const PlayerArea = memo(({highlightNewTileArea, gamePaused, player} : PlayerArea
                   <img 
                     draggable={false}
                     key={ability}
-                    onClick={gamePaused ? () => {} : highlightNewTileArea} // TODO: disable if game paused
+                    onClick={highlightNewTileArea} // TODO: disable if game paused
                     src={`/${ability}.png`} 
                     alt={ability} 
                     style={{
@@ -86,16 +85,9 @@ const PlayerArea = memo(({highlightNewTileArea, gamePaused, player} : PlayerArea
               }
             })
           }
-          {
-            (gamePaused) &&
-            <div className="game-paused">
-              <p>Timer has been hit! Time left remaining:
-                <span>{gameState.minutesLeft}</span>:
-                <span>{gameState.secondsLeft.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}</span>
-              </p>
-              <button onClick={_handleContinueGame}>Continue</button> {/* TODO show only for player who paused game*/}
-            </div>
-          }
+          {/* {
+            (gamePaused) && <PlayerAreaDisabled />
+          } */}
           {
               gameState.gameOver && 
               <div className="game-paused">
@@ -108,6 +100,6 @@ const PlayerArea = memo(({highlightNewTileArea, gamePaused, player} : PlayerArea
   )
 }, areEqual)
 
-PlayerArea.whyDidYouRender = true
+// PlayerArea.whyDidYouRender = true
 
 export default PlayerArea;

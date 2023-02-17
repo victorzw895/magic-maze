@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { heroColor, Player, playerNumber, direction, Escalator, DBPlayer } from '../types';
+import { heroColor, Player, playerNumber, direction, Escalator, DBPlayer, BasePlayer } from '../types';
 
 export type Action = {type: 'playerHeld', value: number | null, color: heroColor} | 
               {type: 'showMovableSpaces', value: direction[]} | 
               {type: 'showEscalatorSpaces', value: Escalator[]} | 
               {type: 'showTeleportSpaces', color: heroColor | null} | 
-              {type: 'setPlayer', value: Player} | undefined;
+              {type: 'setPlayer', value: Player} |
+              {type: 'assignActions', value: BasePlayer} | undefined;
 export type Dispatch = (action: Action) => void;
 
 type PlayerProviderProps = {children: React.ReactNode}
@@ -21,6 +22,8 @@ export const PlayerFactory = (playerName: string, currentPlayers: number) => {
     showMovableDirections: [],
     showTeleportSpaces: null,
     showEscalatorSpaces: [],
+    playerDirections: [], 
+    playerAbilities: [],
   }
 
   const dbPlayerState: DBPlayer = {
@@ -43,7 +46,9 @@ const playerInitialState: Player = {
   number: null,
   showMovableDirections: [],
   showTeleportSpaces: null,
-  showEscalatorSpaces: []
+  showEscalatorSpaces: [],
+  playerDirections: [], 
+  playerAbilities: [],
 }
 
 const PlayerStateContext = createContext<Player | undefined>(undefined);
@@ -70,6 +75,11 @@ const playerReducer = (playerState: Player, action: any) => {
     }
     case 'setPlayer': {
       newState = action.value;
+      return newState;
+    }
+    case 'assignActions': {
+      newState.playerAbilities = action.value.playerAbilities;
+      newState.playerDirections = action.value.playerDirections;
       return newState;
     }
     case 'movePawn': {

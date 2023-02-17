@@ -4,6 +4,7 @@ import { Stack, Button, List, ListItem } from '@mui/material';
 import { DBPlayer } from '../types';
 import { setDoc, useDocData } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
+import { usePlayerState, usePlayerDispatch } from '../Contexts/PlayerContext';
 
 const WaitingRoom = ({isHost}: {isHost: boolean}) => {
   const { gameState, gameDispatch } = useGame();
@@ -43,7 +44,6 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
     )
     gameDispatch({type: "startGame"})
   }
-
 
   return (
     <>

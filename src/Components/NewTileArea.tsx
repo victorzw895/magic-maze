@@ -5,20 +5,23 @@ import { generateTile } from '../Contexts/TilesContext';
 import { useGame } from '../Contexts/GameContext';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
+import { useFirestoreState } from '../Contexts/FirestoreContext';
 
 interface NewTileAreaProps {
   tile: DBTile,
   clearHighlightAreas: () => void,
-  gamePaused: boolean,
+  disableAction: boolean,
 }
 
 const areEqual = (prevProps: NewTileAreaProps, nextProps: NewTileAreaProps) => {
   return isEqual(prevProps, nextProps);
 }
 
-const NewTileArea = React.memo(({tile, clearHighlightAreas, gamePaused}: NewTileAreaProps) => {
+const NewTileArea = React.memo(({tile, clearHighlightAreas, disableAction}: NewTileAreaProps) => {
+  // console.log('new tile area re render')
   const { gridPosition, placementDirection } = tile;
   const { gameState } = useGame();
+  // const gamePaused = useFirestoreState();
 
   const addNewTile = async (newTile: DBTile) => {
     const docSnap = await getDoc(gameState.roomId);
@@ -32,7 +35,8 @@ const NewTileArea = React.memo(({tile, clearHighlightAreas, gamePaused}: NewTile
     }
   }
 
-  const placeNewTile = (e: MouseEvent<HTMLDivElement>) => {
+  const placeNewTile = () => {
+    if (disableAction) return
     if (placementDirection) {
       addNewTile({gridPosition, placementDirection} as DBTile);
     }
@@ -46,7 +50,7 @@ const NewTileArea = React.memo(({tile, clearHighlightAreas, gamePaused}: NewTile
 
   return (
     <div className={`tile new-tile-area ${placementDirection ? placementDirection : "placeholder"}`}
-      onClick={gamePaused ? () => {} : (e) => placeNewTile(e)} // TODO: disable if game paused
+      onClick={placeNewTile} // TODO: disable if game paused
       style={
         {
           gridColumnStart: gridPosition[0], 

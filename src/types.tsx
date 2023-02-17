@@ -37,11 +37,16 @@ export interface Escalator {
   escalatorName: string | null
 }
 
-export interface Player {
+export interface BasePlayer {
   number: playerNumber,  // TODO remove, can use values straight from DB
+  playerDirections: direction[],
+  playerAbilities: basicAbility[],
+}
+
+export interface Player extends BasePlayer {
   showMovableDirections: direction[],
   showTeleportSpaces: heroColor | null,
-  showEscalatorSpaces: Escalator[]
+  showEscalatorSpaces: Escalator[],
 }
 
 type BlockedPosition = {
@@ -94,11 +99,8 @@ export interface Room {
 }
 
 
-export interface DBPlayer {
+export interface DBPlayer extends BasePlayer {
   name: string,
-  number: playerNumber,
-  playerDirections: direction[],
-  playerAbilities: basicAbility[],
   pinged: boolean
 }
 
