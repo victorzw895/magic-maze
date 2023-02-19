@@ -6,6 +6,8 @@ import { setDoc } from '../utils/useFirestore';
 import { usePlayerState } from '../Contexts/PlayerContext';
 
 const PlayerAreaDisabled = () => {
+  // console.log('re render player area')
+
   const { gameState } = useGame();
 
   const _handleContinueGame = async () => {

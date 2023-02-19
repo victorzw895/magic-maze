@@ -21,9 +21,7 @@ export const PlayerFactory = (playerName: string, currentPlayers: number) => {
     number: currentPlayers + 1 as playerNumber,
     showMovableDirections: [],
     showTeleportSpaces: null,
-    showEscalatorSpaces: [],
-    playerDirections: [], 
-    playerAbilities: [],
+    showEscalatorSpaces: [], // TODO revisit this (trim down data)
   }
 
   const dbPlayerState: DBPlayer = {
@@ -47,8 +45,6 @@ const playerInitialState: Player = {
   showMovableDirections: [],
   showTeleportSpaces: null,
   showEscalatorSpaces: [],
-  playerDirections: [], 
-  playerAbilities: [],
 }
 
 const PlayerStateContext = createContext<Player | undefined>(undefined);
@@ -78,8 +74,11 @@ const playerReducer = (playerState: Player, action: any) => {
       return newState;
     }
     case 'assignActions': {
-      newState.playerAbilities = action.value.playerAbilities;
-      newState.playerDirections = action.value.playerDirections;
+      // TODO, these are constant values that never change, should move to a seperate provider,
+      // so components using these values do not re-render whenever playerContext value changes.
+      // MINOR priority
+      // newState.playerAbilities = action.value.playerAbilities;
+      // newState.playerDirections = action.value.playerDirections;
       return newState;
     }
     case 'movePawn': {
@@ -95,6 +94,10 @@ const playerReducer = (playerState: Player, action: any) => {
 const PlayerProvider = ({children}: PlayerProviderProps) => {
 
   const [playerState, playerDispatch] = useReducer(playerReducer, playerInitialState);
+  // TODO split player state, static values and dynamic values
+  // eg
+  // number, playerDirections, playerAbilities
+  // showMovables ....
 
   return (
     <PlayerStateContext.Provider value={playerState}>

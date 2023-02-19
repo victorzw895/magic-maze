@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, ReactNode, memo, useCallback } from 'react';
 import Tiles from './Tiles';
 import NewTileArea from './NewTileArea';
-import Pawn from './Pieces/Pawn';
+import Pawns from './Pieces/Pawns';
+// import Pawn from './Pieces/Pawn';
 import PlayerArea from './PlayerArea';
 import { Room, DBTile, DBPlayer } from '../types';
 import './Board.scss';
@@ -12,30 +13,29 @@ import { useDocData, getDoc } from '../utils/useFirestore';
 import useHighlightArea from '../utils/useHighlightArea';
 import Timer from './Timer';
 import Pinged from './Pinged';
-import { useFirestoreState } from '../Contexts/FirestoreContext';
+import { useGamePausedDocState, useGameStartedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
+import PlayerAreaDisabled from './PlayerAreaDisabled';
 
-const BoardComponent = ({timer, children}: {timer: ReactNode, children: ReactNode}) => {
+const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: ReactNode, children: ReactNode}) => {
+  console.log('*** Board Component re render')
   const draggableNodeRef = useRef(null);
   const { gameState } = useGame();
-  const [room] = useDocData(gameState.roomId);
-  const playerState = usePlayerState();
-  const playerDispatch = usePlayerDispatch();
-  const { players, gameStarted }: Room = room
+  // const playerDispatch = usePlayerDispatch();
 
-  const gamePaused = useFirestoreState();
+  // const {player} = usePlayerDocState();
+  const gameStarted = useGameStartedDocState();
   const [availableArea, highlightNewTileArea, clearHighlightAreas] = useHighlightArea(gameState.roomId);
 
-  useEffect(() => {
-    (() => {
-      const currentPlayer = players.find(player => player.number === playerState.number);
-      if (!currentPlayer) return;
-      playerDispatch({type: 'assignActions', value: {
-        number: currentPlayer.number,
-        playerDirections: currentPlayer.playerDirections,
-        playerAbilities: currentPlayer.playerAbilities,
-      }})
-    })()
-  }, [gameStarted])
+  // useEffect(() => {
+  //   (() => {
+  //     if (!player) return;
+  //     playerDispatch({type: 'assignActions', value: {
+  //       number: player.number,
+  //       playerDirections: player.playerDirections,
+  //       playerAbilities: player.playerAbilities,
+  //     }})
+  //   })()
+  // }, [gameStarted])
 
   return (
     <>
@@ -51,16 +51,15 @@ const BoardComponent = ({timer, children}: {timer: ReactNode, children: ReactNod
                 key={`${newTileArea.gridPosition[0]}-${newTileArea.gridPosition[1]}`} 
                 tile={newTileArea} 
                 clearHighlightAreas={clearHighlightAreas} 
-                disableAction={!newTileArea.placementDirection ? true : gamePaused}
                 />
             )
           })}
           {children}
         </div>
       </Draggable>
-      <PlayerArea highlightNewTileArea={gamePaused ? () => {} : highlightNewTileArea}>
+      <PlayerArea highlightNewTileArea={highlightNewTileArea}>
         {/* TODO take pinged value from room as props*/}
-        <Pinged />
+        {pinged}
       </PlayerArea>
     </>
   );
@@ -68,16 +67,15 @@ const BoardComponent = ({timer, children}: {timer: ReactNode, children: ReactNod
 
 
 const Board = () => {
+  console.log('BOARD!!!!')
   return (
     <div className="Board">
       <BoardComponent
         timer={<Timer />}
+        pinged={<Pinged />}
       >
         <Tiles />
-        <Pawn color="yellow" />
-        <Pawn color="orange"/>
-        <Pawn color="green"/>
-        <Pawn color="purple"/>
+        <Pawns />
       </BoardComponent>
     </div>
   );

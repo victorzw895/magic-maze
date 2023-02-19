@@ -1,4 +1,4 @@
-import { memo, ReactNode } from 'react';
+import { memo, ReactNode, useEffect } from 'react';
 import { useGame } from '../Contexts/GameContext';
 import { DBPlayer } from '../types';
 import isEqual from 'lodash/isEqual';
@@ -6,6 +6,7 @@ import { setDoc } from '../utils/useFirestore';
 import { usePlayerState } from '../Contexts/PlayerContext';
 import PlayerAreaDisabled from './PlayerAreaDisabled';
 import { useDocData, getDoc } from '../utils/useFirestore';
+import { useGamePausedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
 
 interface PlayerAreaProps {
   highlightNewTileArea: () => void,
@@ -17,25 +18,27 @@ const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
   return isEqual(prevProps, nextProps);
 }
 
-// TODO, this component only needs to re-render if highlightNewTileArea or gamePaused changes.
+// TODO, this component only needs to re-render if highlightNewTileArea changes.
 // player object is pretty much static. Should only update if pinged value is updated
 // probably remove player from props.
-// get docSnap and 
-const PlayerArea = memo(({highlightNewTileArea} : PlayerAreaProps) => {
-  console.log('re render player area', {highlightNewTileArea})
+const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
+  console.log('*** *** re render player area')
   const { gameState } = useGame();
-  const playerState = usePlayerState();
-  // const [room] = useDocData(gameState.roomId);
+  const { player }: { player: DBPlayer } = usePlayerDocState();
+  // const playerState = usePlayerState(); // TODO causing extra re render, can fix through TODO in playercontext
+  const gamePaused = useGamePausedDocState();
 
-  // const {gamePaused} = room;
+  useEffect(() => {
+    console.log('*** player area useEffect')
+  }, [children, player])
 
   return (
     <div className="player-area">
       {
-        playerState.number &&
+        player.number &&
         <>
           {
-            playerState.playerDirections.map(direction => {
+            player.playerDirections.map(direction => {
               return (
                 <img 
                   key={direction}
@@ -51,7 +54,7 @@ const PlayerArea = memo(({highlightNewTileArea} : PlayerAreaProps) => {
             })
           }
           {
-            playerState.playerAbilities.map(ability => {
+            player.playerAbilities.map(ability => {
               if (ability === "explore") {
                 // DECISION: use button, or image?
                 // return <button key={ability} onClick={() => highlightNewTileArea()}>Add Tile</button>
@@ -59,7 +62,7 @@ const PlayerArea = memo(({highlightNewTileArea} : PlayerAreaProps) => {
                   <img 
                     draggable={false}
                     key={ability}
-                    onClick={highlightNewTileArea} // TODO: disable if game paused
+                    onClick={gamePaused ? () => {} : highlightNewTileArea} // TODO: disable if game paused
                     src={`/${ability}.png`} 
                     alt={ability} 
                     style={{
@@ -85,9 +88,8 @@ const PlayerArea = memo(({highlightNewTileArea} : PlayerAreaProps) => {
               }
             })
           }
-          {/* {
-            (gamePaused) && <PlayerAreaDisabled />
-          } */}
+          {/* TODO: when firestore gamePaused, update gameState */}
+          {gamePaused && <PlayerAreaDisabled />}
           {
               gameState.gameOver && 
               <div className="game-paused">
@@ -98,7 +100,7 @@ const PlayerArea = memo(({highlightNewTileArea} : PlayerAreaProps) => {
       }
     </div>
   )
-}, areEqual)
+}
 
 // PlayerArea.whyDidYouRender = true
 

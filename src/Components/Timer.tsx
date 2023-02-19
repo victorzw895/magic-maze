@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 import { useTimer } from 'react-timer-hook';
 import { useGame } from '../Contexts/GameContext';
-import { useDocData } from "../utils/useFirestore"; 
+import { useGamePausedDocState } from '../Contexts/FirestoreContext';
 
 
 const Timer = () => {
   console.count('Render timer') // 28 times
-  const { gameState, gameDispatch } = useGame();
-  const [room] = useDocData(gameState.roomId);
+  const { gameDispatch } = useGame();
+  const gamePaused = useGamePausedDocState();
   const time = new Date();
 
   useEffect(() => {
@@ -53,11 +53,8 @@ const Timer = () => {
   // this toggles pause on timer, missing game pause.
   // for accuracy, best to move timer into firebase
   useEffect(() => {
-    (async () => {
-      if (!room) return;
-      toggleTimer(room.gamePaused);
-    })()
-  }, [room?.gamePaused])
+    toggleTimer(gamePaused);
+  }, [gamePaused])
 
   return (
     <div className="timer">

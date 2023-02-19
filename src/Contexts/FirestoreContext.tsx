@@ -1,9 +1,15 @@
-import React, { createContext, useContext, useEffect, useReducer, useState } from 'react';
+import React, { createContext, useContext, useEffect, useReducer, useState, useMemo } from 'react';
 import { useDocumentData, useDocument } from 'react-firebase-hooks/firestore'
-import { Room } from '../types';
+import { Room, DBPlayer, DBHeroPawn } from '../types';
 import { useGame } from '../Contexts/GameContext';
+import { usePlayerDispatch, usePlayerState } from '../Contexts/PlayerContext';
 import { firestore, gamesRef } from "../Firestore";
 import { useDocData, getDoc } from '../utils/useFirestore';
+import useGamePaused from '../utils/useGamePaused';
+import useTiles from '../utils/useTiles';
+import usePlayer from '../utils/usePlayer';
+import usePawns from '../utils/usePawns';
+import useGreen from '../utils/useGreen'; // TODO remove, unused
 
 type Action = {type: 'update', value: string} | undefined;
 // type Dispatch = (document: any, roomId?: string) => Promise<void>
@@ -12,64 +18,131 @@ type Dispatch = (action: Action) => void;
 type DBProviderProps = {children: React.ReactNode}
 
 
-const DocRefStateContext = createContext<any>(undefined);
-const DocRefDispatchContext = createContext<Dispatch | undefined>(undefined);
-
-
-// const docRefReducer = (docRefState: DocumentReference<any> | null, action: any) => {
-//   let newState = docRefState;
-
-//   switch (action?.type) {
-//     case 'update': {
-//       if (!action.value) return newState;
-//       return doc(gamesRef, action.value);
-//     }
-//     default: {
-//       throw new Error(`Unhandled action type: ${action?.type}`)
-//     }
-//   }
-// }
-
+const GameStartedDocContext = createContext<any>(undefined);
+const GamePausedDocContext = createContext<any>(undefined);
+const GreenPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
+const YellowPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
+const PurplePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
+const OrangePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
+const TilesDocContext = createContext<any>(undefined);
+const PlayerDocContext = createContext<any>(undefined);
 
 const FirestoreProvider = ({children}: DBProviderProps) => {
   const { gameState } = useGame();
-  // const [docRef, setDocRef] = useReducer(docRefReducer, null);
   const [room] = useDocData(gameState.roomId);
-  const [gamePaused, setGamePaused] = useState(false);
+
+  const [gameStarted, setGameStarted] = useState(false);
+  const [heroesEscaped, setHeroesEscaped] = useState([]);
+  const [weaponsStolen, setWeaponsStolen] = useState([]);
+  
+  const [gamePaused] = useGamePaused(room);
+  const [tiles] = useTiles(room);
+  const [player, setPlayer, pinged] = usePlayer(room);
+  const [green] = useGreen(room);
+  const {yellow, purple, orange} = usePawns(room);
+  // const {green, yellow, purple, orange} = usePawns(room);
 
   useEffect(() => {
-    (() => {
-      console.log('gamePaused from fiestore context')
-      setGamePaused(room.gamePaused);
-    })()
-  }, [room.gamePaused])
+    setGameStarted(room.gameStarted)
+  }, [room.gameStarted]);
 
-  // const docRefProviderValue = { docRef, setDocRef };
+  const playerProviderValue = useMemo(() => { // TODO figure out why need useMemo???
+    return {player, setPlayer}
+  }, [player]);
 
   return (
-    <DocRefStateContext.Provider value={gamePaused}>
-      {/* <DocRefDispatchContext.Provider value={setDocRef}> */}
-        {children}
-      {/* </DocRefDispatchContext.Provider> */}
-    </DocRefStateContext.Provider>
+    <GameStartedDocContext.Provider value={gameStarted}>
+      <GamePausedDocContext.Provider value={gamePaused}>
+        <TilesDocContext.Provider value={tiles}>
+          <PlayerDocContext.Provider value={playerProviderValue}>
+            <GreenPawnDocContext.Provider value={green}>
+            <YellowPawnDocContext.Provider value={yellow}>
+            <PurplePawnDocContext.Provider value={purple}>
+            <OrangePawnDocContext.Provider value={orange}>
+              {children}
+            </OrangePawnDocContext.Provider>
+            </PurplePawnDocContext.Provider>
+            </YellowPawnDocContext.Provider>
+            </GreenPawnDocContext.Provider>
+          </PlayerDocContext.Provider>
+        </TilesDocContext.Provider>
+      </GamePausedDocContext.Provider>
+    </GameStartedDocContext.Provider>
   )
 }
 
 
-const useFirestoreState = () => {
-  const context = useContext(DocRefStateContext)
+const useGameStartedDocState = () => {
+  const context = useContext(GameStartedDocContext)
   if (context === undefined) {
-    throw new Error('useDocRef must be used within a DocRefContext');
+    throw new Error('useGameStartedDocState must be used within a GameStartedDocContext');
   }
   return context;
 }
 
-const useFirestoreDispatch = () => {
-  const context = useContext(DocRefDispatchContext)
+const useGamePausedDocState = () => {
+  const context = useContext(GamePausedDocContext)
   if (context === undefined) {
-    throw new Error('useDocRef must be used within a DocRefContext');
+    throw new Error('useGamePausedDocState must be used within a GamePausedDocContext');
   }
   return context;
 }
 
-export { FirestoreProvider, useFirestoreState, useFirestoreDispatch };
+const useGreenDocState = () => {
+  const context = useContext(GreenPawnDocContext)
+  if (context === undefined) {
+    throw new Error('useGreenDocState must be used within a GreenPawnDocContext');
+  }
+  return context;
+}
+
+const useYellowDocState = () => {
+  const context = useContext(YellowPawnDocContext)
+  if (context === undefined) {
+    throw new Error('useYellowDocState must be used within a YellowPawnDocContext');
+  }
+  return context;
+}
+
+const usePurpleDocState = () => {
+  const context = useContext(PurplePawnDocContext)
+  if (context === undefined) {
+    throw new Error('usePurpleDocState must be used within a PurplePawnDocContext');
+  }
+  return context;
+}
+
+const useOrangeDocState = () => {
+  const context = useContext(OrangePawnDocContext)
+  if (context === undefined) {
+    throw new Error('useOrangeDocState must be used within a OrangePawnDocContext');
+  }
+  return context;
+}
+
+const useTilesDocState = () => {
+  const context = useContext(TilesDocContext)
+  if (context === undefined) {
+    throw new Error('useTilesDocState must be used within a TilesDocContext');
+  }
+  return context;
+}
+const usePlayerDocState = () => {
+  const context = useContext(PlayerDocContext)
+  if (context === undefined) {
+    throw new Error('usePlayerDocState must be used within a PlayerDocContext');
+  }
+  return context;
+}
+
+export { 
+  FirestoreProvider,
+  useGameStartedDocState,
+  useGamePausedDocState,
+  useGreenDocState,
+  useYellowDocState,
+  usePurpleDocState,
+  useOrangeDocState,
+  useTilesDocState,
+  usePlayerDocState,
+};

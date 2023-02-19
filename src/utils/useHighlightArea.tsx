@@ -49,7 +49,7 @@ const useHighlightArea = (roomId: string): [ DBTile[], () => void, () => void] =
     }
   }
 
-  const highlightNewTileArea = useCallback(async () => {
+  const highlightNewTileArea = async () => {
     const docSnap = await getDoc(roomId);
     if (!docSnap.exists()) return;
 
@@ -70,7 +70,7 @@ const useHighlightArea = (roomId: string): [ DBTile[], () => void, () => void] =
     })
 
     setAvailableArea(placeholderTiles);
-  }, [])
+  }
 
   const clearHighlightAreas = useCallback(() => {
     const resetAreas = availableArea.map(area => {

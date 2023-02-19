@@ -9,14 +9,19 @@ import reportWebVitals from './reportWebVitals';
 import { GameProvider } from './Contexts/GameContext';
 import { Provider } from './Contexts/DBContext';
 import { FirestoreProvider } from './Contexts/FirestoreContext';
+import { PlayerProvider } from './Contexts/PlayerContext';
+import Test from './Components/Test';
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider>
       <GameProvider>
-        <FirestoreProvider>
-          <App />
-        </FirestoreProvider>
+        <PlayerProvider>
+          <FirestoreProvider>
+            <App />
+            <Test />
+          </FirestoreProvider>
+        </PlayerProvider>
       </GameProvider>
     </Provider>
   </React.StrictMode>,

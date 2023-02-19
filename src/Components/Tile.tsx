@@ -5,13 +5,13 @@ import { tileWallSize, spaceSize } from '../constants';
 import { usePawn } from '../Contexts/PawnContext';
 import { usePlayerState, usePlayerDispatch } from '../Contexts/PlayerContext';
 import isEqual from 'lodash/isEqual';
+import { useGamePausedDocState, useGameStartedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
 
 interface tileProps {
-  id?: string,
   tileData: DBTile,
   tileIndex: number,
   playerHeldPawn: DBHeroPawn,
-  currentPlayer: DBPlayer,
+  // currentPlayer: DBPlayer,
 }
 
 const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
@@ -36,11 +36,15 @@ const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
   return isEqual(prevProps, nextProps);
 }
 
-const Tile = memo(({id, tileIndex, tileData, playerHeldPawn}: tileProps) => {
-  const playerState = usePlayerState();
-  const playerDispatch = usePlayerDispatch(); // TODO this causing re-render
+const Tile = memo(({tileIndex, tileData, playerHeldPawn}: tileProps) => {
+  console.log('$$$ re rendering tile', {tileIndex, tileData, playerHeldPawn})
+  const playerState = usePlayerState(); // Causing 3x extra rerender on pawn click
+  // ^ due to pawn showMovable calls playerDispatch 3x times
+  const { player } = usePlayerDocState();
+  const playerDispatch = usePlayerDispatch();
 
-  const { pawnState } = usePawn();
+  const pawnState = usePawn(); // 2x extra re render
+  // ^ due to pawn showMovable calls pawnDispatch 1x time
 
   const tileHasBlockedSpace = (tileData: DBTile, direction: direction, pawnHeld: HeroPawn) => {
     // console.log("tilehas blocked space")
@@ -63,7 +67,7 @@ const Tile = memo(({id, tileIndex, tileData, playerHeldPawn}: tileProps) => {
   return (
     <>
       {tileData ?
-        <div className={`tile ${id === '1a' ? "start-tile" : ""}`} 
+        <div className={`tile ${tileData.id === '1a' ? "start-tile" : ""}`} 
           style={
             {
               gridColumnStart: tileData.gridPosition[0],
@@ -87,7 +91,7 @@ const Tile = memo(({id, tileIndex, tileData, playerHeldPawn}: tileProps) => {
                     const localPawn = pawnState[playerHeldPawn.color]
                     if (tileData.gridPosition[0] !== playerHeldPawn.gridPosition[0] || tileData.gridPosition[1] !== playerHeldPawn.gridPosition[1]) {
                       let rowBlocked = true;
-                      if (playerState.playerDirections.includes("up")) {
+                      if (player.playerDirections.includes("up")) {
                         if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] && 
                           tileData.gridPosition[1] === playerHeldPawn.gridPosition[1] - 1) {
                           if (tileHasBlockedSpace(tileData, "up", localPawn)) {
@@ -110,10 +114,10 @@ const Tile = memo(({id, tileIndex, tileData, playerHeldPawn}: tileProps) => {
                         }
                       }
 
-                      if (playerState.playerDirections.includes("left")) {
+                      if (player.playerDirections.includes("left")) {
                         if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] - 1 && 
                           tileData.gridPosition[1] === playerHeldPawn.gridPosition[1]) {
-                          if (tileHasBlockedSpace(tileData, "left", localPawn) && playerState.playerDirections.includes("left")) {
+                          if (tileHasBlockedSpace(tileData, "left", localPawn) && player.playerDirections.includes("left")) {
                             if (rowIndex === localPawn.blockedPositions.left.position![1]) {
                               if (colIndex <= localPawn.blockedPositions.left.position![0]) {
                                 rowBlocked = true;
@@ -133,10 +137,10 @@ const Tile = memo(({id, tileIndex, tileData, playerHeldPawn}: tileProps) => {
                         }
                       }
                       
-                      if (playerState.playerDirections.includes("right")) {
+                      if (player.playerDirections.includes("right")) {
                         if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] + 1 && 
                           tileData.gridPosition[1] === playerHeldPawn.gridPosition[1]) {
-                          if (tileHasBlockedSpace(tileData, "right", localPawn) && playerState.playerDirections.includes("right")) {
+                          if (tileHasBlockedSpace(tileData, "right", localPawn) && player.playerDirections.includes("right")) {
                             if (rowIndex === localPawn.blockedPositions.right.position![1]) {
                               if (colIndex >= localPawn.blockedPositions.right.position![0]) {
                                 rowBlocked = true;
@@ -156,10 +160,10 @@ const Tile = memo(({id, tileIndex, tileData, playerHeldPawn}: tileProps) => {
                         }
                       }
 
-                      if (playerState.playerDirections.includes("down")) {
+                      if (player.playerDirections.includes("down")) {
                         if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] && 
                           tileData.gridPosition[1] === playerHeldPawn.gridPosition[1] + 1) {
-                          if (tileHasBlockedSpace(tileData, "down", localPawn) && playerState.playerDirections.includes("down")) {
+                          if (tileHasBlockedSpace(tileData, "down", localPawn) && player.playerDirections.includes("down")) {
                             if (colIndex === localPawn.blockedPositions.down.position![0]) {
                               if (rowIndex >= localPawn.blockedPositions.down.position![1]) {
                                 rowBlocked = true;
@@ -185,7 +189,7 @@ const Tile = memo(({id, tileIndex, tileData, playerHeldPawn}: tileProps) => {
                       let rowBlocked = true;
                       
                       // column directly above from pawn (up movement)
-                      if (rowIndex < playerHeldPawn.position[1] && colIndex === playerHeldPawn.position[0] && playerState.playerDirections.includes("up")) {
+                      if (rowIndex < playerHeldPawn.position[1] && colIndex === playerHeldPawn.position[0] && player.playerDirections.includes("up")) {
                         if (tileHasBlockedSpace(tileData, "up", localPawn)) {
                           if (colIndex === localPawn.blockedPositions.up.position![0]) {
                             if (rowIndex <= localPawn.blockedPositions.up.position![1]) {
@@ -200,7 +204,7 @@ const Tile = memo(({id, tileIndex, tileData, playerHeldPawn}: tileProps) => {
                           rowBlocked = false;
                         }
                       }
-                      else if (colIndex < playerHeldPawn.position[0] && rowIndex === playerHeldPawn.position[1] && playerState.playerDirections.includes("left")) {
+                      else if (colIndex < playerHeldPawn.position[0] && rowIndex === playerHeldPawn.position[1] && player.playerDirections.includes("left")) {
                         if (tileHasBlockedSpace(tileData, "left", localPawn)) {
                           if (rowIndex === localPawn.blockedPositions.left.position![1]) {
                             if (colIndex <= localPawn.blockedPositions.left.position![0]) {
@@ -217,7 +221,7 @@ const Tile = memo(({id, tileIndex, tileData, playerHeldPawn}: tileProps) => {
                           rowBlocked = false;
                         }
                       }
-                      else if (colIndex > playerHeldPawn.position[0] && rowIndex === playerHeldPawn.position[1] && playerState.playerDirections.includes("right")) {
+                      else if (colIndex > playerHeldPawn.position[0] && rowIndex === playerHeldPawn.position[1] && player.playerDirections.includes("right")) {
                         if (tileHasBlockedSpace(tileData, "right", localPawn)) {
                           if (rowIndex === localPawn.blockedPositions.right.position![1]) {
                             if (colIndex >= localPawn.blockedPositions.right.position![0]) {
@@ -232,7 +236,7 @@ const Tile = memo(({id, tileIndex, tileData, playerHeldPawn}: tileProps) => {
                           rowBlocked = false;
                         }
                       }
-                      else if (rowIndex > playerHeldPawn.position[1] && colIndex === playerHeldPawn.position[0] && playerState.playerDirections.includes("down")) {
+                      else if (rowIndex > playerHeldPawn.position[1] && colIndex === playerHeldPawn.position[0] && player.playerDirections.includes("down")) {
                         if (tileHasBlockedSpace(tileData, "down", localPawn)) {
                           if (colIndex === localPawn.blockedPositions.down.position![0]) {
                             if (rowIndex >= localPawn.blockedPositions.down.position![1]) {

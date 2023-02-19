@@ -5,27 +5,26 @@ import { PlayerProvider } from './Contexts/PlayerContext';
 import { TilesProvider } from './Contexts/TilesContext';
 import { useGame } from './Contexts/GameContext';
 import Lobby from './Components/Lobby';
-import { useDocData } from './utils/useFirestore';
+import { useGameStartedDocState } from './Contexts/FirestoreContext';
 
 function App() {
   const { gameState } = useGame();
-
-  const [currentGame] = useDocData(gameState.roomId);
+  const gameStarted = useGameStartedDocState()
 
   return (
     <div className="MMApp">
-      <PlayerProvider>
+      {/* <PlayerProvider> */}
         <TilesProvider>
           <PawnProvider>
             {
-              gameState.roomId && currentGame && currentGame.gameStarted ? 
+              gameState.roomId && gameStarted ? 
               <Board />
                 : 
               <Lobby />
             }
           </PawnProvider>
         </TilesProvider>
-      </PlayerProvider>
+      {/* </PlayerProvider> */}
     </div>
   );
 }

@@ -39,8 +39,6 @@ export interface Escalator {
 
 export interface BasePlayer {
   number: playerNumber,  // TODO remove, can use values straight from DB
-  playerDirections: direction[],
-  playerAbilities: basicAbility[],
 }
 
 export interface Player extends BasePlayer {
@@ -101,7 +99,9 @@ export interface Room {
 
 export interface DBPlayer extends BasePlayer {
   name: string,
-  pinged: boolean
+  pinged: boolean,
+  playerDirections: direction[],
+  playerAbilities: basicAbility[],
 }
 
 

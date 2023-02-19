@@ -130,7 +130,8 @@ export const pawnDBInitialState: DBPawnState = {
   orange: PawnFactory("orange", takePosition()).dbPawn,
 }
 
-const PawnContext = createContext<{pawnState: PawnState; pawnDispatch: Dispatch} | undefined>(undefined);
+const PawnContext = createContext<PawnState | undefined>(undefined);
+const PawnDispatchContext = createContext<any>(undefined);
 
 const pawnReducer = (pawnState: PawnState, action: any) => {
   let newState = {...pawnState};
@@ -152,9 +153,14 @@ const pawnReducer = (pawnState: PawnState, action: any) => {
 
 const PawnProvider = ({children}: PawnProviderProps) => {
   const [pawnState, pawnDispatch] = useReducer(pawnReducer, pawnsInitialState);
-  const value = {pawnState, pawnDispatch};
+  // const value = {pawnState, pawnDispatch};
 
-  return <PawnContext.Provider value={value}>{children}</PawnContext.Provider>
+  return (
+    <PawnContext.Provider value={pawnState}>
+      <PawnDispatchContext.Provider value={pawnDispatch}>
+        {children}
+      </PawnDispatchContext.Provider>
+    </PawnContext.Provider>)
 }
 
 const usePawn = () => {
@@ -165,4 +171,12 @@ const usePawn = () => {
   return context;
 }
 
-export { PawnProvider, usePawn };
+const usePawnDispatch = () => {
+  const context = useContext(PawnDispatchContext)
+  if (context === undefined) {
+    throw new Error('usePawnDispatch must be used within a PawnDispatchContext');
+  }
+  return context;
+}
+
+export { PawnProvider, usePawn, usePawnDispatch };
