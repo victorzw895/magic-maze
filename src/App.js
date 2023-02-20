@@ -14,16 +14,16 @@ function App() {
   return (
     <div className="MMApp">
       {/* <PlayerProvider> */}
-        <TilesProvider>
-          <PawnProvider>
+        {/* <TilesProvider>
+          <PawnProvider> */}
             {
               gameState.roomId && gameStarted ? 
               <Board />
                 : 
               <Lobby />
             }
-          </PawnProvider>
-        </TilesProvider>
+          {/* </PawnProvider>
+        </TilesProvider> */}
       {/* </PlayerProvider> */}
     </div>
   );

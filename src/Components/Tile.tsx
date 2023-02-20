@@ -2,15 +2,22 @@ import { memo } from 'react';
 import Space from './Space';
 import { direction, HeroPawn, DBTile, DBHeroPawn, DBPlayer, TeleporterSpace, ExplorationSpace, WeaponSpace, ExitSpace, TimerSpace } from '../types';
 import { tileWallSize, spaceSize } from '../constants';
-import { usePawn } from '../Contexts/PawnContext';
+import { usePawn, usePawnDispatch } from '../Contexts/PawnContext';
 import { usePlayerState, usePlayerDispatch } from '../Contexts/PlayerContext';
 import isEqual from 'lodash/isEqual';
-import { useGamePausedDocState, useGameStartedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
+import { 
+  usePlayerDocState,
+  useGreenDocState,
+  useYellowDocState,
+  useOrangeDocState,
+  usePurpleDocState,
+  usePlayerHeldPawnDocState 
+} from '../Contexts/FirestoreContext';
 
 interface tileProps {
   tileData: DBTile,
   tileIndex: number,
-  playerHeldPawn: DBHeroPawn,
+  // playerHeldPawn: DBHeroPawn,
   // currentPlayer: DBPlayer,
 }
 
@@ -36,19 +43,36 @@ const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
   return isEqual(prevProps, nextProps);
 }
 
-const Tile = memo(({tileIndex, tileData, playerHeldPawn}: tileProps) => {
-  console.log('$$$ re rendering tile', {tileIndex, tileData, playerHeldPawn})
-  const playerState = usePlayerState(); // Causing 3x extra rerender on pawn click
-  // ^ due to pawn showMovable calls playerDispatch 3x times
-  const { player } = usePlayerDocState();
-  const playerDispatch = usePlayerDispatch();
+// const usePlayerHeldPawn = () => {
+//   const { player } = usePlayerDocState();
 
+//   const green = useGreenDocState();
+//   const yellow = useYellowDocState();
+//   const purple = usePurpleDocState();
+//   const orange = useOrangeDocState();
+
+//   const getPlayerHeldPawn = () => {
+//     const pawnHeld = Object.values({green, yellow, orange, purple}).find((pawn: DBHeroPawn) => pawn.playerHeld && pawn.playerHeld === player.number);
+//     return pawnHeld as DBHeroPawn;
+//   }
+
+//   return getPlayerHeldPawn()
+// }
+
+const Tile = memo(({tileIndex, tileData}: tileProps) => {
+  // const playerState = usePlayerState(); // fixed
+  const { player } = usePlayerDocState();
+  
   const pawnState = usePawn(); // 2x extra re render
-  // ^ due to pawn showMovable calls pawnDispatch 1x time
+
+  console.log('pawnState tile', {pawnState})
+  const playerHeldPawn = usePlayerHeldPawnDocState()
+  console.log('$$$ re rendering tile', {tileIndex, tileData, pawnState, playerHeldPawn, player})
+  // const pawnDispatch = usePawnDispatch();
 
   const tileHasBlockedSpace = (tileData: DBTile, direction: direction, pawnHeld: HeroPawn) => {
     // console.log("tilehas blocked space")
-    if (playerState?.showMovableDirections?.includes(direction)) {
+    if (pawnHeld.showMovableDirections?.includes(direction)) {
       if (pawnHeld.blockedPositions[direction].gridPosition && pawnHeld.blockedPositions[direction].position) {
         if (tileData.gridPosition[0] === pawnHeld.blockedPositions[direction].gridPosition![0] &&
             tileData.gridPosition[1] === pawnHeld.blockedPositions[direction].gridPosition![1]) {
@@ -87,13 +111,111 @@ const Tile = memo(({tileIndex, tileData, playerHeldPawn}: tileProps) => {
               <div className="row" key={`row${rowIndex}`}>
                 {/* {console.log("re rendering tile ******")} */}
                 {row.map((space, colIndex) => {
-                  if (playerHeldPawn && playerHeldPawn.playerHeld === playerState.number && playerState.showMovableDirections.length) {
+                  console.log('pawnState tile', {playerHeldPawn, player, pawnState})
+                  if (playerHeldPawn && playerHeldPawn.playerHeld === player.number) {
                     const localPawn = pawnState[playerHeldPawn.color]
-                    if (tileData.gridPosition[0] !== playerHeldPawn.gridPosition[0] || tileData.gridPosition[1] !== playerHeldPawn.gridPosition[1]) {
-                      let rowBlocked = true;
-                      if (player.playerDirections.includes("up")) {
-                        if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] && 
-                          tileData.gridPosition[1] === playerHeldPawn.gridPosition[1] - 1) {
+                    if (localPawn.showMovableDirections.length) {
+                      if (tileData.gridPosition[0] !== playerHeldPawn.gridPosition[0] || tileData.gridPosition[1] !== playerHeldPawn.gridPosition[1]) {
+                        let rowBlocked = true;
+                        if (player.playerDirections.includes("up")) {
+                          if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] && 
+                            tileData.gridPosition[1] === playerHeldPawn.gridPosition[1] - 1) {
+                            if (tileHasBlockedSpace(tileData, "up", localPawn)) {
+                              if (colIndex === localPawn.blockedPositions.up.position![0]) {
+                                if (rowIndex <= localPawn.blockedPositions.up.position![1]) {
+                                  rowBlocked = true;
+                                }
+                                else if (rowIndex > localPawn.blockedPositions.up.position![1]) {
+                                  rowBlocked = false;
+                                }
+                              }
+                            }
+                            else {
+                              if (colIndex === playerHeldPawn.position[0] - 1 && playerHeldPawn.position[0] === 2) {
+                                if (!localPawn.blockedPositions.up.gridPosition) {
+                                  rowBlocked = false;
+                                }
+                              }
+                            }
+                          }
+                        }
+  
+                        if (player.playerDirections.includes("left")) {
+                          if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] - 1 && 
+                            tileData.gridPosition[1] === playerHeldPawn.gridPosition[1]) {
+                            if (tileHasBlockedSpace(tileData, "left", localPawn) && player.playerDirections.includes("left")) {
+                              if (rowIndex === localPawn.blockedPositions.left.position![1]) {
+                                if (colIndex <= localPawn.blockedPositions.left.position![0]) {
+                                  rowBlocked = true;
+                                }
+                                else if (colIndex > localPawn.blockedPositions.left.position![0]) {
+                                  rowBlocked = false;
+                                }
+                              }
+                            }
+                            else {
+                              if (rowIndex === playerHeldPawn.position[1] + 1 && playerHeldPawn.position[1] === 1) {
+                                if (!localPawn.blockedPositions.left.gridPosition) {
+                                  rowBlocked = false;
+                                }
+                              }
+                            }
+                          }
+                        }
+                        
+                        if (player.playerDirections.includes("right")) {
+                          if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] + 1 && 
+                            tileData.gridPosition[1] === playerHeldPawn.gridPosition[1]) {
+                            if (tileHasBlockedSpace(tileData, "right", localPawn) && player.playerDirections.includes("right")) {
+                              if (rowIndex === localPawn.blockedPositions.right.position![1]) {
+                                if (colIndex >= localPawn.blockedPositions.right.position![0]) {
+                                  rowBlocked = true;
+                                }
+                                else if (colIndex < localPawn.blockedPositions.right.position![0]) {
+                                  rowBlocked = false;
+                                }
+                              }
+                            }
+                            else {
+                              if (rowIndex === playerHeldPawn.position[1] - 1 && playerHeldPawn.position[1] === 2) {
+                                if (!localPawn.blockedPositions.right.gridPosition) {
+                                  rowBlocked = false;
+                                }
+                              }
+                            }
+                          }
+                        }
+  
+                        if (player.playerDirections.includes("down")) {
+                          if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] && 
+                            tileData.gridPosition[1] === playerHeldPawn.gridPosition[1] + 1) {
+                            if (tileHasBlockedSpace(tileData, "down", localPawn) && player.playerDirections.includes("down")) {
+                              if (colIndex === localPawn.blockedPositions.down.position![0]) {
+                                if (rowIndex >= localPawn.blockedPositions.down.position![1]) {
+                                  rowBlocked = true;
+                                }
+                                else if (rowIndex < localPawn.blockedPositions.down.position![1]) {
+                                  rowBlocked = false;
+                                }
+                              }
+                            }
+                            else {
+                              if (colIndex === playerHeldPawn.position[0] + 1 && playerHeldPawn.position[0] === 1) {
+                                if (!localPawn.blockedPositions.down.gridPosition) {
+                                  rowBlocked = false;
+                                }
+                              }
+                            }
+                          }
+                        }
+  
+                        highlightSpace = !rowBlocked
+                      }
+                      else if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] && tileData.gridPosition[1] === playerHeldPawn.gridPosition[1]) {
+                        let rowBlocked = true;
+                        
+                        // column directly above from pawn (up movement)
+                        if (rowIndex < playerHeldPawn.position[1] && colIndex === playerHeldPawn.position[0] && player.playerDirections.includes("up")) {
                           if (tileHasBlockedSpace(tileData, "up", localPawn)) {
                             if (colIndex === localPawn.blockedPositions.up.position![0]) {
                               if (rowIndex <= localPawn.blockedPositions.up.position![1]) {
@@ -105,42 +227,28 @@ const Tile = memo(({tileIndex, tileData, playerHeldPawn}: tileProps) => {
                             }
                           }
                           else {
-                            if (colIndex === playerHeldPawn.position[0] - 1 && playerHeldPawn.position[0] === 2) {
-                              if (!localPawn.blockedPositions.up.gridPosition) {
-                                rowBlocked = false;
-                              }
-                            }
+                            rowBlocked = false;
                           }
                         }
-                      }
-
-                      if (player.playerDirections.includes("left")) {
-                        if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] - 1 && 
-                          tileData.gridPosition[1] === playerHeldPawn.gridPosition[1]) {
-                          if (tileHasBlockedSpace(tileData, "left", localPawn) && player.playerDirections.includes("left")) {
+                        else if (colIndex < playerHeldPawn.position[0] && rowIndex === playerHeldPawn.position[1] && player.playerDirections.includes("left")) {
+                          if (tileHasBlockedSpace(tileData, "left", localPawn)) {
                             if (rowIndex === localPawn.blockedPositions.left.position![1]) {
                               if (colIndex <= localPawn.blockedPositions.left.position![0]) {
                                 rowBlocked = true;
                               }
                               else if (colIndex > localPawn.blockedPositions.left.position![0]) {
+                                
                                 rowBlocked = false;
                               }
                             }
                           }
                           else {
-                            if (rowIndex === playerHeldPawn.position[1] + 1 && playerHeldPawn.position[1] === 1) {
-                              if (!localPawn.blockedPositions.left.gridPosition) {
-                                rowBlocked = false;
-                              }
-                            }
+                            
+                            rowBlocked = false;
                           }
                         }
-                      }
-                      
-                      if (player.playerDirections.includes("right")) {
-                        if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] + 1 && 
-                          tileData.gridPosition[1] === playerHeldPawn.gridPosition[1]) {
-                          if (tileHasBlockedSpace(tileData, "right", localPawn) && player.playerDirections.includes("right")) {
+                        else if (colIndex > playerHeldPawn.position[0] && rowIndex === playerHeldPawn.position[1] && player.playerDirections.includes("right")) {
+                          if (tileHasBlockedSpace(tileData, "right", localPawn)) {
                             if (rowIndex === localPawn.blockedPositions.right.position![1]) {
                               if (colIndex >= localPawn.blockedPositions.right.position![0]) {
                                 rowBlocked = true;
@@ -151,19 +259,11 @@ const Tile = memo(({tileIndex, tileData, playerHeldPawn}: tileProps) => {
                             }
                           }
                           else {
-                            if (rowIndex === playerHeldPawn.position[1] - 1 && playerHeldPawn.position[1] === 2) {
-                              if (!localPawn.blockedPositions.right.gridPosition) {
-                                rowBlocked = false;
-                              }
-                            }
+                            rowBlocked = false;
                           }
                         }
-                      }
-
-                      if (player.playerDirections.includes("down")) {
-                        if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] && 
-                          tileData.gridPosition[1] === playerHeldPawn.gridPosition[1] + 1) {
-                          if (tileHasBlockedSpace(tileData, "down", localPawn) && player.playerDirections.includes("down")) {
+                        else if (rowIndex > playerHeldPawn.position[1] && colIndex === playerHeldPawn.position[0] && player.playerDirections.includes("down")) {
+                          if (tileHasBlockedSpace(tileData, "down", localPawn)) {
                             if (colIndex === localPawn.blockedPositions.down.position![0]) {
                               if (rowIndex >= localPawn.blockedPositions.down.position![1]) {
                                 rowBlocked = true;
@@ -174,94 +274,20 @@ const Tile = memo(({tileIndex, tileData, playerHeldPawn}: tileProps) => {
                             }
                           }
                           else {
-                            if (colIndex === playerHeldPawn.position[0] + 1 && playerHeldPawn.position[0] === 1) {
-                              if (!localPawn.blockedPositions.down.gridPosition) {
-                                rowBlocked = false;
-                              }
-                            }
+                            rowBlocked = false;
                           }
                         }
+  
+  
+                        highlightSpace = !rowBlocked
                       }
-
-                      highlightSpace = !rowBlocked
                     }
-                    else if (tileData.gridPosition[0] === playerHeldPawn.gridPosition[0] && tileData.gridPosition[1] === playerHeldPawn.gridPosition[1]) {
-                      let rowBlocked = true;
-                      
-                      // column directly above from pawn (up movement)
-                      if (rowIndex < playerHeldPawn.position[1] && colIndex === playerHeldPawn.position[0] && player.playerDirections.includes("up")) {
-                        if (tileHasBlockedSpace(tileData, "up", localPawn)) {
-                          if (colIndex === localPawn.blockedPositions.up.position![0]) {
-                            if (rowIndex <= localPawn.blockedPositions.up.position![1]) {
-                              rowBlocked = true;
-                            }
-                            else if (rowIndex > localPawn.blockedPositions.up.position![1]) {
-                              rowBlocked = false;
-                            }
-                          }
-                        }
-                        else {
-                          rowBlocked = false;
-                        }
-                      }
-                      else if (colIndex < playerHeldPawn.position[0] && rowIndex === playerHeldPawn.position[1] && player.playerDirections.includes("left")) {
-                        if (tileHasBlockedSpace(tileData, "left", localPawn)) {
-                          if (rowIndex === localPawn.blockedPositions.left.position![1]) {
-                            if (colIndex <= localPawn.blockedPositions.left.position![0]) {
-                              rowBlocked = true;
-                            }
-                            else if (colIndex > localPawn.blockedPositions.left.position![0]) {
-                              
-                              rowBlocked = false;
-                            }
-                          }
-                        }
-                        else {
-                          
-                          rowBlocked = false;
-                        }
-                      }
-                      else if (colIndex > playerHeldPawn.position[0] && rowIndex === playerHeldPawn.position[1] && player.playerDirections.includes("right")) {
-                        if (tileHasBlockedSpace(tileData, "right", localPawn)) {
-                          if (rowIndex === localPawn.blockedPositions.right.position![1]) {
-                            if (colIndex >= localPawn.blockedPositions.right.position![0]) {
-                              rowBlocked = true;
-                            }
-                            else if (colIndex < localPawn.blockedPositions.right.position![0]) {
-                              rowBlocked = false;
-                            }
-                          }
-                        }
-                        else {
-                          rowBlocked = false;
-                        }
-                      }
-                      else if (rowIndex > playerHeldPawn.position[1] && colIndex === playerHeldPawn.position[0] && player.playerDirections.includes("down")) {
-                        if (tileHasBlockedSpace(tileData, "down", localPawn)) {
-                          if (colIndex === localPawn.blockedPositions.down.position![0]) {
-                            if (rowIndex >= localPawn.blockedPositions.down.position![1]) {
-                              rowBlocked = true;
-                            }
-                            else if (rowIndex < localPawn.blockedPositions.down.position![1]) {
-                              rowBlocked = false;
-                            }
-                          }
-                        }
-                        else {
-                          rowBlocked = false;
-                        }
-                      }
-
-
-                      highlightSpace = !rowBlocked
-                    }
-                    
                   }
 
                   const {type, details} = space;
                   const playerHeldPawnColor = playerHeldPawn?.color;
                   const highlightTeleporter = type === 'teleporter' && (details as TeleporterSpace).color === playerHeldPawnColor;
-                  const highlightEscalator = details?.hasEscalator && playerState.showEscalatorSpaces.length;
+                  const highlightEscalator = details?.hasEscalator && pawnState[playerHeldPawnColor]?.showEscalatorSpaces.length;
                   
                   return (
                     <Space 
@@ -275,15 +301,16 @@ const Tile = memo(({tileIndex, tileData, playerHeldPawn}: tileProps) => {
                           spaceWeaponStolen: (details as WeaponSpace)?.weaponStolen,
                         }
                       }
-                      playerDispatch={playerDispatch}
+                      // playerDispatch={playerDispatch}
+                      // pawnDispatch={pawnDispatch}
                       key={`space${rowIndex}-${colIndex} ${highlightSpace ? "highlight" : ""}`} 
                       spacePosition={[colIndex, rowIndex]} 
                       gridPosition={tileData.gridPosition}
                       tileIndex={tileIndex}
                       showMovableArea={highlightSpace} 
                       colorSelected={(highlightSpace || highlightTeleporter || highlightEscalator) && playerHeldPawn ? playerHeldPawn.color : null}
-                      highlightTeleporter={highlightTeleporter ? playerState.showTeleportSpaces: null}
-                      highlightEscalator={highlightEscalator ? playerState.showEscalatorSpaces: []}
+                      highlightTeleporter={highlightTeleporter ? pawnState[playerHeldPawnColor].showTeleportSpaces: null}
+                      highlightEscalator={highlightEscalator ? pawnState[playerHeldPawnColor].showEscalatorSpaces: []}
                     />
                   )
                 })}

@@ -4,7 +4,8 @@ import { useGame } from '../Contexts/GameContext';
 import { heroColor, Escalator, SpaceTypeName } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
-import { Dispatch } from '../Contexts/PlayerContext';
+import { Dispatch } from '../Contexts/PawnContext';
+import { usePawn, usePawnDispatch } from '../Contexts/PawnContext';
 
 interface SpaceProps {
   spaceType: SpaceTypeName,
@@ -20,7 +21,8 @@ interface SpaceProps {
   highlightTeleporter: heroColor | null,
   highlightEscalator: Escalator[],
   tileIndex: number,
-  playerDispatch: Dispatch
+  // pawnDispatch: Dispatch
+  // pawnDispatch: Dispatch
 }
 
 const areEqual = (prevProps: SpaceProps, nextProps: SpaceProps) => {
@@ -51,11 +53,12 @@ const areEqual = (prevProps: SpaceProps, nextProps: SpaceProps) => {
 }
 
 
-const Space = memo(({spaceType, spaceColor, spaceHasEscalator, spaceEscalatorName, spaceIsDisabled, spaceWeaponStolen, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex, playerDispatch}: SpaceProps) => {
+const Space = memo(({spaceType, spaceColor, spaceHasEscalator, spaceEscalatorName, spaceIsDisabled, spaceWeaponStolen, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex}: SpaceProps) => {
   console.count('Re-render space');
-  console.log('Space render', {spaceType, spaceColor, spaceHasEscalator, spaceEscalatorName, spaceIsDisabled, spaceWeaponStolen, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex, playerDispatch})
+  console.log('Space render', {spaceType, spaceColor, spaceHasEscalator, spaceEscalatorName, spaceIsDisabled, spaceWeaponStolen, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex})
   const { gameState } = useGame();
   // const playerDispatch = usePlayerDispatch(); // TODO this causing re-render
+  const pawnDispatch = usePawnDispatch();
 
   const isTeleporter = spaceType === "teleporter";
   const teleporterColor = isTeleporter ? spaceColor : "";
@@ -177,9 +180,17 @@ const Space = memo(({spaceType, spaceColor, spaceHasEscalator, spaceEscalatorNam
             heroesEscaped: newRoomValue.heroesEscaped
           },
         )
-        playerDispatch({type: "showMovableSpaces", value: []})
-        playerDispatch({type: "showTeleportSpaces", color: null})
-        playerDispatch({type: "showEscalatorSpaces", value: []})
+        // playerDispatch({type: "showMovableSpaces", value: []})
+        // playerDispatch({type: "showTeleportSpaces", color: null})
+        // playerDispatch({type: "showEscalatorSpaces", value: []})
+        pawnDispatch({
+          type: 'showActions',
+          blockedPositions: newRoomValue.pawns[colorSelected].blockedPositions, // TODO rename blockedDirections ??
+          color: colorSelected,
+          playerDirections: [],
+          escalatorSpaces: [],
+          teleporterSpaces: null,
+        })
       }
     }
   }

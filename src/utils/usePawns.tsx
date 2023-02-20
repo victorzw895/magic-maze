@@ -3,26 +3,21 @@ import { ExplorationSpace, DBTile, DBPawns, DBHeroPawn, DBPlayer, Room } from '.
 import { getDoc } from './useFirestore';
 import { usePlayerDispatch, usePlayerState } from '../Contexts/PlayerContext';
 
-const usePawns = (room: Room): DBPawns => {
-  const player = usePlayerState();
-  // const [pawns, setPawns] = useState({});
+const usePawns = (room: Room): any => {
+  // const player = usePlayerState();
+  const [playerHeldPawn, setPlayerHeldPawn] = useState({});
   const [green, setGreen] = useState<DBHeroPawn>({} as DBHeroPawn);
   const [yellow, setYellow] = useState<DBHeroPawn>({} as DBHeroPawn);
   const [purple, setPurple] = useState<DBHeroPawn>({} as DBHeroPawn);
   const [orange, setOrange] = useState<DBHeroPawn>({} as DBHeroPawn);
 
   const { pawns } = room;
-
   const { green: greenPawn, yellow: yellowPawn, orange: orangePawn, purple: purplePawn } = pawns;
 
-  // useEffect(() => {
-  //   const pawnHeld = Object.values(pawns).find((pawn: DBHeroPawn) => pawn.playerHeld && pawn.playerHeld === player.number);
-  //   setPlayerHeldPawn(pawnHeld);
-  // }, [pawns])
-
   useEffect(() => {
-    console.log('from fiestore useeffect green pawn')
+    console.log('from fiestore useeffect green pawn', greenPawn)
     setGreen(greenPawn)
+    setPlayerHeldPawn(greenPawn)
   },
   [
     greenPawn.playerHeld, 
@@ -35,6 +30,7 @@ const usePawns = (room: Room): DBPawns => {
   useEffect(() => {
     console.log('from fiestore useeffect yellow pawn')
     setYellow(yellowPawn)
+    setPlayerHeldPawn(yellowPawn)
   },
   [
     yellowPawn.playerHeld, 
@@ -47,6 +43,7 @@ const usePawns = (room: Room): DBPawns => {
   useEffect(() => {
     console.log('from fiestore useeffect purple pawn')
     setPurple(purplePawn)
+    setPlayerHeldPawn(purplePawn)
   },
   [
     purplePawn.playerHeld, 
@@ -59,6 +56,7 @@ const usePawns = (room: Room): DBPawns => {
   useEffect(() => {
     console.log('from fiestore useeffect orange pawn')
     setOrange(orangePawn)
+    setPlayerHeldPawn(orangePawn)
   },
   [
     orangePawn.playerHeld, 
@@ -68,34 +66,14 @@ const usePawns = (room: Room): DBPawns => {
     orangePawn.gridPosition[1]
   ])
 
-  // useEffect(() => {
-  //   (() => {
-  //     console.log('setPawns from fiestore context')
-  //     // setPawns(room.pawns);
-  //   })()
-  // }, [room.pawns.green.gridPosition[0], room.pawns.green.gridPosition[1]])
-
-  // useEffect(() => {
-  //   (() => {
-  //     console.log('setPawns from fiestore context')
-  //     // setPawns(room.pawns);
-  //   })()
-  // }, [room.pawns.green.position[0], room.pawns.green.position[1]]) // Must be non-array or objects so its not checking for referential equality
-  
-  // useEffect(() => {
-  //   (() => {
-  //     console.log('setPawns from fiestore context')
-  //     // setPawns(room.pawns);
-  //   })()
-  // }, [room.pawns.green.playerHeld]) // Must be non-array or objects so its not checking for referential equality
-
 
   return {
     green,
     yellow,
     purple,
-    orange
-  } as DBPawns;
+    orange,
+    playerHeldPawn
+  };
 };
 
 export default usePawns;

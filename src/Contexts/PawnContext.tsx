@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useReducer } from 'react';
-import { HeroPawn, heroName, heroWeapon, heroColor, DBHeroPawn } from '../types';
+import React, { createContext, useContext, useReducer, useMemo } from 'react';
+import { HeroPawn, heroName, heroWeapon, heroColor, DBHeroPawn, direction, Escalator } from '../types';
 
 const startPositions = [
   [1, 1],
@@ -64,7 +64,9 @@ export const PawnFactory = (color: heroColor, startPosition?: number[]) => {
         gridPosition: null
       }
     },
-    
+    showMovableDirections: [],
+    showTeleportSpaces: null,
+    showEscalatorSpaces: [],
   }
 
   const dbPawnState: DBHeroPawn = {
@@ -94,12 +96,21 @@ export type BlockedPositions = {
   right: BlockedPosition
 }
 
-
+// {type: 'showMovableSpaces', value: direction[]} | 
+// {type: 'showEscalatorSpaces', value: Escalator[]} | 
+// {type: 'showTeleportSpaces', color: heroColor | null}
 type Action = 
               // {type: 'playerHeld', value: number | null, color: heroColor} | 
-              // {type: 'movePawn', value: number[], color: heroColor} | 
+              {
+                type: 'showActions',
+                blockedPositions: BlockedPositions,
+                playerDirections: direction[],
+                escalatorSpaces: Escalator[],
+                teleporterSpaces: heroColor | null,
+                color: heroColor | null
+              } | 
               {type: 'addBlockedPositions', value: BlockedPositions, color: heroColor} | undefined;
-type Dispatch = (action: Action) => void;
+export type Dispatch = (action: Action) => void;
 export type PawnState = {
   yellow: HeroPawn,
   green: HeroPawn,
@@ -136,13 +147,30 @@ const PawnDispatchContext = createContext<any>(undefined);
 const pawnReducer = (pawnState: PawnState, action: any) => {
   let newState = {...pawnState};
 
+// case 'showMovableSpaces': {
+    //   newState.showMovableDirections = action.value;
+    //   return newState;
+    // }
+    // case 'showTeleportSpaces': {
+    //   newState.showTeleportSpaces = action.color;
+    //   return newState;
+    // }
+    // case 'showEscalatorSpaces': {
+    //   newState.showEscalatorSpaces = action.value;
+    //   return newState;
+    // }
+
   switch (action.type) {
     // case 'playerHeld': 
     //   newState[action.color as keyof PawnState].playerHeld = action.value;
     //   return newState;
-    // case 'movePawn': 
-    //   newState[action.color as keyof PawnState].position = action.value;
-    //   return newState;
+    case 'showActions': 
+      console.log('show actions', {newState, action})
+      newState[action.color as keyof PawnState].blockedPositions = action.blockedPositions;
+      newState[action.color as keyof PawnState].showMovableDirections = action.playerDirections;
+      newState[action.color as keyof PawnState].showTeleportSpaces = action.teleporterSpaces;
+      newState[action.color as keyof PawnState].showEscalatorSpaces = action.escalatorSpaces;
+      return newState;
     case 'addBlockedPositions': 
       newState[action.color as keyof PawnState].blockedPositions = action.value;
       return newState;

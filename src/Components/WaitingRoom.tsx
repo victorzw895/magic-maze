@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
 import { Stack, Button, List, ListItem } from '@mui/material';
@@ -10,13 +10,10 @@ import { useGamePausedDocState, useGameStartedDocState, usePlayerDocState } from
 
 const WaitingRoom = ({isHost}: {isHost: boolean}) => {
   const { gameState, gameDispatch } = useGame();
-  const playerState = usePlayerState();
-
-  const {setPlayer} = usePlayerDocState();
-
   const [room] = useDocData(gameState.roomId);
-
   const { players } = room;
+  const playerState = usePlayerState();
+  const {setPlayer} = usePlayerDocState();
 
   // Assign actions to existing players ->
   // set initial tile ->
@@ -26,23 +23,11 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
   const startGame = async () => {
     // set player actions
     const dbPlayers: DBPlayer[] = assignRandomActions(players)
-    // const currentPlayer = dbPlayers.find(dbPlayer => dbPlayer.number === playerState.number);
-    // if (currentPlayer) {
-    //   playerDispatch({type: "setPlayer", value: currentPlayer});
-    // }
-    // setInitialTile
-    // setPawnPositions
-    const currentPlayer = dbPlayers.find((player: DBPlayer) => player.number === playerState.number);
-    if (!currentPlayer) return;
-    setPlayer(currentPlayer);
-    
     const firstTile = allTiles.find(tile => tile.id === "1a");
     const initTile = {
       ...firstTile,
       gridPosition: [8, 8]
     }
-    // console.log(initTile);
-    console.log('initTile', initTile);
     await setDoc(gameState.roomId, 
       { 
         players: dbPlayers, 
@@ -53,6 +38,17 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
     )
     gameDispatch({type: "startGame"})
   }
+
+
+  useEffect(() => {
+    (async () => {
+      if (!room.gameStarted) return;
+      
+      const currentPlayer = room.players.find((player: DBPlayer) => player.number === playerState.number);
+      if (!currentPlayer) return;
+      setPlayer(currentPlayer);
+    })()
+  }, [room.gameStarted])
 
   return (
     <>

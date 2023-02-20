@@ -8,6 +8,7 @@ import { Room, DBTile, DBPlayer } from '../types';
 import './Board.scss';
 import { useGame } from '../Contexts/GameContext';
 import { usePlayerDispatch, usePlayerState } from '../Contexts/PlayerContext';
+import { usePawn } from '../Contexts/PawnContext';
 import Draggable from 'react-draggable';
 import { useDocData, getDoc } from '../utils/useFirestore';
 import useHighlightArea from '../utils/useHighlightArea';
@@ -20,22 +21,8 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
   console.log('*** Board Component re render')
   const draggableNodeRef = useRef(null);
   const { gameState } = useGame();
-  // const playerDispatch = usePlayerDispatch();
-
-  // const {player} = usePlayerDocState();
   const gameStarted = useGameStartedDocState();
   const [availableArea, highlightNewTileArea, clearHighlightAreas] = useHighlightArea(gameState.roomId);
-
-  // useEffect(() => {
-  //   (() => {
-  //     if (!player) return;
-  //     playerDispatch({type: 'assignActions', value: {
-  //       number: player.number,
-  //       playerDirections: player.playerDirections,
-  //       playerAbilities: player.playerAbilities,
-  //     }})
-  //   })()
-  // }, [gameStarted])
 
   return (
     <>
@@ -67,7 +54,6 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
 
 
 const Board = () => {
-  console.log('BOARD!!!!')
   return (
     <div className="Board">
       <BoardComponent

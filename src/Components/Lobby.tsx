@@ -105,6 +105,7 @@ const Lobby = () => {
 
     if (docSnap.exists()) {
       roomFound = docSnap.data() as Room;
+      console.log('joinRoom', {roomFound})
       // setGameDoc(gamesDocRef)
     }
     else {
@@ -118,10 +119,14 @@ const Lobby = () => {
         ...roomFound.players, 
         dbPlayer
       ];
+      console.log('joinRoom', {roomFound})
       gameDispatch({type: "joinRoom", value: existingRoomCode});
       playerDispatch({type: "setPlayer", value: player});
       await setDoc(existingRoomCode, 
-        {players: playersInRoom},
+        {
+          ...roomFound,
+          players: playersInRoom
+        },
       )
     }
     else if (!roomFound) {

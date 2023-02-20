@@ -20,10 +20,11 @@ type DBProviderProps = {children: React.ReactNode}
 
 const GameStartedDocContext = createContext<any>(undefined);
 const GamePausedDocContext = createContext<any>(undefined);
-const GreenPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
-const YellowPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
-const PurplePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
-const OrangePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
+const PlayerHeldPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
+const GreenPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
+const YellowPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
+const PurplePawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
+const OrangePawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
 const TilesDocContext = createContext<any>(undefined);
 const PlayerDocContext = createContext<any>(undefined);
 
@@ -38,9 +39,10 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [gamePaused] = useGamePaused(room);
   const [tiles] = useTiles(room);
   const [player, setPlayer, pinged] = usePlayer(room);
-  const [green] = useGreen(room);
-  const {yellow, purple, orange} = usePawns(room);
-  // const {green, yellow, purple, orange} = usePawns(room);
+  // const [green] = useGreen(room);
+  // const {yellow, purple, orange} = usePawns(room);
+  const pawns = usePawns(room);
+  const {green, yellow, purple, orange, playerHeldPawn} = pawns;
 
   useEffect(() => {
     setGameStarted(room.gameStarted)
@@ -59,7 +61,9 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
             <YellowPawnDocContext.Provider value={yellow}>
             <PurplePawnDocContext.Provider value={purple}>
             <OrangePawnDocContext.Provider value={orange}>
-              {children}
+              <PlayerHeldPawnDocContext.Provider value={playerHeldPawn}>
+                {children}
+              </PlayerHeldPawnDocContext.Provider>
             </OrangePawnDocContext.Provider>
             </PurplePawnDocContext.Provider>
             </YellowPawnDocContext.Provider>
@@ -120,6 +124,14 @@ const useOrangeDocState = () => {
   return context;
 }
 
+const usePlayerHeldPawnDocState = () => {
+  const context = useContext(PlayerHeldPawnDocContext)
+  if (context === undefined) {
+    throw new Error('usePlayerHeldPawnDocState must be used within a PlayerHeldPawnDocContext');
+  }
+  return context;
+}
+
 const useTilesDocState = () => {
   const context = useContext(TilesDocContext)
   if (context === undefined) {
@@ -145,4 +157,5 @@ export {
   useOrangeDocState,
   useTilesDocState,
   usePlayerDocState,
+  usePlayerHeldPawnDocState,
 };

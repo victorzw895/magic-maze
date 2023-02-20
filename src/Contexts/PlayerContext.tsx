@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { heroColor, Player, playerNumber, direction, Escalator, DBPlayer, BasePlayer } from '../types';
+import { heroColor, Player, playerNumber, direction, Escalator, DBPlayer } from '../types';
 
 export type Action = {type: 'playerHeld', value: number | null, color: heroColor} | 
               {type: 'showMovableSpaces', value: direction[]} | 
               {type: 'showEscalatorSpaces', value: Escalator[]} | 
               {type: 'showTeleportSpaces', color: heroColor | null} | 
               {type: 'setPlayer', value: Player} |
-              {type: 'assignActions', value: BasePlayer} | undefined;
+              {type: 'assignActions', value: Player} | undefined;
 export type Dispatch = (action: Action) => void;
 
 type PlayerProviderProps = {children: React.ReactNode}
@@ -19,9 +19,9 @@ export interface PlayerFactoryType {
 export const PlayerFactory = (playerName: string, currentPlayers: number) => {
   const localPlayerState: Player = {
     number: currentPlayers + 1 as playerNumber,
-    showMovableDirections: [],
-    showTeleportSpaces: null,
-    showEscalatorSpaces: [], // TODO revisit this (trim down data)
+    // showMovableDirections: [],
+    // showTeleportSpaces: null,
+    // showEscalatorSpaces: [], // TODO revisit this (trim down data)
   }
 
   const dbPlayerState: DBPlayer = {
@@ -42,9 +42,9 @@ export const PlayerFactory = (playerName: string, currentPlayers: number) => {
 
 const playerInitialState: Player = {
   number: null,
-  showMovableDirections: [],
-  showTeleportSpaces: null,
-  showEscalatorSpaces: [],
+  // showMovableDirections: [],
+  // showTeleportSpaces: null,
+  // showEscalatorSpaces: [],
 }
 
 const PlayerStateContext = createContext<Player | undefined>(undefined);
@@ -57,18 +57,18 @@ const playerReducer = (playerState: Player, action: any) => {
     case 'playerHeld': {
       return newState;
     }
-    case 'showMovableSpaces': {
-      newState.showMovableDirections = action.value;
-      return newState;
-    }
-    case 'showTeleportSpaces': {
-      newState.showTeleportSpaces = action.color;
-      return newState;
-    }
-    case 'showEscalatorSpaces': {
-      newState.showEscalatorSpaces = action.value;
-      return newState;
-    }
+    // case 'showMovableSpaces': {
+    //   newState.showMovableDirections = action.value;
+    //   return newState;
+    // }
+    // case 'showTeleportSpaces': {
+    //   newState.showTeleportSpaces = action.color;
+    //   return newState;
+    // }
+    // case 'showEscalatorSpaces': {
+    //   newState.showEscalatorSpaces = action.value;
+    //   return newState;
+    // }
     case 'setPlayer': {
       newState = action.value;
       return newState;
