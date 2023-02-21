@@ -3,6 +3,26 @@ import { Room } from '../types';
 import { setDoc as setDocument, doc as document, getDoc as getDocument } from "firebase/firestore"; 
 import { gamesRef } from "../Firestore";
 import { useDocumentData } from 'react-firebase-hooks/firestore'
+import { BlockedPositions } from '../Contexts/PawnContext';
+
+const blockedDirections: BlockedPositions = {
+  up: {
+    position: null,
+    gridPosition: null
+  },
+  right: {
+    position: null,
+    gridPosition: null
+  },
+  left: {
+    position: null,
+    gridPosition: null
+  },
+  down: {
+    position: null,
+    gridPosition: null
+  },
+}
 
 const dbInitialState: Room = {
   gameStarted: false,
@@ -20,6 +40,10 @@ const dbInitialState: Room = {
       gridPosition: [],
       ability: "",
       canUseAbility: false,
+      blockedPositions: blockedDirections,
+      showMovableDirections: [],
+      showEscalatorSpaces: [],
+      showTeleportSpaces: null,
     },
     yellow: {
       color: "yellow",
@@ -28,6 +52,10 @@ const dbInitialState: Room = {
       gridPosition: [],
       ability: "",
       canUseAbility: false,
+      blockedPositions: blockedDirections,
+      showMovableDirections: [],
+      showEscalatorSpaces: [],
+      showTeleportSpaces: null,
     },
     orange: {
       color: "orange",
@@ -36,6 +64,10 @@ const dbInitialState: Room = {
       gridPosition: [],
       ability: "",
       canUseAbility: false,
+      blockedPositions: blockedDirections,
+      showMovableDirections: [],
+      showEscalatorSpaces: [],
+      showTeleportSpaces: null,
     },
     purple: {
       color: "purple",
@@ -44,6 +76,10 @@ const dbInitialState: Room = {
       gridPosition: [],
       ability: "",
       canUseAbility: false,
+      blockedPositions: blockedDirections,
+      showMovableDirections: [],
+      showEscalatorSpaces: [],
+      showTeleportSpaces: null,
     }
   },
 }

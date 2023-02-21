@@ -11,6 +11,9 @@ import { Provider } from './Contexts/DBContext';
 import { FirestoreProvider } from './Contexts/FirestoreContext';
 import { PlayerProvider } from './Contexts/PlayerContext';
 import Test from './Components/Test';
+import { PawnProvider } from './Contexts/PawnContext';
+// import { PlayerProvider } from './Contexts/PlayerContext';
+import { TilesProvider } from './Contexts/TilesContext';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -18,8 +21,12 @@ ReactDOM.render(
       <GameProvider>
         <PlayerProvider>
           <FirestoreProvider>
-            <App />
-            <Test />
+            <TilesProvider>
+              <PawnProvider>
+                <App />
+                <Test />
+              </PawnProvider>
+            </TilesProvider>
           </FirestoreProvider>
         </PlayerProvider>
       </GameProvider>
