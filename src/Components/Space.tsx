@@ -58,8 +58,6 @@ const Space = memo(({spaceType, spaceColor, spaceHasEscalator, spaceEscalatorNam
   console.log('Space render', {spaceType, spaceColor, spaceHasEscalator, spaceEscalatorName, spaceIsDisabled, spaceWeaponStolen, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex})
   const { gameState } = useGame();
   // const playerDispatch = usePlayerDispatch(); // TODO this causing re-render
-  const pawnDispatch = usePawnDispatch();
-
   const isTeleporter = spaceType === "teleporter";
   const teleporterColor = isTeleporter ? spaceColor : "";
 
@@ -146,6 +144,10 @@ const Space = memo(({spaceType, spaceColor, spaceHasEscalator, spaceEscalatorNam
         newRoomValue.pawns[colorSelected].position = spacePosition;
         newRoomValue.pawns[colorSelected].gridPosition = gridPosition;
         newRoomValue.pawns[colorSelected].playerHeld = null;
+        newRoomValue.pawns[colorSelected].showEscalatorSpaces = [];
+        newRoomValue.pawns[colorSelected].showMovableDirections = [];
+        newRoomValue.pawns[colorSelected].showTeleportSpaces = null;
+        newRoomValue.pawns[colorSelected].playerHeld = null;
         newRoomValue.pawns[colorSelected].blockedPositions = {
           up: {position: null, gridPosition: null},
           down: {position: null, gridPosition: null},
@@ -183,14 +185,14 @@ const Space = memo(({spaceType, spaceColor, spaceHasEscalator, spaceEscalatorNam
         // playerDispatch({type: "showMovableSpaces", value: []})
         // playerDispatch({type: "showTeleportSpaces", color: null})
         // playerDispatch({type: "showEscalatorSpaces", value: []})
-        pawnDispatch({
-          type: 'showActions',
-          blockedPositions: newRoomValue.pawns[colorSelected].blockedPositions, // TODO rename blockedDirections ??
-          color: colorSelected,
-          playerDirections: [],
-          escalatorSpaces: [],
-          teleporterSpaces: null,
-        })
+        // pawnDispatch({
+        //   type: 'showActions',
+        //   blockedPositions: newRoomValue.pawns[colorSelected].blockedPositions, // TODO rename blockedDirections ??
+        //   color: colorSelected,
+        //   playerDirections: [],
+        //   escalatorSpaces: [],
+        //   teleporterSpaces: null,
+        // })
       }
     }
   }

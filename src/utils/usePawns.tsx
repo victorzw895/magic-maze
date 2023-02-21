@@ -3,8 +3,38 @@ import { ExplorationSpace, DBTile, DBPawns, DBHeroPawn, DBPlayer, Room } from '.
 import { getDoc } from './useFirestore';
 import { usePlayerDispatch, usePlayerState } from '../Contexts/PlayerContext';
 
+const initPlayerHeldPawn = {
+  color: null,
+  playerHeld: null,
+  position: [],
+  gridPosition: [8, 8],
+  ability: '',
+  canUseAbility: false,
+  blockedPositions: {
+    up: {
+      position: null,
+      gridPosition: null
+    },
+    left: {
+      position: null,
+      gridPosition: null
+    },
+    right: {
+      position: null,
+      gridPosition: null
+    },
+    down: {
+      position: null,
+      gridPosition: null
+    }
+  },
+  showMovableDirections: [],
+  showTeleportSpaces: null,
+  showEscalatorSpaces: [],
+}
+
 const usePawns = (room: Room): any => {
-  // const player = usePlayerState();
+  const player = usePlayerState();
   const [playerHeldPawn, setPlayerHeldPawn] = useState({});
   const [green, setGreen] = useState<DBHeroPawn>({} as DBHeroPawn);
   const [yellow, setYellow] = useState<DBHeroPawn>({} as DBHeroPawn);
@@ -15,9 +45,16 @@ const usePawns = (room: Room): any => {
   const { green: greenPawn, yellow: yellowPawn, orange: orangePawn, purple: purplePawn } = pawns;
 
   useEffect(() => {
+    const currentHeldPawn = Object.values(pawns).find(pawn => pawn.playerHeld === player.number);
+    setPlayerHeldPawn(currentHeldPawn || initPlayerHeldPawn);
+  }, [pawns])
+
+  useEffect(() => {
     console.log('from fiestore useeffect green pawn', greenPawn)
     setGreen(greenPawn)
-    setPlayerHeldPawn(greenPawn)
+    if (greenPawn.playerHeld === player.number){
+      setPlayerHeldPawn(greenPawn)
+    }
   },
   [
     greenPawn.playerHeld, 
@@ -30,7 +67,9 @@ const usePawns = (room: Room): any => {
   useEffect(() => {
     console.log('from fiestore useeffect yellow pawn')
     setYellow(yellowPawn)
-    setPlayerHeldPawn(yellowPawn)
+    if (yellowPawn.playerHeld === player.number){
+      setPlayerHeldPawn(yellowPawn)
+    }
   },
   [
     yellowPawn.playerHeld, 
@@ -43,7 +82,9 @@ const usePawns = (room: Room): any => {
   useEffect(() => {
     console.log('from fiestore useeffect purple pawn')
     setPurple(purplePawn)
-    setPlayerHeldPawn(purplePawn)
+    if (purplePawn.playerHeld === player.number){
+      setPlayerHeldPawn(purplePawn)
+    }
   },
   [
     purplePawn.playerHeld, 
@@ -56,7 +97,9 @@ const usePawns = (room: Room): any => {
   useEffect(() => {
     console.log('from fiestore useeffect orange pawn')
     setOrange(orangePawn)
-    setPlayerHeldPawn(orangePawn)
+    if (orangePawn.playerHeld === player.number){
+      setPlayerHeldPawn(orangePawn)
+    }
   },
   [
     orangePawn.playerHeld, 

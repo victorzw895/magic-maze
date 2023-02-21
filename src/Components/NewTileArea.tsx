@@ -1,5 +1,5 @@
 import React, { MouseEvent, memo } from 'react';
-import { DBTile } from '../types';
+import { DBHeroPawn, DBTile } from '../types';
 import { tileWallSize, spaceSize } from '../constants';
 import { generateTile } from '../Contexts/TilesContext';
 import { useGame } from '../Contexts/GameContext';
@@ -27,10 +27,42 @@ const NewTileArea = memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
     const docSnap = await getDoc(gameState.roomId);
 
     if (docSnap.exists()) {
+      const room = docSnap.data();
       const tile = generateTile(newTile);
+      const newPawns = room.pawns;
+      Object.values(room.pawns).forEach((pawn: any) => {
+        const blockedDirections = {
+          up: {
+            position: null,
+            gridPosition: null
+          },
+          right: {
+            position: null,
+            gridPosition: null
+          },
+          left: {
+            position: null,
+            gridPosition: null
+          },
+          down: {
+            position: null,
+            gridPosition: null
+          },
+        }
+        if (pawn.playerHeld) {
+          pawn.blockedPositions = blockedDirections
+          pawn.showMovableDirections = []
+          pawn.showEscalatorSpaces = []
+          pawn.showTeleportSpaces = null
+        }
+      })
+
       await setDoc(
         gameState.roomId, 
-        {tiles: [...docSnap.data().tiles, tile]},
+        {
+          tiles: [...room.tiles, tile],
+          pawns: newPawns
+        },
       )
     }
   }

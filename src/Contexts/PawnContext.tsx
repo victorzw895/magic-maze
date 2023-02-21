@@ -46,6 +46,19 @@ export const PawnFactory = (color: heroColor, startPosition?: number[]) => {
     height: 46.25,
     width: 46.25,
     weapon: weapon as heroWeapon, 
+    // TODO consider moving these to db
+    // showMovableDirections: [],
+    // showTeleportSpaces: null,
+    // showEscalatorSpaces: [],
+  }
+
+  const dbPawnState: DBHeroPawn = {
+    color,
+    playerHeld: null,
+    position: startPosition || [],
+    gridPosition: [8, 8],
+    ability: '',
+    canUseAbility: false,
     blockedPositions: {
       up: {
         position: null,
@@ -67,15 +80,6 @@ export const PawnFactory = (color: heroColor, startPosition?: number[]) => {
     showMovableDirections: [],
     showTeleportSpaces: null,
     showEscalatorSpaces: [],
-  }
-
-  const dbPawnState: DBHeroPawn = {
-    color,
-    playerHeld: null,
-    position: startPosition || [],
-    gridPosition: [8, 8],
-    ability: '',
-    canUseAbility: false,
   }
 
   return {
@@ -166,13 +170,13 @@ const pawnReducer = (pawnState: PawnState, action: any) => {
     //   return newState;
     case 'showActions': 
       console.log('show actions', {newState, action})
-      newState[action.color as keyof PawnState].blockedPositions = action.blockedPositions;
-      newState[action.color as keyof PawnState].showMovableDirections = action.playerDirections;
-      newState[action.color as keyof PawnState].showTeleportSpaces = action.teleporterSpaces;
-      newState[action.color as keyof PawnState].showEscalatorSpaces = action.escalatorSpaces;
+      // newState[action.color as keyof PawnState].blockedPositions = action.blockedPositions;
+      // newState[action.color as keyof PawnState].showMovableDirections = action.playerDirections;
+      // newState[action.color as keyof PawnState].showTeleportSpaces = action.teleporterSpaces;
+      // newState[action.color as keyof PawnState].showEscalatorSpaces = action.escalatorSpaces;
       return newState;
     case 'addBlockedPositions': 
-      newState[action.color as keyof PawnState].blockedPositions = action.value;
+      // newState[action.color as keyof PawnState].blockedPositions = action.value;
       return newState;
     default: 
       throw new Error(`Unhandled action type: ${action.type}`)

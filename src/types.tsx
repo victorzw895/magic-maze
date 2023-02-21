@@ -53,15 +53,6 @@ export interface HeroPawn {
   weapon: heroWeapon,
   width: number,
   height: number,
-  blockedPositions: {
-    up: BlockedPosition,
-    down: BlockedPosition,
-    left: BlockedPosition,
-    right: BlockedPosition
-  },
-  showMovableDirections: direction[],
-  showTeleportSpaces: heroColor | null,
-  showEscalatorSpaces: Escalator[],
 }
 
 // DB Types ///////////////////////////////////////////
@@ -110,6 +101,15 @@ export interface DBHeroPawn {
   gridPosition: number[],
   ability: string,
   canUseAbility: boolean,
+  blockedPositions: {
+    up: BlockedPosition,
+    down: BlockedPosition,
+    left: BlockedPosition,
+    right: BlockedPosition
+  },
+  showMovableDirections: direction[],
+  showTeleportSpaces: heroColor | null,
+  showEscalatorSpaces: Escalator[],
 }
 
 export interface DBTile {
