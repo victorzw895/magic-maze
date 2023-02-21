@@ -1,20 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
 import { Stack, Button, List, ListItem } from '@mui/material';
 import { DBPlayer } from '../types';
 import { setDoc, useDocData } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
-import { usePlayerState, usePlayerDispatch } from '../Contexts/PlayerContext';
-import { useGamePausedDocState, useGameStartedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
+import { usePlayerState } from '../Contexts/PlayerContext';
+import { usePlayerDocState } from '../Contexts/FirestoreContext';
 
 const WaitingRoom = ({isHost}: {isHost: boolean}) => {
   const { gameState, gameDispatch } = useGame();
-  const [room] = useDocData(gameState.roomId);
-  const { players } = room;
   const playerState = usePlayerState();
   const {setPlayer} = usePlayerDocState();
 
+  const [room] = useDocData(gameState.roomId);
+  const { players } = room;
+  
   // Assign actions to existing players ->
   // set initial tile ->
   // set pawn positions ->

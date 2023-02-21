@@ -47,6 +47,13 @@ type BlockedPosition = {
   gridPosition: number[] | null;
 }
 
+export type BlockedPositions = {
+  up: BlockedPosition,
+  down: BlockedPosition,
+  left: BlockedPosition,
+  right: BlockedPosition
+}
+
 export interface HeroPawn {
   heroName: heroName,
   color: heroColor,
@@ -94,19 +101,19 @@ export interface DBPlayer extends Player {
 }
 
 
-export interface DBHeroPawn {
+export interface DBHeroPawn extends PawnActions {
   color: heroColor,
   playerHeld: playerNumber | null,
   position: number[],
   gridPosition: number[],
   ability: string,
   canUseAbility: boolean,
-  blockedPositions: {
-    up: BlockedPosition,
-    down: BlockedPosition,
-    left: BlockedPosition,
-    right: BlockedPosition
-  },
+}
+
+
+
+export interface PawnActions {
+  blockedPositions: BlockedPositions,
   showMovableDirections: direction[],
   showTeleportSpaces: heroColor | null,
   showEscalatorSpaces: Escalator[],

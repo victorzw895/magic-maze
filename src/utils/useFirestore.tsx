@@ -1,87 +1,11 @@
-// utils/usePageBottom.js
 import { Room } from '../types';
 import { setDoc as setDocument, doc as document, getDoc as getDocument } from "firebase/firestore"; 
 import { gamesRef } from "../Firestore";
 import { useDocumentData } from 'react-firebase-hooks/firestore'
-import { BlockedPositions } from '../Contexts/PawnContext';
-
-const blockedDirections: BlockedPositions = {
-  up: {
-    position: null,
-    gridPosition: null
-  },
-  right: {
-    position: null,
-    gridPosition: null
-  },
-  left: {
-    position: null,
-    gridPosition: null
-  },
-  down: {
-    position: null,
-    gridPosition: null
-  },
-}
+import { roomDefaultValues } from '../constants';
 
 const dbInitialState: Room = {
-  gameStarted: false,
-  gamePaused: false,
-  timeLeft: 200,
-  weaponsStolen: [],
-  heroesEscaped: [],
-  players: [],
-  tiles: [],
-  pawns: {
-    green: {
-      color: "green",
-      playerHeld: null,
-      position: [],
-      gridPosition: [],
-      ability: "",
-      canUseAbility: false,
-      blockedPositions: blockedDirections,
-      showMovableDirections: [],
-      showEscalatorSpaces: [],
-      showTeleportSpaces: null,
-    },
-    yellow: {
-      color: "yellow",
-      playerHeld: null,
-      position: [],
-      gridPosition: [],
-      ability: "",
-      canUseAbility: false,
-      blockedPositions: blockedDirections,
-      showMovableDirections: [],
-      showEscalatorSpaces: [],
-      showTeleportSpaces: null,
-    },
-    orange: {
-      color: "orange",
-      playerHeld: null,
-      position: [],
-      gridPosition: [],
-      ability: "",
-      canUseAbility: false,
-      blockedPositions: blockedDirections,
-      showMovableDirections: [],
-      showEscalatorSpaces: [],
-      showTeleportSpaces: null,
-    },
-    purple: {
-      color: "purple",
-      playerHeld: null,
-      position: [],
-      gridPosition: [],
-      ability: "",
-      canUseAbility: false,
-      blockedPositions: blockedDirections,
-      showMovableDirections: [],
-      showEscalatorSpaces: [],
-      showTeleportSpaces: null,
-    }
-  },
+  ...roomDefaultValues,
 }
 
 const doc = (roomId: string) => document(gamesRef, roomId);

@@ -1,14 +1,13 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { Game, direction, basicAbility, DBPlayer } from '../types';
 import { gamesRef } from "../Firestore";
-import { setDoc, doc, getDoc, getFirestore } from "firebase/firestore"; 
+import { doc } from "firebase/firestore"; 
 
-type Action = {type: 'joinRoom', value: String} | 
+type Action = {type: 'joinRoom', value: String} | // USED
               {type: 'toggleTimer', value: boolean} | 
               {type: 'timeLeft', minutes: number, seconds: number} | 
-              {type: 'gameOver'} | 
-              // {type: 'joinRoom', value: Game, playerName: string} | 
-              {type: 'startGame'} | undefined;
+              {type: 'gameOver'} |  // USED
+              {type: 'startGame'} | undefined; // USED
 type Dispatch = (action: Action) => void;
 
 type GameProviderProps = {children: React.ReactNode}
@@ -17,8 +16,6 @@ const gameInitialState: Game = {
   // roomId: "PKHRP",
   roomId: "",
   docRef: null,
-  // Maybe add: gameRef
-  // players: [],
   gameStarted: false, // TODO remove, can use values straight from DB
   gamePaused: false, // TODO remove, can use values straight from DB
   timerRunning: false, // TODO maybe not necessary

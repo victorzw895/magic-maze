@@ -2,15 +2,11 @@ import { memo, ReactNode, useEffect } from 'react';
 import { useGame } from '../Contexts/GameContext';
 import { DBPlayer } from '../types';
 import isEqual from 'lodash/isEqual';
-import { setDoc } from '../utils/useFirestore';
-import { usePlayerState } from '../Contexts/PlayerContext';
 import PlayerAreaDisabled from './PlayerAreaDisabled';
-import { useDocData, getDoc } from '../utils/useFirestore';
 import { useGamePausedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
 
 interface PlayerAreaProps {
   highlightNewTileArea: () => void,
-  // gamePaused: boolean,
   children: ReactNode
 }
 
@@ -22,7 +18,6 @@ const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
 // player object is pretty much static. Should only update if pinged value is updated
 // probably remove player from props.
 const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
-  console.log('*** *** re render player area')
   const { gameState } = useGame();
   const { player }: { player: DBPlayer } = usePlayerDocState();
   // const playerState = usePlayerState(); // TODO causing extra re render, can fix through TODO in playercontext
