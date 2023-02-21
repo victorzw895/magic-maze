@@ -6,6 +6,7 @@ import { Stack, Button, TextField, Paper } from '@mui/material';
 import { Room } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import WaitingRoom from './WaitingRoom';
+import { roomDefaultValues } from '../constants';
 
 const Lobby = () => {
   console.log('re-render Lobby');
@@ -40,54 +41,11 @@ const Lobby = () => {
 
     playerDispatch({type: "setPlayer", value: player});
 
-    // TODO move initialValue into a constants file
     await setDoc(newGameCode, {
-      players: [dbPlayer],
-      gameStarted: false,
-      gamePaused: false,
-      weaponsStolen: [],
-      heroesEscaped: [],
-      // timeLeft: 200,
-      tiles: [],
-      pawns: {
-        green: {
-          color: "green",
-          playerHeld: null,
-          position: [],
-          gridPosition: [],
-          ability: "",
-          canUseAbility: false,
-        },
-        yellow: {
-          color: "yellow",
-          playerHeld: null,
-          position: [],
-          gridPosition: [],
-          ability: "",
-          canUseAbility: false,
-        },
-        orange: {
-          color: "orange",
-          playerHeld: null,
-          position: [],
-          gridPosition: [],
-          ability: "",
-          canUseAbility: false,
-        },
-        purple: {
-          color: "purple",
-          playerHeld: null,
-          position: [],
-          gridPosition: [],
-          ability: "",
-          canUseAbility: false,
-        }
-      },
-      }
-    )
-    // setGameDoc(doc(gamesRef, newGameCode))
+      ...roomDefaultValues,
+      players: [dbPlayer]
+    })
   }
-
 
   // check room code typed
   // if document with room code exists
@@ -101,15 +59,13 @@ const Lobby = () => {
     if (!existingRoomCode) return
     const docSnap = await getDoc(existingRoomCode);
 
-    let roomFound: Room;
 
-    if (docSnap.exists()) {
-      roomFound = docSnap.data() as Room;
-      // setGameDoc(gamesDocRef)
+    if (!docSnap.exists()) {
+      return // TODO error message
+      // setFailJoinRoomMessage("Room code not found");
     }
-    else {
-      return
-    }
+
+    const roomFound = docSnap.data() as Room;
 
     // if found
     if (roomFound && !roomFound.gameStarted && roomFound.players.length <= 8) {
@@ -121,7 +77,10 @@ const Lobby = () => {
       gameDispatch({type: "joinRoom", value: existingRoomCode});
       playerDispatch({type: "setPlayer", value: player});
       await setDoc(existingRoomCode, 
-        {players: playersInRoom},
+        {
+          ...roomFound,
+          players: playersInRoom
+        },
       )
     }
     else if (!roomFound) {

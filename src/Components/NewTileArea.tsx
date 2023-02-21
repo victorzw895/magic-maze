@@ -1,16 +1,17 @@
-import React, { MouseEvent, memo } from 'react';
-import { DBTile } from '../types';
-import { tileWallSize, spaceSize } from '../constants';
+import { memo } from 'react';
+import { DBHeroPawn, DBTile, Room } from '../types';
+import { tileWallSize } from '../constants';
 import { generateTile } from '../Contexts/TilesContext';
 import { useGame } from '../Contexts/GameContext';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
 import { useGamePausedDocState } from '../Contexts/FirestoreContext';
+import { getDisplacementValue } from '../Helpers/TileMethods';
+import { getDefaultBlockedPositions } from '../constants';
 
 interface NewTileAreaProps {
   tile: DBTile,
   clearHighlightAreas: () => void,
-  // disableAction: boolean,
 }
 
 const areEqual = (prevProps: NewTileAreaProps, nextProps: NewTileAreaProps) => {
@@ -18,8 +19,8 @@ const areEqual = (prevProps: NewTileAreaProps, nextProps: NewTileAreaProps) => {
 }
 
 const NewTileArea = memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
-  console.log('new tile area re render')
   const { gridPosition, placementDirection } = tile;
+  
   const { gameState } = useGame();
   const gamePaused = useGamePausedDocState();
 
@@ -27,10 +28,25 @@ const NewTileArea = memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
     const docSnap = await getDoc(gameState.roomId);
 
     if (docSnap.exists()) {
+      const room = docSnap.data() as Room;
       const tile = generateTile(newTile);
+      const newPawns = room.pawns;
+      Object.values(newPawns).forEach((pawn: DBHeroPawn) => {
+        if (pawn.playerHeld) {
+          pawn.blockedPositions = getDefaultBlockedPositions()
+          console.log('pawn.blockedPositions', pawn.blockedPositions);
+          pawn.showMovableDirections = []
+          pawn.showEscalatorSpaces = []
+          pawn.showTeleportSpaces = null
+        }
+      })
+
       await setDoc(
         gameState.roomId, 
-        {tiles: [...docSnap.data().tiles, tile]},
+        {
+          tiles: [...room.tiles, tile],
+          pawns: newPawns
+        },
       )
     }
   }
@@ -42,10 +58,6 @@ const NewTileArea = memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
     }
 
     clearHighlightAreas();
-  }
-
-  const getDisplacementValue = (positionValue: number) => {
-    return tileWallSize - ((Math.abs(8 - positionValue) * 2) * spaceSize)
   }
 
   return (
@@ -67,6 +79,6 @@ const NewTileArea = memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
   )
 }, areEqual)
 
-NewTileArea.whyDidYouRender = true
+// NewTileArea.whyDidYouRender = true
 
 export default NewTileArea;

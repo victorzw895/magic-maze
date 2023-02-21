@@ -1,4 +1,6 @@
-import { direction, DBHeroPawn, DBTile, DBPawns, Space } from '../types';
+import { direction, DBHeroPawn, DBTile, DBPawns, Space, DBPlayer, Escalator, PawnActions } from '../types';
+import { getDefaultBlockedPositions } from '../constants';
+import isEqual from 'lodash/isEqual';
 
 const directionPositionValue = {
   "up": -1,
@@ -300,4 +302,32 @@ export const getFirstBlockedSpace = (tiles: DBTile[], pawns: DBPawns,  pawn: DBH
   }
 
   return firstBlocked;
+}
+
+export const getPlayerPawnActions = (player: DBPlayer, tiles: DBTile[], pawns: DBPawns, pawnData: DBHeroPawn): PawnActions => {
+  const playerDirections = player.playerDirections;
+  const blockedPositions = getDefaultBlockedPositions();
+  const escalatorSpaces: Escalator[] = [];
+  playerDirections.forEach((direction: direction) => {
+    const blockedSpace = getFirstBlockedSpace(tiles, pawns, pawnData, direction);
+    blockedPositions[direction].position = blockedSpace.position
+    blockedPositions[direction].gridPosition = blockedSpace.gridPosition
+    if (player.playerAbilities.includes("escalator")) {
+      const escalatorSpace = getEscalatorSpace(tiles, pawns, pawnData, direction);
+      if (
+        escalatorSpace &&
+        isEqual(escalatorSpace.gridPosition, pawnData.gridPosition) && 
+        isEqual(escalatorSpace.position, pawnData.position)
+      ) {
+      escalatorSpaces.push(escalatorSpace);
+      }
+    }
+  })
+
+  return {
+    blockedPositions,
+    showMovableDirections: playerDirections,
+    showEscalatorSpaces: escalatorSpaces,
+    showTeleportSpaces: player.playerAbilities.includes("teleport") ? pawnData.color : null,
+  }
 }

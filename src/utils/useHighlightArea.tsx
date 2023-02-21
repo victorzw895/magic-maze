@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState, ReactNode } from 'react';
-import { ExplorationSpace, DBTile, DBHeroPawn, DBPawns, Room } from '../types';
+import { useCallback, useState } from 'react';
+import { ExplorationSpace, DBTile, DBHeroPawn, Room } from '../types';
 import { getDoc } from '../utils/useFirestore';
 
 const startTiles = () => {
@@ -14,7 +14,6 @@ const startTiles = () => {
 
 const useHighlightArea = (roomId: string): [ DBTile[], () => void, () => void] => {
   const [availableArea, setAvailableArea] = useState<DBTile[]>(startTiles() as DBTile[]);
-  // const [room, setRoom] = useState({});
 
   const getExplorationTile = (tiles: DBTile[], pawn: DBHeroPawn, pawnColIndex: number, pawnRowIndex: number) => {
     const currentTile = tiles.find(tile => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1])
@@ -59,7 +58,8 @@ const useHighlightArea = (roomId: string): [ DBTile[], () => void, () => void] =
 
     const highlightAreas = Object.values(pawns).map(pawn => {
       return getExplorationTile(tiles, pawn, pawn.position[0], pawn.position[1]) 
-    }).filter(gridPos => gridPos) as DBTile[]
+    })
+      .filter(gridPos => gridPos) as DBTile[]
 
     // adding placementDirection value to tiles that need to be highlighted
     highlightAreas.forEach(newArea => {

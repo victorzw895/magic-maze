@@ -1,51 +1,11 @@
-// utils/usePageBottom.js
 import { Room } from '../types';
 import { setDoc as setDocument, doc as document, getDoc as getDocument } from "firebase/firestore"; 
 import { gamesRef } from "../Firestore";
 import { useDocumentData } from 'react-firebase-hooks/firestore'
+import { roomDefaultValues } from '../constants';
 
 const dbInitialState: Room = {
-  gameStarted: false,
-  gamePaused: false,
-  timeLeft: 200,
-  weaponsStolen: [],
-  heroesEscaped: [],
-  players: [],
-  tiles: [],
-  pawns: {
-    green: {
-      color: "green",
-      playerHeld: null,
-      position: [],
-      gridPosition: [],
-      ability: "",
-      canUseAbility: false,
-    },
-    yellow: {
-      color: "yellow",
-      playerHeld: null,
-      position: [],
-      gridPosition: [],
-      ability: "",
-      canUseAbility: false,
-    },
-    orange: {
-      color: "orange",
-      playerHeld: null,
-      position: [],
-      gridPosition: [],
-      ability: "",
-      canUseAbility: false,
-    },
-    purple: {
-      color: "purple",
-      playerHeld: null,
-      position: [],
-      gridPosition: [],
-      ability: "",
-      canUseAbility: false,
-    }
-  },
+  ...roomDefaultValues,
 }
 
 const doc = (roomId: string) => document(gamesRef, roomId);

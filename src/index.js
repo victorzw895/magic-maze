@@ -7,23 +7,23 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { GameProvider } from './Contexts/GameContext';
-import { Provider } from './Contexts/DBContext';
 import { FirestoreProvider } from './Contexts/FirestoreContext';
 import { PlayerProvider } from './Contexts/PlayerContext';
 import Test from './Components/Test';
+import { TilesProvider } from './Contexts/TilesContext';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider>
-      <GameProvider>
-        <PlayerProvider>
-          <FirestoreProvider>
+    <GameProvider>
+      <PlayerProvider>
+        <FirestoreProvider>
+          <TilesProvider>
             <App />
             <Test />
-          </FirestoreProvider>
-        </PlayerProvider>
-      </GameProvider>
-    </Provider>
+          </TilesProvider>
+        </FirestoreProvider>
+      </PlayerProvider>
+    </GameProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState, ReactNode } from 'react';
-import { ExplorationSpace, DBTile, DBHeroPawn, DBPawns, Room } from '../types';
-import { getDoc } from '../utils/useFirestore';
+import { useEffect, useState } from 'react';
+import { DBTile, Room } from '../types';
 import isEqual from 'lodash/isEqual'
 
 const useGamePaused = (room: Room): [DBTile[]] => {
@@ -12,7 +11,6 @@ const useGamePaused = (room: Room): [DBTile[]] => {
 
   useEffect(() => {
     if (isEqual(tiles, room.tiles)) return; // TODO, may not best solution
-    console.log('setTiles from fiestore context', room.tiles)
     setTiles(room.tiles);
   }, [room.tiles])
 

@@ -37,19 +37,21 @@ export interface Escalator {
   escalatorName: string | null
 }
 
-export interface BasePlayer {
+export interface Player {
   number: playerNumber,  // TODO remove, can use values straight from DB
 }
 
-export interface Player extends BasePlayer {
-  showMovableDirections: direction[],
-  showTeleportSpaces: heroColor | null,
-  showEscalatorSpaces: Escalator[],
-}
 
 type BlockedPosition = {
   position: number[] | null;
   gridPosition: number[] | null;
+}
+
+export type BlockedPositions = {
+  up: BlockedPosition,
+  down: BlockedPosition,
+  left: BlockedPosition,
+  right: BlockedPosition
 }
 
 export interface HeroPawn {
@@ -58,12 +60,6 @@ export interface HeroPawn {
   weapon: heroWeapon,
   width: number,
   height: number,
-  blockedPositions: {
-    up: BlockedPosition,
-    down: BlockedPosition,
-    left: BlockedPosition,
-    right: BlockedPosition
-  }
 }
 
 // DB Types ///////////////////////////////////////////
@@ -97,7 +93,7 @@ export interface Room {
 }
 
 
-export interface DBPlayer extends BasePlayer {
+export interface DBPlayer extends Player {
   name: string,
   pinged: boolean,
   playerDirections: direction[],
@@ -105,13 +101,22 @@ export interface DBPlayer extends BasePlayer {
 }
 
 
-export interface DBHeroPawn {
+export interface DBHeroPawn extends PawnActions {
   color: heroColor,
   playerHeld: playerNumber | null,
   position: number[],
   gridPosition: number[],
   ability: string,
   canUseAbility: boolean,
+}
+
+
+
+export interface PawnActions {
+  blockedPositions: BlockedPositions,
+  showMovableDirections: direction[],
+  showTeleportSpaces: heroColor | null,
+  showEscalatorSpaces: Escalator[],
 }
 
 export interface DBTile {
