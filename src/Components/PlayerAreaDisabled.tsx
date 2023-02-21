@@ -1,13 +1,8 @@
 import { memo, ReactNode } from 'react';
 import { useGame } from '../Contexts/GameContext';
-import { DBPlayer } from '../types';
-import isEqual from 'lodash/isEqual';
 import { setDoc } from '../utils/useFirestore';
-import { usePlayerState } from '../Contexts/PlayerContext';
 
 const PlayerAreaDisabled = () => {
-  // console.log('re render player area')
-
   const { gameState } = useGame();
 
   const _handleContinueGame = async () => {

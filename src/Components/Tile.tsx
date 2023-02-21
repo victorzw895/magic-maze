@@ -1,91 +1,27 @@
 import { memo } from 'react';
 import Space from './Space';
-import { direction, HeroPawn, DBTile, DBHeroPawn, DBPlayer, TeleporterSpace, ExplorationSpace, WeaponSpace, ExitSpace, TimerSpace } from '../types';
-import { tileWallSize, spaceSize } from '../constants';
-import { usePawn, usePawnDispatch } from '../Contexts/PawnContext';
-import { usePlayerState, usePlayerDispatch } from '../Contexts/PlayerContext';
+import { DBTile, TeleporterSpace, ExplorationSpace, WeaponSpace, ExitSpace, TimerSpace } from '../types';
+import { tileWallSize } from '../constants';
 import isEqual from 'lodash/isEqual';
 import { 
   usePlayerDocState,
-  useGreenDocState,
-  useYellowDocState,
-  useOrangeDocState,
-  usePurpleDocState,
   usePlayerHeldPawnDocState 
 } from '../Contexts/FirestoreContext';
+import { getDisplacementValue, tileHasBlockedSpace } from '../Helpers/TileMethods';
 
 interface tileProps {
   tileData: DBTile,
   tileIndex: number,
-  // playerHeldPawn: DBHeroPawn,
-  // currentPlayer: DBPlayer,
 }
 
 const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
-  // console.log(prevProps, nextProps)
-  // TODO FIX
-  // if (!prevProps.playerHeldPawn || !nextProps.playerHeldPawn) {
-  //   return false;
-  // }
-  // if (prevProps.playerHeldPawn.gridPosition[0] !== nextProps.playerHeldPawn.gridPosition[0] ||
-  //     prevProps.playerHeldPawn.gridPosition[1] !== nextProps.playerHeldPawn.gridPosition[1]) {
-  //       return false;
-  //     }
-  // else {
-  //   if (prevProps.playerHeldPawn.position[0] !== nextProps.playerHeldPawn.position[0] ||
-  //       prevProps.playerHeldPawn.position[1] !== nextProps.playerHeldPawn.position[1]) {
-  //       return false
-  //     }
-  // }
-  
-  // return true
-
   return isEqual(prevProps, nextProps);
 }
 
-// const usePlayerHeldPawn = () => {
-//   const { player } = usePlayerDocState();
-
-//   const green = useGreenDocState();
-//   const yellow = useYellowDocState();
-//   const purple = usePurpleDocState();
-//   const orange = useOrangeDocState();
-
-//   const getPlayerHeldPawn = () => {
-//     const pawnHeld = Object.values({green, yellow, orange, purple}).find((pawn: DBHeroPawn) => pawn.playerHeld && pawn.playerHeld === player.number);
-//     return pawnHeld as DBHeroPawn;
-//   }
-
-//   return getPlayerHeldPawn()
-// }
-
-const Tile = memo(({tileIndex, tileData}: tileProps) => {
-  // const playerState = usePlayerState(); // fixed
+const Tile = ({tileIndex, tileData}: tileProps) => {
+  console.log('tile re render')
   const { player } = usePlayerDocState();
-  
-  // const pawnState = usePawn(); // 2x extra re render
-
   const playerHeldPawn = usePlayerHeldPawnDocState()
-  console.log('$$$ re rendering tile', {tileIndex, tileData, playerHeldPawn, player})
-  // const pawnDispatch = usePawnDispatch();
-
-  const tileHasBlockedSpace = (tileData: DBTile, direction: direction, pawnHeld: DBHeroPawn) => {
-    // console.log("tilehas blocked space")
-    if (pawnHeld.showMovableDirections?.includes(direction)) {
-      if (pawnHeld.blockedPositions[direction].gridPosition && pawnHeld.blockedPositions[direction].position) {
-        if (tileData.gridPosition[0] === pawnHeld.blockedPositions[direction].gridPosition![0] &&
-            tileData.gridPosition[1] === pawnHeld.blockedPositions[direction].gridPosition![1]) {
-              // console.log('true')
-              return true;
-            }
-      }
-    }
-    return false;
-  }
-
-  const getDisplacementValue = (positionValue: number) => {
-    return tileWallSize - ((Math.abs(8 - positionValue) * 2) * spaceSize)
-  }
   
   return (
     <>
@@ -103,15 +39,12 @@ const Tile = memo(({tileIndex, tileData}: tileProps) => {
             }
           }>
           {tileData.spaces && Object.values(tileData.spaces).map((row, rowIndex) => {
-            // let rowBlocked = true;
             let highlightSpace = false;
 
             return (
               <div className="row" key={`row${rowIndex}`}>
-                {/* {console.log("re rendering tile ******")} */}
                 {row.map((space, colIndex) => {
                   if (playerHeldPawn && playerHeldPawn.playerHeld === player.number) {
-                    // const localPawn = pawnState[playerHeldPawn.color]
                     if (playerHeldPawn.showMovableDirections.length) {
                       if (tileData.gridPosition[0] !== playerHeldPawn.gridPosition[0] || tileData.gridPosition[1] !== playerHeldPawn.gridPosition[1]) {
                         let rowBlocked = true;
@@ -299,8 +232,6 @@ const Tile = memo(({tileIndex, tileData}: tileProps) => {
                           spaceWeaponStolen: (details as WeaponSpace)?.weaponStolen,
                         }
                       }
-                      // playerDispatch={playerDispatch}
-                      // pawnDispatch={pawnDispatch}
                       key={`space${rowIndex}-${colIndex} ${highlightSpace ? "highlight" : ""}`} 
                       spacePosition={[colIndex, rowIndex]} 
                       gridPosition={tileData.gridPosition}
@@ -323,7 +254,6 @@ const Tile = memo(({tileIndex, tileData}: tileProps) => {
               transform: `rotate(${tileData.rotation}deg)`,
             }}>
           </img>
-          {console.log("rendering tile")}
         </div>
             :
         <>
@@ -331,8 +261,8 @@ const Tile = memo(({tileIndex, tileData}: tileProps) => {
       }
     </>
   )
-}, areEqual)
+}
 
-Tile.whyDidYouRender = true
+// Tile.whyDidYouRender = true
 
 export default Tile;

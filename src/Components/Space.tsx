@@ -1,11 +1,8 @@
 import { useEffect, useState, memo } from 'react';
 import { useGame } from '../Contexts/GameContext';
-// import { usePlayerDispatch } from '../Contexts/PlayerContext';
 import { heroColor, Escalator, SpaceTypeName } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
-import { Dispatch } from '../Contexts/PawnContext';
-import { usePawn, usePawnDispatch } from '../Contexts/PawnContext';
 
 interface SpaceProps {
   spaceType: SpaceTypeName,
@@ -21,43 +18,46 @@ interface SpaceProps {
   highlightTeleporter: heroColor | null,
   highlightEscalator: Escalator[],
   tileIndex: number,
-  // pawnDispatch: Dispatch
-  // pawnDispatch: Dispatch
 }
 
 const areEqual = (prevProps: SpaceProps, nextProps: SpaceProps) => {
-  // const {spaceData, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex} = prevProps;
-  // const {nextSpaceData, nextShowMovableArea, nextSpacePosition, nextColorSelected, nextGridPosition, nextHighlightTeleporter, nextHighlightEscalator, nextTileIndex} = nextProps;
-  // if (!isEqual(prevProps.spaceData, nextProps.spaceData)) {
-  //   return false
-  // }
-  // if (!isEqual(prevProps.spacePosition, nextProps.spacePosition)) {
-  //   return false
-  // }
-  // if (prevProps.showMovableArea !== nextProps.showMovableArea) {
-  //   return false
-  // }
-  // if (prevProps.highlightTeleporter !== nextProps.highlightTeleporter) {
-  //     return false
-  // }
-  // if (!isEqual(prevProps.highlightEscalator, nextProps.highlightEscalator)) {
-  //     return false
-  // }
-  // if (prevProps.colorSelected !== nextProps.colorSelected) {
-  //     return false
-  // }
-  // console.count('Space re-render');
-  // return true
-  // console.log(prevProps, nextProps, isEqual(prevProps, nextProps))
   return isEqual(prevProps, nextProps);
 }
 
 
-const Space = memo(({spaceType, spaceColor, spaceHasEscalator, spaceEscalatorName, spaceIsDisabled, spaceWeaponStolen, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex}: SpaceProps) => {
-  console.count('Re-render space');
-  console.log('Space render', {spaceType, spaceColor, spaceHasEscalator, spaceEscalatorName, spaceIsDisabled, spaceWeaponStolen, showMovableArea, spacePosition, colorSelected, gridPosition, highlightTeleporter, highlightEscalator, tileIndex})
+const Space = memo(({
+  spaceType,
+  spaceColor,
+  spaceHasEscalator,
+  spaceEscalatorName,
+  spaceIsDisabled,
+  spaceWeaponStolen,
+  showMovableArea,
+  spacePosition,
+  colorSelected,
+  gridPosition,
+  highlightTeleporter,
+  highlightEscalator,
+  tileIndex
+}: SpaceProps) => {
+  
+  console.log('Re-render space', {
+    spaceType,
+    spaceColor,
+    spaceHasEscalator,
+    spaceEscalatorName,
+    spaceIsDisabled,
+    spaceWeaponStolen,
+    showMovableArea,
+    spacePosition,
+    colorSelected,
+    gridPosition,
+    highlightTeleporter,
+    highlightEscalator,
+    tileIndex
+  });
   const { gameState } = useGame();
-  // const playerDispatch = usePlayerDispatch(); // TODO this causing re-render
+
   const isTeleporter = spaceType === "teleporter";
   const teleporterColor = isTeleporter ? spaceColor : "";
 
@@ -182,17 +182,6 @@ const Space = memo(({spaceType, spaceColor, spaceHasEscalator, spaceEscalatorNam
             heroesEscaped: newRoomValue.heroesEscaped
           },
         )
-        // playerDispatch({type: "showMovableSpaces", value: []})
-        // playerDispatch({type: "showTeleportSpaces", color: null})
-        // playerDispatch({type: "showEscalatorSpaces", value: []})
-        // pawnDispatch({
-        //   type: 'showActions',
-        //   blockedPositions: newRoomValue.pawns[colorSelected].blockedPositions, // TODO rename blockedDirections ??
-        //   color: colorSelected,
-        //   playerDirections: [],
-        //   escalatorSpaces: [],
-        //   teleporterSpaces: null,
-        // })
       }
     }
   }
@@ -205,7 +194,6 @@ const Space = memo(({spaceType, spaceColor, spaceHasEscalator, spaceEscalatorNam
        // TODO: disable if game paused
     >
       <div className={teleporterColor}></div>
-      {/* {console.log("re rendering space")} */}
     </div>
   )
 }, areEqual)

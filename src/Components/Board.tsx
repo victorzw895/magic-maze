@@ -1,21 +1,15 @@
-import { useState, useEffect, useRef, ReactNode, memo, useCallback } from 'react';
+import { useRef, ReactNode } from 'react';
 import Tiles from './Tiles';
 import NewTileArea from './NewTileArea';
 import Pawns from './Pieces/Pawns';
-// import Pawn from './Pieces/Pawn';
 import PlayerArea from './PlayerArea';
-import { Room, DBTile, DBPlayer } from '../types';
 import './Board.scss';
 import { useGame } from '../Contexts/GameContext';
-import { usePlayerDispatch, usePlayerState } from '../Contexts/PlayerContext';
-import { usePawn } from '../Contexts/PawnContext';
 import Draggable from 'react-draggable';
-import { useDocData, getDoc } from '../utils/useFirestore';
 import useHighlightArea from '../utils/useHighlightArea';
 import Timer from './Timer';
 import Pinged from './Pinged';
-import { useGamePausedDocState, useGameStartedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
-import PlayerAreaDisabled from './PlayerAreaDisabled';
+import { useGameStartedDocState } from '../Contexts/FirestoreContext';
 
 const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: ReactNode, children: ReactNode}) => {
   console.log('*** Board Component re render')

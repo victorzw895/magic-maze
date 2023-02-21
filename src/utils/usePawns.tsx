@@ -1,36 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState, ReactNode } from 'react';
-import { ExplorationSpace, DBTile, DBPawns, DBHeroPawn, DBPlayer, Room } from '../types';
-import { getDoc } from './useFirestore';
-import { usePlayerDispatch, usePlayerState } from '../Contexts/PlayerContext';
+import { useEffect, useState } from 'react';
+import { DBHeroPawn, Room } from '../types';
+import { pawnDefaultValues } from '../constants';
+import { usePlayerState } from '../Contexts/PlayerContext';
 
 const initPlayerHeldPawn = {
+  ...pawnDefaultValues,
   color: null,
-  playerHeld: null,
-  position: [],
   gridPosition: [8, 8],
-  ability: '',
-  canUseAbility: false,
-  blockedPositions: {
-    up: {
-      position: null,
-      gridPosition: null
-    },
-    left: {
-      position: null,
-      gridPosition: null
-    },
-    right: {
-      position: null,
-      gridPosition: null
-    },
-    down: {
-      position: null,
-      gridPosition: null
-    }
-  },
-  showMovableDirections: [],
-  showTeleportSpaces: null,
-  showEscalatorSpaces: [],
 }
 
 const usePawns = (room: Room): any => {

@@ -1,5 +1,5 @@
 import Tile from './Tile';
-import { DBHeroPawn, Room, DBTile } from '../types';
+import { DBTile } from '../types';
 import './Board.scss';
 import { useTilesDocState } from '../Contexts/FirestoreContext';
 

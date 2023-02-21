@@ -87,16 +87,6 @@ const updateSpaceDirections = (spaces: Space[][], rotationValue: number) => {
   ))
 }
 
-// const updateTileDirections = (newTile: DBTile, rotationValue: number) => {
-//   if (newTile.entryDirection) {
-//     newTile.entryDirection = getUpdatedDirectionValue(newTile.entryDirection, rotationValue)
-//   }
-//   if (newTile.entrySide) {
-//     newTile.entrySide = getUpdatedDirectionValue(newTile.entrySide, rotationValue)
-//   }
-//   return newTile;
-// }
-
 export const generateTile = (newTileState: DBTile) => {
   const newId = availableTiles.pop();
   const tile = allTiles.find(tile => tile.id === newId?.toString()) as DBTile;
@@ -108,18 +98,15 @@ export const generateTile = (newTileState: DBTile) => {
 
   switch (rotationValue) {
     case 90:
-      // updateTileDirections(newTile, rotationValue)
       rotateTileSpaces(tileSpaces);
       updateSpaceDirections(tileSpaces, rotationValue);
       break; 
     case 180:
-      // updateTileDirections(newTile, rotationValue)
       rotateTileSpaces(tileSpaces);
       rotateTileSpaces(tileSpaces);
       updateSpaceDirections(tileSpaces, rotationValue);
       break;
     case 270:
-      // updateTileDirections(newTile, rotationValue)
       rotateTileSpaces(tileSpaces);
       rotateTileSpaces(tileSpaces);
       rotateTileSpaces(tileSpaces);
@@ -154,18 +141,15 @@ const tilesReducer = (tilesState: DBTile[], action: any) => {
 
       switch (rotationValue) {
         case 90:
-          // updateTileDirections(newTile, rotationValue)
           rotateTileSpaces(tileSpaces);
           updateSpaceDirections(tileSpaces, rotationValue);
           break; 
         case 180:
-          // updateTileDirections(newTile, rotationValue)
           rotateTileSpaces(tileSpaces);
           rotateTileSpaces(tileSpaces);
           updateSpaceDirections(tileSpaces, rotationValue);
           break;
         case 270:
-          // updateTileDirections(newTile, rotationValue)
           rotateTileSpaces(tileSpaces);
           rotateTileSpaces(tileSpaces);
           rotateTileSpaces(tileSpaces);

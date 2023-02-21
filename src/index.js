@@ -7,30 +7,23 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { GameProvider } from './Contexts/GameContext';
-import { Provider } from './Contexts/DBContext';
 import { FirestoreProvider } from './Contexts/FirestoreContext';
 import { PlayerProvider } from './Contexts/PlayerContext';
 import Test from './Components/Test';
-import { PawnProvider } from './Contexts/PawnContext';
-// import { PlayerProvider } from './Contexts/PlayerContext';
 import { TilesProvider } from './Contexts/TilesContext';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider>
-      <GameProvider>
-        <PlayerProvider>
-          <FirestoreProvider>
-            <TilesProvider>
-              <PawnProvider>
-                <App />
-                <Test />
-              </PawnProvider>
-            </TilesProvider>
-          </FirestoreProvider>
-        </PlayerProvider>
-      </GameProvider>
-    </Provider>
+    <GameProvider>
+      <PlayerProvider>
+        <FirestoreProvider>
+          <TilesProvider>
+            <App />
+            <Test />
+          </TilesProvider>
+        </FirestoreProvider>
+      </PlayerProvider>
+    </GameProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
