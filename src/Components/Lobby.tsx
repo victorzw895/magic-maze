@@ -7,10 +7,15 @@ import { Room } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import WaitingRoom from './WaitingRoom';
 import { roomDefaultValues } from '../constants';
+// import { useGameStartedDocState } from '../Contexts/FirestoreContext';
 
 const Lobby = () => {
   console.log('re-render Lobby');
+  // const gameStarted = useGameStartedDocState()
+  // console.log('gameStarted', gameStarted)
+
   const { gameState, gameDispatch } = useGame();
+  console.log("game State", gameState, gameState.roomId)
   const playerDispatch = usePlayerDispatch();
 
   const [playerName, setPlayerName] = useState("");

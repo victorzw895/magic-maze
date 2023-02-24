@@ -10,6 +10,8 @@ import { usePlayerDocState } from '../Contexts/FirestoreContext';
 
 const WaitingRoom = ({isHost}: {isHost: boolean}) => {
   const { gameState, gameDispatch } = useGame();
+
+  console.log("gameState room id,", gameState.roomId)
   const playerState = usePlayerState();
   const {setPlayer} = usePlayerDocState();
 
@@ -40,6 +42,10 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
     gameDispatch({type: "startGame"})
   }
 
+  const backToLobby = () => {
+    gameDispatch({ type: "exitRoom" })
+  }
+
 
   useEffect(() => {
     (async () => {
@@ -64,6 +70,7 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
           {isHost && 
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
               <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
+              <Button variant="contained" size="small" disableElevation onClick={backToLobby}>Back</Button>
             </Stack>
           }
         </List>
