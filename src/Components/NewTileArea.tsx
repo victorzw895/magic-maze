@@ -52,7 +52,6 @@ const NewTileArea = memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
   }
 
   const placeNewTile = () => {
-    if (gamePaused) return
     if (placementDirection) {
       addNewTile({gridPosition, placementDirection} as DBTile);
     }
@@ -62,7 +61,7 @@ const NewTileArea = memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
 
   return (
     <div className={`tile new-tile-area ${placementDirection ? placementDirection : "placeholder"}`}
-      onClick={placeNewTile} // TODO: disable if game paused
+      onClick={gamePaused ? () => {} :placeNewTile}
       style={
         {
           gridColumnStart: gridPosition[0], 

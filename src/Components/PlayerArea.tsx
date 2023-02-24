@@ -14,13 +14,9 @@ const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
   return isEqual(prevProps, nextProps);
 }
 
-// TODO, this component only needs to re-render if highlightNewTileArea changes.
-// player object is pretty much static. Should only update if pinged value is updated
-// probably remove player from props.
 const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
   const { gameState } = useGame();
   const { player }: { player: DBPlayer } = usePlayerDocState();
-  // const playerState = usePlayerState(); // TODO causing extra re render, can fix through TODO in playercontext
   const gamePaused = useGamePausedDocState();
 
   useEffect(() => {
