@@ -18,6 +18,7 @@ const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
   return isEqual(prevProps, nextProps);
 }
 
+// memo could be good
 const Tile = ({tileIndex, tileData}: tileProps) => {
   console.log('tile re render')
   const { player } = usePlayerDocState();

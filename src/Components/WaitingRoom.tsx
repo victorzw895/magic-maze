@@ -1,17 +1,13 @@
 import { useEffect } from 'react';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
-import { Stack, Button, List, ListItem } from '@mui/material';
+import { Paper, Stack, Button, List, ListItem } from '@mui/material';
 import { DBPlayer } from '../types';
 import { setDoc, useDocData } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
-import { usePlayerState } from '../Contexts/PlayerContext';
-import { usePlayerDocState } from '../Contexts/FirestoreContext';
 
 const WaitingRoom = ({isHost}: {isHost: boolean}) => {
   const { gameState, gameDispatch } = useGame();
-  const playerState = usePlayerState();
-  const {setPlayer} = usePlayerDocState();
 
   const [room] = useDocData(gameState.roomId);
   const { players } = room;
@@ -40,34 +36,23 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
     gameDispatch({type: "startGame"})
   }
 
-
-  useEffect(() => {
-    (async () => {
-      if (!room.gameStarted) return;
-      
-      const currentPlayer = room.players.find((player: DBPlayer) => player.number === playerState.number);
-      if (!currentPlayer) return;
-      setPlayer(currentPlayer);
-    })()
-  }, [room.gameStarted])
-
   return (
     <>
       <h4 className="lobby-code">CODE: {gameState.roomId}</h4>
-      {players && players.length && 
-        <List sx={{ width: '100%', maxWidth: 360, bgcolor: '#63B0CD' }}>
+      <Paper sx={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '100%', minHeight: '135px', maxWidth: '360px', bgcolor: '#63B0CD' }}>
+        <List>
           {
-            players.map((player: any) => {
+            players && players.map((player: any) => {
               return <ListItem key={player.number}>{`${player.number}  ${player.name}`}</ListItem>
             })
           }
-          {isHost && 
-            <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
-              <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
-            </Stack>
-          }
         </List>
-      }
+        {isHost && 
+          <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
+            <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
+          </Stack>
+        }
+      </Paper>
     </>
   )
 }
