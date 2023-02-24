@@ -115,6 +115,7 @@ const Lobby = () => {
                 <TextField margin="normal" size="small" type="text" variant="filled" label="Enter Room Code" onChange={_handleRoomCode} value={existingRoomCode}></TextField>
                 <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
                   <Button variant="contained" size="small" disableElevation onClick={joinRoom}>Join</Button>
+                  <Button variant="contained" size="small" disableElevation onClick={() => setPromptCode(false)}>Back</Button>
                 </Stack>
               </>
                 :
