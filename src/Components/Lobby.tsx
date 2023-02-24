@@ -7,7 +7,6 @@ import { Room } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import WaitingRoom from './WaitingRoom';
 import { roomDefaultValues } from '../constants';
-// import { useGameStartedDocState } from '../Contexts/FirestoreContext';
 
 const Lobby = () => {
   console.log('re-render Lobby');
@@ -15,7 +14,6 @@ const Lobby = () => {
   // console.log('gameStarted', gameStarted)
 
   const { gameState, gameDispatch } = useGame();
-  console.log("game State", gameState, gameState.roomId)
   const playerDispatch = usePlayerDispatch();
 
   const [playerName, setPlayerName] = useState("");
@@ -115,7 +113,7 @@ const Lobby = () => {
                 <TextField margin="normal" size="small" type="text" variant="filled" label="Enter Room Code" onChange={_handleRoomCode} value={existingRoomCode}></TextField>
                 <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
                   <Button variant="contained" size="small" disableElevation onClick={joinRoom}>Join</Button>
-                  <Button variant="contained" size="small" disableElevation onClick={() => setPromptCode(false)}>Back</Button>
+                  <Button variant="contained" size="small" id="back" disableElevation onClick={() => setPromptCode(false)}>Back</Button>
                 </Stack>
               </>
                 :

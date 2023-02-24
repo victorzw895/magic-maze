@@ -53,7 +53,7 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
           {isHost && 
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
               <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
-              <Button variant="contained" size="small" disableElevation onClick={backToLobby}>Back</Button>
+              <Button variant="contained" size="small" id="back" disableElevation onClick={backToLobby}>Back</Button>
             </Stack>
           }
         </List>
