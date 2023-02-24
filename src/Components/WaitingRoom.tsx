@@ -1,19 +1,13 @@
 import { useEffect } from 'react';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
-import { Stack, Button, List, ListItem } from '@mui/material';
+import { Paper, Stack, Button, List, ListItem } from '@mui/material';
 import { DBPlayer } from '../types';
 import { setDoc, useDocData } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
-import { usePlayerState } from '../Contexts/PlayerContext';
-import { usePlayerDocState } from '../Contexts/FirestoreContext';
 
 const WaitingRoom = ({isHost}: {isHost: boolean}) => {
   const { gameState, gameDispatch } = useGame();
-
-  console.log("gameState room id,", gameState.roomId)
-  const playerState = usePlayerState();
-  const {setPlayer} = usePlayerDocState();
 
   const [room] = useDocData(gameState.roomId);
   const { players } = room;
@@ -46,24 +40,13 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
     gameDispatch({ type: "exitRoom" })
   }
 
-
-  useEffect(() => {
-    (async () => {
-      if (!room.gameStarted) return;
-      
-      const currentPlayer = room.players.find((player: DBPlayer) => player.number === playerState.number);
-      if (!currentPlayer) return;
-      setPlayer(currentPlayer);
-    })()
-  }, [room.gameStarted])
-
   return (
     <>
       <h4 className="lobby-code">CODE: {gameState.roomId}</h4>
-      {players && players.length && 
-        <List sx={{ width: '100%', maxWidth: 360, bgcolor: '#63B0CD' }}>
+      <Paper sx={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '100%', minHeight: '135px', maxWidth: '360px', bgcolor: '#63B0CD' }}>
+        <List>
           {
-            players.map((player: any) => {
+            players && players.map((player: any) => {
               return <ListItem key={player.number}>{`${player.number}  ${player.name}`}</ListItem>
             })
           }
@@ -74,7 +57,8 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
             </Stack>
           }
         </List>
-      }
+ 
+      </Paper>
     </>
   )
 }
