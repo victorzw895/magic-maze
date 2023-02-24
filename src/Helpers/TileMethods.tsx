@@ -34,6 +34,7 @@ export const showMovableSpaces = async (
 
     Object.values(newPawns).forEach((pawn: DBHeroPawn) => {
       if (pawn.color === color && !pawnData.playerHeld) {
+        console.log('player', player);
         const playerPawnActions = getPlayerPawnActions(player, tiles, newPawns, pawn);
         
         pawn.playerHeld = player.number

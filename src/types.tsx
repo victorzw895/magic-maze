@@ -92,6 +92,7 @@ export interface Room {
   pawns: DBPawns,
 }
 
+export type RoomKeys = keyof Room;
 
 export interface DBPlayer extends Player {
   name: string,

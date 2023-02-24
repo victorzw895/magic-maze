@@ -23,6 +23,7 @@ const usePawns = (room: Room): any => {
   useEffect(() => {
     const currentHeldPawn = Object.values(pawns).find(pawn => pawn.playerHeld === player.number);
     setPlayerHeldPawn(currentHeldPawn || initPlayerHeldPawn);
+  // }, [greenPawn.playerHeld, yellowPawn.playerHeld, purplePawn.playerHeld, orangePawn.playerHeld])
   }, [pawns])
 
   useEffect(() => {

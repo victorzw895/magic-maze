@@ -10,9 +10,8 @@ const useGamePaused = (room: Room): [DBTile[]] => {
   // isDisabled
 
   useEffect(() => {
-    if (isEqual(tiles, room.tiles)) return; // TODO, may not best solution
     setTiles(room.tiles);
-  }, [room.tiles])
+  }, [room.tiles.length])
 
   return [tiles];
 };
