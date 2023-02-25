@@ -7,7 +7,8 @@ type Action = {type: 'joinRoom', value: String} | // USED
               {type: 'toggleTimer', value: boolean} | 
               {type: 'timeLeft', minutes: number, seconds: number} | 
               {type: 'gameOver'} |  // USED
-              {type: 'startGame'} | undefined; // USED
+              {type: 'startGame'} | // USED
+              {type: 'exitRoom'} | undefined;
 type Dispatch = (action: Action) => void;
 
 type GameProviderProps = {children: React.ReactNode}
@@ -122,13 +123,13 @@ const gameReducer = (gameState: Game, action: any) => {
       // ]
       // newState.players = players;
       newState.roomId = action.value;
-      newState.docRef = doc(gamesRef, action.value);
+      // newState.docRef = doc(gamesRef, action.value);
       // newState.players.push(PlayerFactory(0, action.playerName))
       return newState;
     }
     case 'joinRoom': {
       newState.roomId = action.value;
-      newState.docRef = doc(gamesRef, action.value);
+      // newState.docRef = doc(gamesRef, action.value);
       // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
       return newState;
     }
@@ -158,6 +159,10 @@ const gameReducer = (gameState: Game, action: any) => {
       newState.secondsLeft = 0;
       newState.gameOver = true;
       return newState;
+    }
+    case 'exitRoom': {
+      newState.roomId = ""
+      return newState
     }
     default: {
       throw new Error(`Unhandled action type: ${action.type}`)

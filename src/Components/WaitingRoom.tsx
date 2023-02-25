@@ -36,6 +36,10 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
     gameDispatch({type: "startGame"})
   }
 
+  const backToLobby = () => {
+    gameDispatch({ type: "exitRoom" })
+  }
+
   return (
     <>
       <h4 className="lobby-code">CODE: {gameState.roomId}</h4>
@@ -46,12 +50,14 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
               return <ListItem key={player.number}>{`${player.number}  ${player.name}`}</ListItem>
             })
           }
+          {isHost && 
+            <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
+              <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
+              <Button variant="contained" size="small" disableElevation onClick={backToLobby}>Back</Button>
+            </Stack>
+          }
         </List>
-        {isHost && 
-          <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
-            <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
-          </Stack>
-        }
+ 
       </Paper>
     </>
   )
