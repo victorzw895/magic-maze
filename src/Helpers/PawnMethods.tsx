@@ -1,5 +1,6 @@
 import { direction, DBHeroPawn, DBTile, DBPawns, Space, DBPlayer, Escalator, PawnActions } from '../types';
 import { getDefaultBlockedPositions } from '../constants';
+import { oppositeDirection } from './TileMethods';
 import isEqual from 'lodash/isEqual';
 
 const directionPositionValue = {
@@ -73,22 +74,34 @@ const filterSpacesFromRows = (rows: Space[][], pawn: DBHeroPawn, direction: dire
 
 const getAllDirectionalSpaces = (tiles: DBTile[], pawn: DBHeroPawn, direction: direction) => {
   const directionalSpaces = [];
-  const currentTile = tiles.find((tile: any) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
-  const rows = filterRowsOfTargetDirection(currentTile!, pawn, direction) || [];
-  const spaces = filterSpacesFromRows(rows, pawn, direction) || [];
+  const currentTile = tiles.find((tile) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
 
   let adjacentTileFound;
   let extraSpaces = [];
   
   if (
-    (direction === "up" && pawn.position[0] === 2) ||
-    (direction === "down" && pawn.position[0] === 1)
+    (direction === "up" && pawn.position[0] === 2  && (
+      !currentTile?.spaces[2][0].details?.sideWalls?.includes(direction) || 
+      currentTile?.spaces[2][0].type !== 'barrier')
+    ) 
+      ||
+    (direction === "down" && pawn.position[0] === 1 && (
+      !currentTile?.spaces[1][3].details?.sideWalls?.includes(direction) || 
+      currentTile?.spaces[1][3].type !== 'barrier')
+    )
   ) {
     adjacentTileFound = findDirectionAdjacentTile(tiles, pawn, "col", direction);
   }
   else if (
-    (direction === "left" && pawn.position[1] === 1) ||
-    (direction === "right" && pawn.position[1] === 2)
+    (direction === "left" && pawn.position[1] === 1 && (
+      !currentTile?.spaces[0][1].details?.sideWalls?.includes(direction) ||
+      currentTile?.spaces[0][1].type !== 'barrier')
+    ) 
+      ||
+    (direction === "right" && pawn.position[1] === 2 && (
+      !currentTile?.spaces[3][2].details?.sideWalls?.includes(direction) ||
+      currentTile?.spaces[3][2].type !== 'barrier')
+    ) 
   ) {
     adjacentTileFound = findDirectionAdjacentTile(tiles, pawn, "row", direction);
   }
@@ -96,7 +109,8 @@ const getAllDirectionalSpaces = (tiles: DBTile[], pawn: DBHeroPawn, direction: d
   if (adjacentTileFound) {
     extraSpaces.push(...getExtraDirectionalSpaces(adjacentTileFound, pawn, direction) || []);
   }
-
+  const rows = filterRowsOfTargetDirection(currentTile!, pawn, direction) || [];
+  const spaces = filterSpacesFromRows(rows, pawn, direction) || [];
 
   if (direction === "right" || direction === "down") {
     directionalSpaces.push(...spaces, ...extraSpaces);
@@ -220,9 +234,9 @@ export const getFirstBlockedSpace = (tiles: DBTile[], pawns: DBPawns,  pawn: DBH
   let firstBlockedSpacePosition = null;
   let blockedSpaceGridPosition = null;
 
-  const currentTile = tiles.find((tile: any) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
+  const currentTile = tiles.find((tile) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
   if (currentTile) {
-    const tileRow = Object.values(currentTile.spaces!).find((row, rowIndex) => rowIndex === startRow);
+    const tileRow = Object.values(currentTile.spaces).find((row, rowIndex) => rowIndex === startRow);
     const currentSpace = (tileRow as any).find((col: any, colIndex: number) => colIndex === startCol);
     if (currentSpace && currentSpace.details?.sideWalls?.includes(direction)) {
       firstBlockedSpacePosition = [startCol, startRow];

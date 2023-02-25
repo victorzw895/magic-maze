@@ -25,6 +25,8 @@ const Pawn = ({pawnData}: pawnProps) => {
   const { player } = usePlayerDocState();
   const tiles: DBTile[] = useTilesDocState();
 
+  console.log('pawn position', {pawnData})
+
   // TODO: HOC on a pawn component, modify logic for single pawn re render
   useEffect(() => {
     (async () => {
