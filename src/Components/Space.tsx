@@ -168,8 +168,9 @@ const Space = memo(({
         }
 
         if (isExit && spaceColor === colorSelected) {
-          if (newRoomValue.weaponsStolen.length !== 4) return
-          newRoomValue.heroesEscaped = [...newRoomValue.heroesEscaped, colorSelected]
+          if (newRoomValue.weaponsStolen.length === 4) {
+            newRoomValue.heroesEscaped = [...newRoomValue.heroesEscaped, colorSelected]
+          }
         }
 
         await setDoc(
