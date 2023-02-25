@@ -32,7 +32,7 @@ export const tile6 = {
           "up",
           "down"
         ],
-        "exploreDirection": "right",
+        "exploreDirection": "left",
         "color": "green",
         "hasLoudspeaker": true,
         "ability": "weCanTalkAgain"

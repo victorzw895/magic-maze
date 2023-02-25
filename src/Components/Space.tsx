@@ -161,15 +161,15 @@ const Space = memo(({
           newRoomValue.gamePaused = true;
         }
 
+        // Might not require weaponStolen boolean on space, weaponStolen array may be enough
         if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.weaponStolen = true;
           newRoomValue.weaponsStolen = [...newRoomValue.weaponsStolen, colorSelected]
         }
 
-        if (isExit && !spaceColor && spaceColor === colorSelected) {
-          if (newRoomValue.weaponsStolen.length === 4) {
-            newRoomValue.heroesEscaped = [...newRoomValue.heroesEscaped, colorSelected]
-          }
+        if (isExit && spaceColor === colorSelected) {
+          if (newRoomValue.weaponsStolen.length !== 4) return
+          newRoomValue.heroesEscaped = [...newRoomValue.heroesEscaped, colorSelected]
         }
 
         await setDoc(
@@ -193,7 +193,18 @@ const Space = memo(({
       onClick={showMovableArea || showTeleport || showEscalator ? movePawn : () => {}}
        // TODO: disable if game paused
     >
-      <div className={teleporterColor}></div>
+      <div className={`${teleporterColor}${showTeleport ? ' circle-multiple' : ''}`}>
+        {
+          showTeleport ?
+            <>
+              <div className={`circle ${teleporterColor}`}></div>
+              <div className={`circle ${teleporterColor}`}></div>
+              <div className={`circle ${teleporterColor}`}></div>  
+            </>
+              :
+            <></>
+        }
+      </div>
     </div>
   )
 }, areEqual)
