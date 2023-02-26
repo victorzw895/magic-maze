@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
 import { Room, DBHeroPawn, DBTile } from '../../types';
 import { tileWallSize } from '../../constants';
 import { useGame } from '../../Contexts/GameContext';
-import { getDoc, setDoc } from '../../utils/useFirestore';
+import { getDoc } from '../../utils/useFirestore';
 import { showMovableSpaces } from '../../Helpers/TileMethods';
 import { 
   useTilesDocState,
@@ -10,7 +9,6 @@ import {
   useGamePausedDocState,
 } from '../../Contexts/FirestoreContext';
 import { getDisplacementValue } from '../../Helpers/TileMethods';
-import { getPlayerPawnActions } from '../../Helpers/PawnMethods';
 
 interface pawnProps {
   pawnData: DBHeroPawn,
