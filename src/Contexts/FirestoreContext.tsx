@@ -15,6 +15,8 @@ type DBProviderProps = {children: React.ReactNode}
 
 const GameStartedDocContext = createContext<any>(undefined);
 const GamePausedDocContext = createContext<any>(undefined);
+const WeaponsStolenDocContext = createContext<any>(undefined);
+const HeroesEscapedDocContext = createContext<any>(undefined);
 const PlayerHeldPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
 const GreenPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
 const YellowPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
@@ -38,6 +40,14 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const {green, yellow, purple, orange, playerHeldPawn} = pawns;
 
   useEffect(() => {
+    setWeaponsStolen(room.weaponsStolen)
+  }, [room.weaponsStolen.length])
+
+  useEffect(() => {
+    setHeroesEscaped(room.heroesEscaped)
+  }, [room.heroesEscaped.length])
+
+  useEffect(() => {
     setGameStarted(room.gameStarted)
   }, [room.gameStarted]);
 
@@ -55,7 +65,11 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
             <PurplePawnDocContext.Provider value={purple}>
             <OrangePawnDocContext.Provider value={orange}>
               <PlayerHeldPawnDocContext.Provider value={playerHeldPawn}>
-                {children}
+                <WeaponsStolenDocContext.Provider value={weaponsStolen}>
+                  <HeroesEscapedDocContext.Provider value={heroesEscaped}>
+                    {children}
+                  </HeroesEscapedDocContext.Provider>
+                </WeaponsStolenDocContext.Provider>
               </PlayerHeldPawnDocContext.Provider>
             </OrangePawnDocContext.Provider>
             </PurplePawnDocContext.Provider>
@@ -132,10 +146,27 @@ const useTilesDocState = () => {
   }
   return context;
 }
+
 const usePlayerDocState = () => {
   const context = useContext(PlayerDocContext)
   if (context === undefined) {
     throw new Error('usePlayerDocState must be used within a PlayerDocContext');
+  }
+  return context;
+}
+
+const useWeaponsStolenDocState = () => {
+  const context = useContext(WeaponsStolenDocContext)
+  if (context === undefined) {
+    throw new Error('useWeaponsStolenDocState must be used within a WeaponsStolenDocContext');
+  }
+  return context;
+}
+
+const useHeroesEscapedDocState = () => {
+  const context = useContext(HeroesEscapedDocContext)
+  if (context === undefined) {
+    throw new Error('useHeroesEscapedDocState must be used within a HeroesEscapedDocContext');
   }
   return context;
 }
@@ -151,4 +182,6 @@ export {
   useTilesDocState,
   usePlayerDocState,
   usePlayerHeldPawnDocState,
+  useWeaponsStolenDocState,
+  useHeroesEscapedDocState,
 };

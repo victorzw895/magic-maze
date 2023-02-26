@@ -1,5 +1,26 @@
 import { BlockedPositions, heroColor, Room } from './types';
 
+export const jpgAssets = ['objective_a', 'objective_b'];
+export const pngAssets = [
+  'down',
+  'up',
+  'left',
+  'right',
+  'emergency-exit',
+  'escalator',
+  'explore',
+  'hour-glass',
+  'teleport-disabled',
+  'teleport',
+]
+
+export const svgAssets = [
+  'green-pawn',
+  'yellow-pawn',
+  'purple-pawn',
+  'orange-pawn',
+]
+
 export const tileWallSize: number = 14;
 export const spaceSize: number = 46.25;
 

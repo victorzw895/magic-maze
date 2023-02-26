@@ -14,6 +14,7 @@ import { usePlayerState } from '../Contexts/PlayerContext';
 import { usePlayerDocState } from '../Contexts/FirestoreContext';
 import { getDoc } from '../utils/useFirestore';
 import { Room } from '../types';
+import Objectives from './Objectives';
 
 const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: ReactNode, children: ReactNode}) => {
   console.log('*** Board Component re render')
@@ -42,6 +43,7 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
   return (
     <>
       {gameStarted ? timer : <></>}
+      <Objectives /> {/* minimize when playing, can click to expand */}
       <Draggable
         nodeRef={draggableNodeRef}
         defaultPosition={{x: 0, y: 0}}
