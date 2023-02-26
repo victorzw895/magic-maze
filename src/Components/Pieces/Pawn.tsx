@@ -25,39 +25,6 @@ const Pawn = ({pawnData}: pawnProps) => {
   const { player } = usePlayerDocState();
   const tiles: DBTile[] = useTilesDocState();
 
-  console.log('pawn position', {pawnData})
-
-  // TODO: HOC on a pawn component, modify logic for single pawn re render
-  useEffect(() => {
-    (async () => {
-      if (tiles.length <= 1) return;
-
-      const docSnap = await getDoc(gameState.roomId);
-      if (!docSnap.exists()) return;
-
-      const roomFound: Room = docSnap.data() as Room;
-      const newPawns = roomFound.pawns;
-
-      if (!player) return;
-      if (pawnData.playerHeld === player.number) {
-        const playerPawnActions = getPlayerPawnActions(player, tiles, newPawns, pawnData);
-          newPawns[color].blockedPositions = playerPawnActions.blockedPositions
-          newPawns[color].showMovableDirections = playerPawnActions.showMovableDirections
-          newPawns[color].showEscalatorSpaces = playerPawnActions.showEscalatorSpaces
-          newPawns[color].showTeleportSpaces = playerPawnActions.showTeleportSpaces
-      }
-
-      await setDoc(
-        gameState.roomId, 
-        { 
-          pawns: {
-            ...newPawns,
-          }
-        },
-      )
-    })()
-  }, [tiles.length])
-
   const toggleMovableSpaces = async () => {
     const docSnap = await getDoc(gameState.roomId);
     if (!docSnap.exists()) return;
