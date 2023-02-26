@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
-import { Paper, Stack, Button, List, ListItem } from '@mui/material';
+import { Paper, Stack, Button, List, ListItem, Alert, Box } from '@mui/material';
 import { DBPlayer } from '../types';
 import { setDoc, useDocData } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
+import { doc } from '../utils/useFirestore'
+import {deleteDoc} from "firebase/firestore";
 
 const WaitingRoom = ({isHost}: {isHost: boolean}) => {
   const { gameState, gameDispatch } = useGame();
@@ -40,6 +42,11 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
     gameDispatch({ type: "exitRoom" })
   }
 
+  const deleteRoom = () => {
+    deleteDoc(doc(gameState.roomId))
+    gameDispatch({ type: "exitRoom" })
+  }
+
   return (
     <>
       <h4 className="lobby-code">CODE: {gameState.roomId}</h4>
@@ -47,13 +54,24 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
         <List>
           {
             players && players.map((player: any) => {
+              console.log(players)
               return <ListItem key={player.number}>{`${player.number}  ${player.name}`}</ListItem>
             })
+            
           }
           {isHost && 
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
               <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
               <Button variant="contained" size="small" id="back" disableElevation onClick={backToLobby}>Back</Button>
+              <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room</Button>
+            </Stack>
+          }
+          {!isHost && players.length == 0 && 
+            <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
+              <Alert severity="info" style={{margin: "20px"}}>This game has been deleted. Please click "back" to return to the Lobby area</Alert>
+              <Box textAlign='center'>
+                <Button variant="contained" size="small" id="back" disableElevation onClick={backToLobby}>Back</Button>
+              </Box>
             </Stack>
           }
         </List>
