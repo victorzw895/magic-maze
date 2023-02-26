@@ -4,21 +4,6 @@ import { setDoc } from '../utils/useFirestore';
 import { getPlayerPawnActions } from '../Helpers/PawnMethods';
 import { getDefaultBlockedPositions } from '../constants';
 
-export const oppositeDirection = (direction: direction) => {
-  switch (direction) {
-    case 'up':
-      return 'down'
-    case 'down':
-      return 'up'
-    case 'left':
-      return 'right'
-    case 'right':
-      return 'left'
-    default:
-      break;
-  }
-}
-
 export const tileHasBlockedSpace = (tileData: DBTile, direction: direction, pawnHeld: DBHeroPawn) => {
   if (pawnHeld?.showMovableDirections?.includes(direction)) {
     if (pawnHeld.blockedPositions[direction].gridPosition && pawnHeld.blockedPositions[direction].position) {

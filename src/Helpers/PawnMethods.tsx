@@ -1,6 +1,5 @@
 import { direction, DBHeroPawn, DBTile, DBPawns, Space, DBPlayer, Escalator, PawnActions } from '../types';
 import { getDefaultBlockedPositions } from '../constants';
-import { oppositeDirection } from './TileMethods';
 import isEqual from 'lodash/isEqual';
 
 const directionPositionValue = {
