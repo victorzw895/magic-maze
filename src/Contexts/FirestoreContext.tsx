@@ -39,9 +39,20 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   
   const [gamePaused] = useGamePaused(room);
   const [tiles] = useTiles(room);
-  const [players, setPlayers, player, setPlayer, pinged] = usePlayer(room);
+  const [players, setPlayers, player, setPlayer] = usePlayer();
   const pawns = usePawns(room);
   const {green, yellow, purple, orange, playerHeldPawn} = pawns;
+
+  const [pinged, setPinged] = useState(false);
+
+  useEffect(() => {
+    if (room.pings.length && room.pings.includes(player.number)) {
+      setPinged(true);
+    }
+    else {
+      setPinged(false);
+    }
+  }, [room.pings])
 
   useEffect(() => {
     setWeaponsStolen(room.weaponsStolen)

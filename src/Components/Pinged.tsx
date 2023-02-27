@@ -16,6 +16,23 @@ const Pinged = () => {
   const { player, players } = usePlayerDocState();
   const pinged = usePingedDocState();
 
+  useEffect(() => {
+    if (pinged) {
+      const timer = setTimeout(async () => {
+        const docSnap = await getDoc(gameState.roomId);
+        if (!docSnap.exists()) return;
+        const room = docSnap.data() as Room;
+        
+        await setDoc(
+          gameState.roomId, 
+          {
+            pings: room.pings.filter(ping => ping !== player.number)
+          },
+        )
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [pinged])
 
   const handleClick = async (playerNumber: number) => {
     const docSnap = await getDoc(gameState.roomId);
@@ -33,22 +50,24 @@ const Pinged = () => {
     <>
       {
         players.length > 1 ? 
-          pinged ? 
-            <img
-              className='shake'
-              key={'bell-shake'}
-              draggable={false}
-              src={'/bell-shake.png'} 
-              alt={'bell-shake'} 
-              style={{
-                width: '80px',
-                margin: '0 30px'
-              }}
-                />
-              :
-              <PopupState variant="popover" popupId="ping-popup">
-              {(popupState) => (
-                  <div>
+          <PopupState variant="popover" popupId="ping-popup">
+          {(popupState) => (
+              <>
+                {
+                  pinged ? 
+                    <img
+                      className='shake'
+                      {...bindTrigger(popupState)}
+                      key={'bell-shake'}
+                      draggable={false}
+                      src={'/bell-shake.png'} 
+                      alt={'bell-shake'} 
+                      style={{
+                        width: '80px',
+                        margin: '0 30px'
+                      }}
+                        />
+                      :
                     <img 
                       key={'bell'}
                       {...bindTrigger(popupState)}
@@ -60,47 +79,48 @@ const Pinged = () => {
                         margin: '0 30px'
                       }}
                         />
-                    <Popover
-                      {...bindPopover(popupState)}
-                      anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'center',
-                      }}
-                      transformOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'center',
-                      }}
-                    >
-                      <List dense={true}>
-                        {
-                          players.map((dbPlayer) => {
-                            if (dbPlayer.number !== player.number) {
-                              return (
-                                <ListItemButton onClick={() => {
-                                    popupState.close()
-                                    handleClick(dbPlayer.number)
-                                  }} >
-                                  <ListItemIcon>
-                                    <NotificationsIcon />
-                                  </ListItemIcon>
-                                  <ListItemText
-                                    primary={dbPlayer.name}
-                                    secondary={`${dbPlayer.playerDirections.join(', ')}, ${dbPlayer.playerAbilities.join(', ')}`}
-                                  />
-                                </ListItemButton>
-                              )
-                            }
-                            return <></>
-                          })
+                  }
+                <Popover
+                  {...bindPopover(popupState)}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                  }}
+                  transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                  }}
+                >
+                  <List dense={true}>
+                    {
+                      players.map((dbPlayer) => {
+                        if (dbPlayer.number !== player.number) {
+                          return (
+                            <ListItemButton onClick={() => {
+                                popupState.close()
+                                handleClick(dbPlayer.number)
+                              }} >
+                              <ListItemIcon>
+                                <NotificationsIcon />
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={dbPlayer.name}
+                                secondary={`${dbPlayer.playerDirections.join(', ')}, ${dbPlayer.playerAbilities.join(', ')}`}
+                              />
+                            </ListItemButton>
+                          )
                         }
-                      </List>
-                    </Popover>
-                  </div>
-                )}
-            </PopupState>
-            :
-          <>
-          </>
+                        return <></>
+                      })
+                    }
+                  </List>
+                </Popover>
+              </>
+            )}
+        </PopupState>
+          :
+        <>
+        </>
       }
     </>
   )
