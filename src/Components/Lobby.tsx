@@ -3,7 +3,7 @@ import cryptoRandomString from 'crypto-random-string';
 import { useGame } from '../Contexts/GameContext';
 import { usePlayerDispatch, PlayerFactory, PlayerFactoryType } from '../Contexts/PlayerContext';
 import { Stack, Button, TextField, Paper, Alert } from '@mui/material';
-import { Room } from '../types';
+import { playerNumber, Room } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import WaitingRoom from './WaitingRoom';
 import { roomDefaultValues } from '../constants';
@@ -17,7 +17,7 @@ const Lobby = () => {
   const playerDispatch = usePlayerDispatch();
 
   const [playerName, setPlayerName] = useState("");
-  const [isHost, setIsHost] = useState(false);
+  const [roomHost, setRoomHost] = useState<playerNumber>(null);
   const [promptCode, setPromptCode] = useState(false);
   const [existingRoomCode, setExistingRoomCode] = useState("");
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState("");
@@ -38,7 +38,7 @@ const Lobby = () => {
   // create new Document, save player (DB)
   const createNewGame = async () => {
     const newGameCode = cryptoRandomString({length: 5, type: 'distinguishable'});
-    setIsHost(true);
+    // setIsHost(true);
     // save Room Code
     gameDispatch({type: "joinRoom", value: newGameCode});
     // create new player
@@ -51,6 +51,8 @@ const Lobby = () => {
       ...roomDefaultValues,
       players: [dbPlayer]
     })
+    console.log("setting host num", player.number)
+    setRoomHost(player.number)
   }
 
   // check room code typed
@@ -67,7 +69,6 @@ const Lobby = () => {
 
 
     if (!docSnap.exists()) {
-      
       setAlert(true)
       return // TODO error message
       
@@ -91,6 +92,7 @@ const Lobby = () => {
           players: playersInRoom
         },
       )
+
     }
     else if (!roomFound) {
       setFailJoinRoomMessage("Room code not found");
@@ -110,7 +112,7 @@ const Lobby = () => {
       </h3>
       
       {gameState.roomId ?
-        <WaitingRoom isHost={isHost} currentPlayer={currentPlayer} />
+        <WaitingRoom roomHost={roomHost} currentPlayer={currentPlayer} setRoomHost={setRoomHost} />
           :
         <Paper className="lobby-actions" sx={{ width: '100%', maxWidth: 360, bgcolor: '#63B0CD' }}>
           {

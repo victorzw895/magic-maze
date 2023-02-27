@@ -88,6 +88,7 @@ export interface Room {
   weaponsStolen: heroColor[],
   heroesEscaped: heroColor[],
   players: DBPlayer[],
+  host: number,
   tiles: DBTile[],
   pawns: DBPawns,
 }
