@@ -74,6 +74,7 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
 const Board = () => {
   return (
     <div className="Board">
+      {/* Loading board components use MUI Backdrop + Progress */}
       <BoardComponent
         timer={<Timer />}
         pinged={<Pinged />}
@@ -81,6 +82,7 @@ const Board = () => {
         <Tiles />
         <Pawns />
       </BoardComponent>
+      {/* IF WON Component use MUI Backdrop and Win message or modal*/}
     </div>
   );
 };

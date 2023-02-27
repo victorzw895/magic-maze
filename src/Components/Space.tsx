@@ -4,6 +4,31 @@ import { heroColor, Escalator, SpaceTypeName } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
 
+import achievementSound from '../assets/achievement.mp3'; // download file from firestore storage instead
+import teleporterSound from '../assets/teleporter.mp3'; // download file from firestore storage instead
+import exitSound from '../assets/exit.mp3'; // download file from firestore storage instead
+import selectSound from '../assets/select.mp3'; // download file from firestore storage instead
+
+const playSelect = () => {
+  const audio = new Audio(selectSound);
+  audio.play();
+}
+
+const playTeleporter = () => {
+  const audio = new Audio(teleporterSound);
+  audio.play();
+}
+
+const playExit = () => {
+  const audio = new Audio(exitSound);
+  audio.play();
+}
+
+const playAchievement = () => {
+  const audio = new Audio(achievementSound);
+  audio.play();
+}
+
 interface SpaceProps {
   spaceType: SpaceTypeName,
   spaceColor: heroColor | undefined,
@@ -154,22 +179,31 @@ const Space = memo(({
           right: {position: null, gridPosition: null},
           left: {position: null, gridPosition: null},
         };
-        if (isTimer && !spaceIsDisabled) {
+        if (isTeleporter && showTeleport) {
+          // playWarp();
+          playTeleporter();
+        }
+        else if (isTimer && !spaceIsDisabled) {
           // pause and update db with pause
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
           newRoomValue.gamePaused = true;
         }
-
         // Might not require weaponStolen boolean on space, weaponStolen array may be enough
-        if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
+        else if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
+          // playGrab();
+          playAchievement();
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.weaponStolen = true;
           newRoomValue.weaponsStolen = [...newRoomValue.weaponsStolen, colorSelected]
         }
-
-        if (isExit && spaceColor === colorSelected) {
+        else if (isExit && spaceColor === colorSelected) {
           if (newRoomValue.weaponsStolen.length === 4) {
             newRoomValue.heroesEscaped = [...newRoomValue.heroesEscaped, colorSelected]
+            playExit();
+            // if last exit, celebration soundtrack
           }
+        }
+        else {
+          playSelect();
         }
 
         await setDoc(
