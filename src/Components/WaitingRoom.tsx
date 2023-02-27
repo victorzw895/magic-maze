@@ -7,6 +7,7 @@ import { setDoc, useDocData, getDoc } from "../utils/useFirestore";
 import { allTiles } from '../Data/all-tiles-data';
 import { doc } from '../utils/useFirestore'
 import {deleteDoc, updateDoc} from "firebase/firestore";
+import CloseIcon from '@mui/icons-material/Close';
 
 const WaitingRoom = ({isHost, currentPlayer}: {isHost: boolean; currentPlayer: any}) => {
   const { gameState, gameDispatch } = useGame();
@@ -112,9 +113,12 @@ const WaitingRoom = ({isHost, currentPlayer}: {isHost: boolean; currentPlayer: a
                 aria-describedby="modal-modal-description"
               >
                 <Box sx={style}>
-                  <Typography id="modal-modal-title" variant="h6" component="h2">
-                    Exit Room: {gameState.roomId}
-                  </Typography>
+                  <Box sx={{ display: "flex", justifyContent: 'space-between' }}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                      Exit Room: {gameState.roomId}
+                    </Typography>
+                    <Button aria-label="close" onClick={handleClose} sx={{padding: "0px"}}><CloseIcon /></Button>
+                  </Box>
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                     You are about to exit the room. You must reassign the host or end game for all
                   </Typography>
