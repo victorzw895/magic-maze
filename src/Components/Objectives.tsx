@@ -7,7 +7,6 @@ const objectives = Object.values(roomDefaultValues.pawns).map((pawn) => pawn.col
 const Objectives = () => {
   const weaponsStolen = useWeaponsStolenDocState();
   const heroesEscaped = useHeroesEscapedDocState();
-  console.log('heroesEscaped', heroesEscaped)
 
   return (
     <div className='objectives'>

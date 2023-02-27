@@ -41,21 +41,21 @@ const Space = memo(({
   tileIndex
 }: SpaceProps) => {
   
-  console.log('Re-render space', {
-    spaceType,
-    spaceColor,
-    spaceHasEscalator,
-    spaceEscalatorName,
-    spaceIsDisabled,
-    spaceWeaponStolen,
-    showMovableArea,
-    spacePosition,
-    colorSelected,
-    gridPosition,
-    highlightTeleporter,
-    highlightEscalator,
-    tileIndex
-  });
+  // console.log('Re-render space', {
+  //   spaceType,
+  //   spaceColor,
+  //   spaceHasEscalator,
+  //   spaceEscalatorName,
+  //   spaceIsDisabled,
+  //   spaceWeaponStolen,
+  //   showMovableArea,
+  //   spacePosition,
+  //   colorSelected,
+  //   gridPosition,
+  //   highlightTeleporter,
+  //   highlightEscalator,
+  //   tileIndex
+  // });
   const { gameState } = useGame();
 
   const isTeleporter = spaceType === "teleporter";
@@ -156,7 +156,6 @@ const Space = memo(({
         };
         if (isTimer && !spaceIsDisabled) {
           // pause and update db with pause
-          // console.log('Stepping on timer', spaceData.details, gameState.timerRunning)
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
           newRoomValue.gamePaused = true;
         }

@@ -53,11 +53,9 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
       <Paper sx={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '100%', minHeight: '135px', maxWidth: '360px', bgcolor: '#63B0CD' }}>
         <List>
           {
-            players && players.map((player: any) => {
-              console.log(players)
-              return <ListItem key={player.number}>{`${player.number}  ${player.name}`}</ListItem>
-            })
-            
+            players && players.map((player: any) => 
+              <ListItem key={player.number}>{`${player.number}  ${player.name}`}</ListItem>
+            )
           }
           {isHost && 
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>

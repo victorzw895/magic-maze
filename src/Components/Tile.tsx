@@ -20,7 +20,6 @@ const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
 
 // memo could be good
 const Tile = ({tileIndex, tileData}: tileProps) => {
-  console.log('tile re render')
   const { player } = usePlayerDocState();
   const playerHeldPawn = usePlayerHeldPawnDocState()
   
