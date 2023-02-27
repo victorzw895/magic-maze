@@ -31,7 +31,7 @@ export const PlayerFactory = (playerName: string, currentPlayers: number) => {
     number: currentPlayers + 1 as playerNumber,
     playerDirections: [], 
     playerAbilities: [],
-    pinged: false
+    // pinged: false
   }
 
   return {
@@ -42,9 +42,7 @@ export const PlayerFactory = (playerName: string, currentPlayers: number) => {
 
 // assign random number
 
-const playerInitialState: Player = {
-  number: null, // USED Can be refactored out
-}
+const playerInitialState: Player = {} as Player;
 
 const PlayerStateContext = createContext<Player | undefined>(undefined);
 const PlayerDispatchContext = createContext<Dispatch | undefined>(undefined);

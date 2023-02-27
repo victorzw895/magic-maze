@@ -26,7 +26,6 @@ const usePawns = (room: Room): any => {
   }, [pawns])
 
   useEffect(() => {
-    console.log('from fiestore useeffect green pawn', greenPawn)
     setGreen(greenPawn)
     if (greenPawn.playerHeld === player.number){
       setPlayerHeldPawn(greenPawn)
@@ -41,7 +40,6 @@ const usePawns = (room: Room): any => {
   ])
 
   useEffect(() => {
-    console.log('from fiestore useeffect yellow pawn')
     setYellow(yellowPawn)
     if (yellowPawn.playerHeld === player.number){
       setPlayerHeldPawn(yellowPawn)
@@ -56,7 +54,6 @@ const usePawns = (room: Room): any => {
   ])
 
   useEffect(() => {
-    console.log('from fiestore useeffect purple pawn')
     setPurple(purplePawn)
     if (purplePawn.playerHeld === player.number){
       setPlayerHeldPawn(purplePawn)
@@ -71,7 +68,6 @@ const usePawns = (room: Room): any => {
   ])
 
   useEffect(() => {
-    console.log('from fiestore useeffect orange pawn')
     setOrange(orangePawn)
     if (orangePawn.playerHeld === player.number){
       setPlayerHeldPawn(orangePawn)

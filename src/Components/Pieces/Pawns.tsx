@@ -36,10 +36,7 @@ const Pawns = () => {
           pawn.showEscalatorSpaces = playerPawnActions.showEscalatorSpaces
           pawn.showTeleportSpaces = playerPawnActions.showTeleportSpaces
         }
-        console.log('newPawns', {playerPawnActions, pawn, blockedPositions: playerPawnActions.blockedPositions})
       })
-
-      console.log('newPawns', newPawns)
 
       await setDoc(
         gameState.roomId, 

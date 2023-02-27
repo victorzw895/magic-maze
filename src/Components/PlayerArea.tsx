@@ -1,10 +1,9 @@
 import { memo, ReactNode, useEffect } from 'react';
 import { useGame } from '../Contexts/GameContext';
-import { DBPlayer } from '../types';
 import isEqual from 'lodash/isEqual';
 import PlayerAreaDisabled from './PlayerAreaDisabled';
+import Pinged from './Pinged';
 import { useGamePausedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
-
 interface PlayerAreaProps {
   highlightNewTileArea: () => void,
   children: ReactNode
@@ -16,12 +15,8 @@ const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
 
 const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
   const { gameState } = useGame();
-  const { player }: { player: DBPlayer } = usePlayerDocState();
+  const { player } = usePlayerDocState();
   const gamePaused = useGamePausedDocState();
-
-  useEffect(() => {
-    console.log('*** player area useEffect')
-  }, [children, player])
 
   return (
     <div className="player-area">
@@ -79,6 +74,7 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
               }
             })
           }
+          <Pinged />
           {/* TODO: when firestore gamePaused, update gameState */}
           {gamePaused && <PlayerAreaDisabled />}
           {

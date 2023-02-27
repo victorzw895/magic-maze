@@ -34,7 +34,6 @@ const NewTileArea = memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
       Object.values(newPawns).forEach((pawn: DBHeroPawn) => {
         if (pawn.playerHeld) {
           pawn.blockedPositions = getDefaultBlockedPositions()
-          console.log('pawn.blockedPositions', pawn.blockedPositions);
           pawn.showMovableDirections = []
           pawn.showEscalatorSpaces = []
           pawn.showTeleportSpaces = null

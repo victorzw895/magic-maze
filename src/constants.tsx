@@ -67,6 +67,7 @@ export const pawnDefaultValues = {
 
 export const roomDefaultValues: Room = {
   players: [],
+  pings: [],
   gameStarted: false,
   gamePaused: false,
   weaponsStolen: [],

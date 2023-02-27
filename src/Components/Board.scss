@@ -415,15 +415,25 @@
   margin-bottom: 100px;
 }
 
-/*
-.space.teleporter div
-remove position relative
+@keyframes shake {
+  0% { transform: translate(4px, 4px) rotate(0deg); }
+  10% { transform: translate(-4px, -5px) rotate(-4deg); }
+  20% { transform: translate(-6px, 3px) rotate(4deg); }
+  30% { transform: translate(6px, 5px) rotate(0deg); }
+  40% { transform: translate(4px, -4px) rotate(4deg); }
+  50% { transform: translate(-4px, 5px) rotate(-4deg); }
+  60% { transform: translate(-6px, 4px) rotate(0deg); }
+  70% { transform: translate(6px, 4px) rotate(-4deg); }
+  80% { transform: translate(-4px, -4px) rotate(4deg); }
+  90% { transform: translate(4px, 5px) rotate(0deg); }
+  100% { transform: translate(4px, -5px) rotate(-4deg); }
+}
 
-.space.teleporter div.purple .circle-multiple
-add position relative
+.shake {
+  transition: opacity 100ms ease-in-out;
+  /* Start the shake animation and make the animation last for 0.5 seconds */
+  animation: shake 1s;
 
-.circle
-remove position relative
-width + height 70%
-margin 15%
-*/
+  /* When the animation is finished, start again */
+  animation-iteration-count: 5;
+}
