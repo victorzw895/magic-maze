@@ -1,3 +1,5 @@
+@import "bourbon";
+
 .Board {
   // margin: 0 auto;
   // width: 90vw;
@@ -12,6 +14,46 @@
   color: white;
   z-index: 200;
 }
+
+.objectives {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 200;
+  height: 100px;
+  // background-color: white;
+  // margin: 20px 40px;
+  // border-radius: 5px;
+}
+
+.objective {
+  height: 60px;
+}
+
+.exit {
+  height: 80px;
+}
+
+.objective, .exit {
+  z-index: 200;
+  margin: 20px 5px;
+  border: 3px solid white;
+  border-radius: 5%;
+  transform: all 300ms;
+
+  &.stolen, &.escaped {
+    filter: brightness(0.2);
+    border: none;
+    // background-color: grey;
+    // height: 100%;
+    // width: 100%;
+    // position:absolute;
+    // background-color:#000;
+    // border-radius: 5%;
+    // opacity:0.5;
+  }
+}
+
 
 .playable-area {
   position: relative;
@@ -74,32 +116,33 @@
     align-content: center;
     justify-content: center;
     align-items: center;
+
+    .circle-multiple {
+      position: relative;
+    }
     
     div {
-      width: 78%;
-      height: 78%;
+      width: 70%;
+      height: 70%;
       border-radius: 50%;
-      position: relative;
+      // position: relative;
       box-sizing: border-box;
-  
+      transition : border 600ms ease-in-out;
+
       &.purple {
-        background-color: rgba(128,0,128,0.5);
-        border: 3px solid purple;
+        background-color: rgba(128,0,128,0.2);
       }
   
       &.orange {
-        background-color: rgba(255,179,71,0.5);
-        border: 3px solid #ff9933;
+        background-color: rgba(255,179,71,0.2);
       }
   
       &.yellow {
-        background-color: rgba(255,225,53,0.5);
-        border: 3px solid yellow;
+        background-color: rgba(255,225,53,0.2);
       }
   
       &.green {
-        background-color: rgba(50,205,50,0.5);
-        border: 3px solid limegreen;
+        background-color: rgba(50,205,50,0.2);
       }
     }
   }
@@ -182,3 +225,205 @@
 #back { // back button
   background-color: #64748B;
 }
+
+// NEED TO ESCAPE
+
+.alerts-border {
+  box-sizing: border-box;
+  border: 5px #ff0000 solid;
+  
+  animation: blink 1s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes blink { 
+  50% { 
+    border-color:#fff ; 
+  }  
+}
+
+// TELEPORTER ANIMATION
+
+
+/// border-gradient mixin: ///
+
+@mixin border-gradient($from, $to, $weight: 0) {
+  $mix-main: mix($from, $to);
+  $mix-sub-from: mix($mix-main, $from);
+  $mix-sub-to: mix($mix-main, $to);
+  
+  box-shadow: 0 6px 0 $weight rgba($mix-sub-to, .25),
+              0 -6px 0 $weight rgba($mix-sub-from, .25),
+              6px 0 0 $weight rgba($mix-sub-to, .25),
+              -6px 0 0 $weight  rgba($mix-sub-from, .25),
+              6px -6px 0 $weight rgba($mix-main, .5),
+              -6px 6px 0 $weight rgba($mix-main, .5),
+              6px 6px 0 $weight rgba($to, .75),
+              -6px -6px 0 $weight rgba($from, .75);
+}
+
+/// BASIC EXAMPLE ///
+
+.circle {
+  @include size(100px);
+  
+  border-radius: 100%;
+
+  &.purple {
+    @include border-gradient(rgb(85, 0, 255), rgb(111, 64, 220));
+  }
+
+  &.orange {
+    @include border-gradient(rgb(255, 0, 0), rgb(161, 42, 28));
+  }
+
+  &.yellow {
+    @include border-gradient(rgb(225, 255, 0), rgb(160, 184, 25));
+  }
+
+  &.green {
+    @include border-gradient(rgb(64, 221, 77), rgb(27, 255, 46));
+  }
+}
+
+
+////////////// OTHER EXAMPLES ////////////////
+
+
+.circle {
+  &:nth-of-type(2) {
+
+    &.purple {
+      @include border-gradient(rgb(83, 104, 210), rgb(62, 42, 192));
+    }
+  
+    &.orange {
+      @include border-gradient(rgb(206, 151, 151), rgb(237, 135, 27));
+    }
+  
+    &.yellow {
+      @include border-gradient(rgb(232, 230, 173), rgb(236, 255, 21));
+    }
+  
+    &.green {
+      @include border-gradient(rgb(139, 255, 131), rgb(30, 219, 191));
+    }
+    /* // @include border-gradient(rgb(83, 104, 210), rgb(62, 42, 192)); */
+
+    animation: rotateThis 1s linear infinite;
+  }
+
+  &:nth-of-type(3) {
+    &.purple {
+      @include border-gradient(#5147e1, #3611b9);
+    }
+  
+    &.orange {
+      @include border-gradient(rgb(186, 71, 71), rgb(191, 80, 20));
+    }
+  
+    &.yellow {
+      @include border-gradient(rgb(251, 243, 0), rgb(205, 190, 61));
+    }
+  
+    &.green {
+      @include border-gradient(rgb(49, 201, 38), rgb(79, 218, 132));
+    }
+  }
+  
+  &-multiple { @include size(100px); }
+  
+  &-multiple & {
+    @include position(absolute, 0px 0px 0px 0px);
+    margin: auto;
+    
+    &:nth-of-type(1) { animation: psycho 6s linear infinite; }
+    &:nth-of-type(2) { animation: psycho 6s linear .1s infinite; }
+    &:nth-of-type(3) { animation: psycho 6s linear .25s infinite; }
+  }
+ 
+}
+
+@keyframes rotateThis {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  
+  to {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes psycho {
+  0% {
+    transform: rotate(0deg) scale(0.9) translate(0, 0);
+  }
+  
+  25% {
+    transform: rotate(90deg) scale(1.1) translate(0, 0);
+  }
+  
+  50% {
+    transform: rotate(180deg) scale(0.9) translate(0, 0);
+  }
+
+  75% {
+    transform: rotate(270deg) scale(1.1) translate(0, 0);
+  }
+  
+  100% {
+    transform: rotate(360deg) scale(0.9) translate(0, 0);
+  }
+}
+
+.btn {
+  border: none;
+  display: inline-block;
+  background: transparent;
+  
+  color: rgba(white, .7);
+  background: rgba(white, .05);
+  text-decoration: none;
+  
+  padding: 15px 20px;
+  
+  border-radius: 10px;
+  
+  transition: all .2s;
+  
+  @include border-gradient(gray, darkgray);
+  
+  &:hover {
+    @include border-gradient(hotpink, skyblue);
+    color: white;
+    background: rgba(skyblue, .05);
+  }
+}
+
+
+///// OTHER /////
+
+.circles > * {
+  display: inline-block; vertical-align: top;
+  
+  position: relative;
+  margin: 0 2%;
+}
+
+.circles { 
+  transform: translateZ(0); 
+  margin-bottom: 100px;
+}
+
+/*
+.space.teleporter div
+remove position relative
+
+.space.teleporter div.purple .circle-multiple
+add position relative
+
+.circle
+remove position relative
+width + height 70%
+margin 15%
+*/

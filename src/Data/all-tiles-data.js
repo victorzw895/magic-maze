@@ -756,7 +756,7 @@ export const allTiles = [
             "up",
             "down"
           ],
-          "exploreDirection": "right",
+          "exploreDirection": "left",
           "color": "green",
           "hasLoudspeaker": true,
           "ability": "weCanTalkAgain"

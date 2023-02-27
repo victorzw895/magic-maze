@@ -19,7 +19,7 @@ ReactDOM.render(
         <FirestoreProvider>
           <TilesProvider>
             <App />
-            <Test />
+            {/* <Test /> */}
           </TilesProvider>
         </FirestoreProvider>
       </PlayerProvider>
