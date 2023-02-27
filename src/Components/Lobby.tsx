@@ -1,13 +1,12 @@
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useEffect } from 'react';
 import cryptoRandomString from 'crypto-random-string';
 import { useGame } from '../Contexts/GameContext';
 import { usePlayerDispatch, PlayerFactory, PlayerFactoryType } from '../Contexts/PlayerContext';
-import { Stack, Button, TextField, Paper } from '@mui/material';
+import { Stack, Button, TextField, Paper, Alert } from '@mui/material';
 import { Room } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import WaitingRoom from './WaitingRoom';
 import { roomDefaultValues } from '../constants';
-// import { useGameStartedDocState } from '../Contexts/FirestoreContext';
 
 const Lobby = () => {
   console.log('re-render Lobby');
@@ -15,7 +14,6 @@ const Lobby = () => {
   // console.log('gameStarted', gameStarted)
 
   const { gameState, gameDispatch } = useGame();
-  console.log("game State", gameState, gameState.roomId)
   const playerDispatch = usePlayerDispatch();
 
   const [playerName, setPlayerName] = useState("");
@@ -23,6 +21,7 @@ const Lobby = () => {
   const [promptCode, setPromptCode] = useState(false);
   const [existingRoomCode, setExistingRoomCode] = useState("");
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState("");
+  const [alert, setAlert] = useState<boolean>(false)
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -66,7 +65,10 @@ const Lobby = () => {
 
 
     if (!docSnap.exists()) {
+      
+      setAlert(true)
       return // TODO error message
+      
       // setFailJoinRoomMessage("Room code not found");
     }
 
@@ -112,10 +114,12 @@ const Lobby = () => {
           {
             promptCode ? 
               <>
+                <> { alert ? <Alert severity="warning" style={{marginTop: "20px"}}>Room code not found</Alert> : "" }</>
                 <TextField margin="normal" size="small" type="text" variant="filled" label="Enter Room Code" onChange={_handleRoomCode} value={existingRoomCode}></TextField>
                 <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
                   <Button variant="contained" size="small" disableElevation onClick={joinRoom}>Join</Button>
-                  <Button variant="contained" size="small" disableElevation onClick={() => setPromptCode(false)}>Back</Button>
+                  <Button variant="contained" size="small" id="back" disableElevation onClick={() => {setPromptCode(false); setAlert(false)}}>Back</Button>
+                  
                 </Stack>
               </>
                 :

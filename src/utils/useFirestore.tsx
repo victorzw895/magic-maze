@@ -10,7 +10,7 @@ const dbInitialState: Room = {
   ...roomDefaultValues,
 }
 
-const doc = (roomId: string) => document(gamesRef, roomId);
+export const doc = (roomId: string) => document(gamesRef, roomId);
 
 export const useDocData = (roomId: string): [...rest: any] => {
   return useDocumentData(roomId ? doc(roomId) : null, {initialValue: dbInitialState});
