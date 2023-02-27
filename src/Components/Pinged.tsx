@@ -11,7 +11,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
-import alertSound from '../assets/alert.wav';
+import alertSound from '../assets/alert.wav'; // download file from firestore storage instead
 
 const playAlert = () => {
   const audio = new Audio(alertSound);
@@ -43,7 +43,7 @@ const Pinged = () => {
           },
         )
       }, 6000);
-      
+
       return () => {
         clearTimeout(timer)
         clearTimeout(alertTimer);
