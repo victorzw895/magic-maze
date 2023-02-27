@@ -22,6 +22,7 @@ const Lobby = () => {
   const [existingRoomCode, setExistingRoomCode] = useState("");
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState("");
   const [alert, setAlert] = useState<boolean>(false)
+  const [currentPlayer, setCurrentPlayer] = useState({})
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -43,6 +44,7 @@ const Lobby = () => {
     // create new player
     const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, 0)
 
+    setCurrentPlayer(player)
     playerDispatch({type: "setPlayer", value: player});
 
     await setDoc(newGameCode, {
@@ -108,7 +110,7 @@ const Lobby = () => {
       </h3>
       
       {gameState.roomId ?
-        <WaitingRoom isHost={isHost} />
+        <WaitingRoom isHost={isHost} currentPlayer={currentPlayer} />
           :
         <Paper className="lobby-actions" sx={{ width: '100%', maxWidth: 360, bgcolor: '#63B0CD' }}>
           {

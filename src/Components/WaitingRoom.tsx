@@ -1,15 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
-import { Paper, Stack, Button, List, ListItem, Alert, Box } from '@mui/material';
+import { Paper, Stack, Button, List, ListItem, Alert, Box, Modal, Typography } from '@mui/material';
 import { DBPlayer } from '../types';
-import { setDoc, useDocData } from "../utils/useFirestore"; 
+import { setDoc, useDocData, getDoc } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
 import { doc } from '../utils/useFirestore'
-import {deleteDoc} from "firebase/firestore";
+import {deleteDoc, updateDoc} from "firebase/firestore";
 
-const WaitingRoom = ({isHost}: {isHost: boolean}) => {
+const WaitingRoom = ({isHost, currentPlayer}: {isHost: boolean; currentPlayer: any}) => {
   const { gameState, gameDispatch } = useGame();
+
+  const [open, setOpen] = useState<boolean>(false)
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const [room] = useDocData(gameState.roomId);
   const { players } = room;
@@ -38,8 +42,46 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
     gameDispatch({type: "startGame"})
   }
 
-  const backToLobby = () => {
-    gameDispatch({ type: "exitRoom" })
+  const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+
+  const exitRoom = async () => {
+    // TODO: need to prompt user to delete player for, firestore and reassign host
+
+    console.log("current player", currentPlayer, gameState.roomId)
+    console.log("all players", players)
+
+
+    // * remove current player from player list
+    const currentPlayerIndex: number = players.findIndex((player: any) => player.number === currentPlayer.number)
+    console.log("current player index",currentPlayerIndex)
+
+    const updatePlayers = [...players]
+    updatePlayers.splice(currentPlayerIndex, 1)
+    console.log("updated players", updatePlayers)
+    
+    // todo: reassign host
+
+    // const docSnap = await getDoc(gameState.roomId);
+
+    // if (docSnap.exists()) {
+    //   const info = docSnap.data()
+    //   console.log("Document data:", info.players);
+    // } else {
+    //   // doc.data() will be undefined in this case
+    //   console.log("No such document!");
+    // }
+     
+    // gameDispatch({ type: "exitRoom" })
   }
 
   const deleteRoom = () => {
@@ -54,15 +96,34 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
         <List>
           {
             players && players.map((player: any) => {
-              console.log(players)
               return <ListItem key={player.number}>{`${player.number}  ${player.name}`}</ListItem>
+              // TODO: back button for non-host players
             })
             
           }
           {isHost && 
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
               <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
-              <Button variant="contained" size="small" id="back" disableElevation onClick={backToLobby}>Back</Button>
+              <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Exit Room</Button>
+              <Modal
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+              >
+                <Box sx={style}>
+                  <Typography id="modal-modal-title" variant="h6" component="h2">
+                    Exit Room: {gameState.roomId}
+                  </Typography>
+                  <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    You are about to exit the room. You must reassign the host or end game for all
+                  </Typography>
+                  <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
+                    <Button variant="contained" size="small" id="back" disableElevation onClick={exitRoom}>Confirm Exit</Button>
+                    <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room for all</Button>
+                  </Stack>
+                </Box>
+              </Modal>              
               <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room</Button>
             </Stack>
           }
@@ -70,7 +131,7 @@ const WaitingRoom = ({isHost}: {isHost: boolean}) => {
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
               <Alert severity="info" style={{margin: "20px"}}>This game has been deleted. Please click "back" to return to the Lobby area</Alert>
               <Box textAlign='center'>
-                <Button variant="contained" size="small" id="back" disableElevation onClick={backToLobby}>Back</Button>
+                <Button variant="contained" size="small" id="back" disableElevation onClick={exitRoom}>Back</Button>
               </Box>
             </Stack>
           }
