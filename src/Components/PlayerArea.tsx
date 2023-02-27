@@ -1,10 +1,17 @@
-import { memo, ReactNode, useEffect } from 'react';
+import { memo, ReactNode, useEffect, useState } from 'react';
 import { useGame } from '../Contexts/GameContext';
-import { DBPlayer } from '../types';
+import { DBPlayer, Room, playerNumber } from '../types';
+import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
 import PlayerAreaDisabled from './PlayerAreaDisabled';
-import { useGamePausedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
-
+import { useGamePausedDocState, usePlayerDocState, usePingedDocState } from '../Contexts/FirestoreContext';
+import Popover from '@mui/material/Popover';
+import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 interface PlayerAreaProps {
   highlightNewTileArea: () => void,
   children: ReactNode
@@ -15,13 +22,27 @@ const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
 }
 
 const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
+  const [openPopover, setOpenPopover] = useState(false);
   const { gameState } = useGame();
-  const { player }: { player: DBPlayer } = usePlayerDocState();
+  const { player, players } = usePlayerDocState();
   const gamePaused = useGamePausedDocState();
+  const pinged = usePingedDocState();
 
   useEffect(() => {
     console.log('*** player area useEffect')
   }, [children, player])
+
+  const handleClick = async (playerNumber: number) => {
+    const docSnap = await getDoc(gameState.roomId);
+
+    if (!docSnap.exists()) return;
+    const room = docSnap.data() as Room;
+    const pings = [...room.pings, playerNumber]
+
+    await setDoc(gameState.roomId, {
+      pings
+    })
+  }
 
   return (
     <div className="player-area">
@@ -78,6 +99,77 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
                 )
               }
             })
+          }
+          {
+            // players.length > 1 ? 
+            true ? 
+              pinged ? 
+                <img 
+                  key={'bell-shake'}
+                  draggable={false}
+                  src={'/bell-shake.png'} 
+                  alt={'bell-shake'} 
+                  style={{
+                    width: '80px',
+                    margin: '0 30px'
+                  }}
+                    />
+                  :
+                  <PopupState variant="popover" popupId="ping-popup">
+                  {(popupState) => (
+                      <div>
+                        <img 
+                          key={'bell'}
+                          {...bindTrigger(popupState)}
+                          draggable={false}
+                          src={`/bell.png`} 
+                          alt={'bell'} 
+                          style={{
+                            width: '80px',
+                            margin: '0 30px'
+                          }}
+                            />
+                        <Popover
+                          {...bindPopover(popupState)}
+                          anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'center',
+                          }}
+                          transformOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'center',
+                          }}
+                        >
+                          <List dense={true}>
+                            {
+                              players.map((dbPlayer) => {
+                                if (dbPlayer.number !== player.number) {
+                                  return (
+                                    <ListItemButton onClick={() => {
+                                        popupState.close()
+                                        handleClick(dbPlayer.number)
+                                      }} >
+                                      <ListItemIcon>
+                                        <NotificationsIcon />
+                                      </ListItemIcon>
+                                      <ListItemText
+                                        primary={dbPlayer.name}
+                                        secondary={`${dbPlayer.playerDirections.join(', ')}, ${dbPlayer.playerAbilities.join(', ')}`}
+                                      />
+                                    </ListItemButton>
+                                  )
+                                }
+                                return <></>
+                              })
+                            }
+                          </List>
+                        </Popover>
+                      </div>
+                    )}
+                </PopupState>
+                :
+              <>
+              </>
           }
           {/* TODO: when firestore gamePaused, update gameState */}
           {gamePaused && <PlayerAreaDisabled />}

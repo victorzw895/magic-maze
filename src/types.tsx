@@ -5,7 +5,7 @@ export type heroName = "Barbarian" | "Mage" | "Elf" | "Dwarf"
 export type heroWeapon = "sword" | "vial" | "bow" | "axe"
 export type heroAbility = "disableSecurityCamera" | "revealExtraTile" | "weCanTalkAgain" | "iAmTiny"
 
-export type playerNumber = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null
+export type playerNumber = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 export type direction = "up" | "right" | "down" | "left"
 export type basicAbility = "explore" | "teleport" | "escalator"
 
@@ -90,12 +90,13 @@ export interface Room {
   players: DBPlayer[],
   tiles: DBTile[],
   pawns: DBPawns,
+  pings: playerNumber[] // ?? add debouncer or throttle, or batch update/consume from firestore
 }
 
 
 export interface DBPlayer extends Player {
   name: string,
-  pinged: boolean,
+  // pinged: boolean,
   playerDirections: direction[],
   playerAbilities: basicAbility[],
 }

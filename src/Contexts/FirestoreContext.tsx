@@ -23,7 +23,11 @@ const YellowPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
 const PurplePawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
 const OrangePawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
 const TilesDocContext = createContext<any>(undefined);
-const PlayerDocContext = createContext<{ player: DBPlayer, setPlayer: Dispatch<SetStateAction<DBPlayer>>} | undefined>(undefined);
+const PlayerDocContext = createContext<{ 
+  players: DBPlayer[], setPlayers: Dispatch<SetStateAction<DBPlayer[]>>,
+  player: DBPlayer, setPlayer: Dispatch<SetStateAction<DBPlayer>> 
+} | undefined>(undefined);
+const PingedDocContext = createContext<boolean>(false);
 
 const FirestoreProvider = ({children}: DBProviderProps) => {
   const { gameState } = useGame();
@@ -35,7 +39,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   
   const [gamePaused] = useGamePaused(room);
   const [tiles] = useTiles(room);
-  const [player, setPlayer, pinged] = usePlayer(room);
+  const [players, setPlayers, player, setPlayer, pinged] = usePlayer(room);
   const pawns = usePawns(room);
   const {green, yellow, purple, orange, playerHeldPawn} = pawns;
 
@@ -52,8 +56,8 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   }, [room.gameStarted]);
 
   const playerProviderValue = useMemo(() => { // TODO figure out why need useMemo???
-    return {player, setPlayer}
-  }, [player]);
+    return {players, setPlayers, player, setPlayer}
+  }, [player, players]);
 
   return (
     <GameStartedDocContext.Provider value={gameStarted}>
@@ -67,7 +71,9 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
               <PlayerHeldPawnDocContext.Provider value={playerHeldPawn}>
                 <WeaponsStolenDocContext.Provider value={weaponsStolen}>
                   <HeroesEscapedDocContext.Provider value={heroesEscaped}>
-                    {children}
+                    <PingedDocContext.Provider value={pinged}>
+                      {children}
+                    </PingedDocContext.Provider>
                   </HeroesEscapedDocContext.Provider>
                 </WeaponsStolenDocContext.Provider>
               </PlayerHeldPawnDocContext.Provider>
@@ -171,6 +177,14 @@ const useHeroesEscapedDocState = () => {
   return context;
 }
 
+const usePingedDocState = () => {
+  const context = useContext(PingedDocContext)
+  if (context === undefined) {
+    throw new Error('usePingedDocState must be used within a PingedDocContext');
+  }
+  return context;
+}
+
 export { 
   FirestoreProvider,
   useGameStartedDocState,
@@ -184,4 +198,5 @@ export {
   usePlayerHeldPawnDocState,
   useWeaponsStolenDocState,
   useHeroesEscapedDocState,
+  usePingedDocState,
 };
