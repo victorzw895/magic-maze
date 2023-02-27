@@ -11,6 +11,15 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
+import alertSound from '../assets/alert.wav';
+
+const playAlert = () => {
+  const audio = new Audio(alertSound);
+  audio.loop = true;
+  audio.play();
+  return audio;
+}
+
 const Pinged = () => {
   const { gameState } = useGame();
   const { player, players } = usePlayerDocState();
@@ -18,6 +27,10 @@ const Pinged = () => {
 
   useEffect(() => {
     if (pinged) {
+      const alertAudio = playAlert();
+      const alertTimer = setTimeout(() => {
+        alertAudio.pause();
+      }, 4000);
       const timer = setTimeout(async () => {
         const docSnap = await getDoc(gameState.roomId);
         if (!docSnap.exists()) return;
@@ -29,8 +42,12 @@ const Pinged = () => {
             pings: room.pings.filter(ping => ping !== player.number)
           },
         )
-      }, 5000);
-      return () => clearTimeout(timer);
+      }, 6000);
+      
+      return () => {
+        clearTimeout(timer)
+        clearTimeout(alertTimer);
+      };
     }
   }, [pinged])
 
