@@ -79,28 +79,14 @@ const getAllDirectionalSpaces = (tiles: DBTile[], pawn: DBHeroPawn, direction: d
   let extraSpaces = [];
   
   if (
-    (direction === "up" && pawn.position[0] === 2  && (
-      !currentTile?.spaces[2][0].details?.sideWalls?.includes(direction) || 
-      currentTile?.spaces[2][0].type !== 'barrier')
-    ) 
-      ||
-    (direction === "down" && pawn.position[0] === 1 && (
-      !currentTile?.spaces[1][3].details?.sideWalls?.includes(direction) || 
-      currentTile?.spaces[1][3].type !== 'barrier')
-    )
+    (direction === "up" && pawn.position[0] === 2 ) ||
+    (direction === "down" && pawn.position[0] === 1)
   ) {
     adjacentTileFound = findDirectionAdjacentTile(tiles, pawn, "col", direction);
   }
   else if (
-    (direction === "left" && pawn.position[1] === 1 && (
-      !currentTile?.spaces[0][1].details?.sideWalls?.includes(direction) ||
-      currentTile?.spaces[0][1].type !== 'barrier')
-    ) 
-      ||
-    (direction === "right" && pawn.position[1] === 2 && (
-      !currentTile?.spaces[3][2].details?.sideWalls?.includes(direction) ||
-      currentTile?.spaces[3][2].type !== 'barrier')
-    ) 
+    (direction === "left" && pawn.position[1] === 1) ||
+    (direction === "right" && pawn.position[1] === 2) 
   ) {
     adjacentTileFound = findDirectionAdjacentTile(tiles, pawn, "row", direction);
   }
@@ -238,8 +224,10 @@ export const getFirstBlockedSpace = (tiles: DBTile[], pawns: DBPawns,  pawn: DBH
     const tileRow = Object.values(currentTile.spaces).find((row, rowIndex) => rowIndex === startRow);
     const currentSpace = (tileRow as any).find((col: any, colIndex: number) => colIndex === startCol);
     if (currentSpace && currentSpace.details?.sideWalls?.includes(direction)) {
-      firstBlockedSpacePosition = [startCol, startRow];
-      blockedSpaceGridPosition = currentTile.gridPosition;
+      return {
+        position: [startCol, startRow],
+        gridPosition: currentTile.gridPosition
+      }
     }
   }
 
@@ -273,6 +261,8 @@ export const getFirstBlockedSpace = (tiles: DBTile[], pawns: DBPawns,  pawn: DBH
     wallDirection = "right"
   }
 
+  let blockNextSpace = false;
+
   for (let i = 0; i <= allSpaces.length - 1; i++) {
     const indexInCurrentTile = readArrayBackwards ? startIndexAlignment - i : startIndexAlignment + i;
     const indexInAdjacentTile = readArrayBackwards ? allSpaces.length - 1 - i : i - spacesInCurrentTile;
@@ -296,7 +286,12 @@ export const getFirstBlockedSpace = (tiles: DBTile[], pawns: DBPawns,  pawn: DBH
         gridColIndex = pawn.gridPosition[0] + gridChangeIndex;
       }
     }
-    
+
+    if (blockNextSpace) {
+      firstBlockedSpacePosition = [colIndex , rowIndex];
+      blockedSpaceGridPosition = [gridColIndex, gridRowIndex];
+      break;
+    }
     if (allSpaces[i].details?.sideWalls?.includes(wallDirection) || allSpaces[i].type === "barrier") {
       firstBlockedSpacePosition = [colIndex , rowIndex];
       blockedSpaceGridPosition = [gridColIndex, gridRowIndex];
@@ -306,6 +301,9 @@ export const getFirstBlockedSpace = (tiles: DBTile[], pawns: DBPawns,  pawn: DBH
       firstBlockedSpacePosition = [colIndex, rowIndex];
       blockedSpaceGridPosition = [gridColIndex, gridRowIndex];
       break;
+    }
+    else if (allSpaces[i].details?.sideWalls?.includes(direction)) {
+      blockNextSpace = true;
     }
   }
 
