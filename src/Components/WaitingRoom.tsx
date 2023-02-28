@@ -56,43 +56,47 @@ const WaitingRoom = ({roomHost, setRoomHost, currentPlayer}: {roomHost: playerNu
   };
 
   const exitRoom = async () => {
-    // TODO: need to prompt user to delete player for, firestore and reassign host
-
-    console.log("current player", currentPlayer, gameState.roomId)
-    console.log("all players", players)
-
-    // ! Feel like there could be async issues below but need revision
-    // * remove current player from player list 
-    const currentPlayerIndex: number = players.findIndex((player: any) => player.number === currentPlayer.number)
-    console.log("current player index",currentPlayerIndex)
-    const updatePlayers = [...players]
-    updatePlayers.splice(currentPlayerIndex, 1)
-    console.log("updated players", updatePlayers)
-    
-    // todo: reassign host
-    await updateDoc(doc(gameState.roomId), {
-      host: updatePlayers[0].number
-    })
-    setRoomHost(updatePlayers[0].number)
-
-    // const docSnap = await getDoc(gameState.roomId);
-
-    // if (docSnap.exists()) {
-    //   const info = docSnap.data()
-    //   console.log("Document data host:", info.host);
-    //   console.log("current player number", currentPlayer.number);
-    // } else {
-    //   // doc.data() will be undefined in this case
-    //   console.log("No such document!");
-    // }
-     
-    // gameDispatch({ type: "exitRoom" })
+    if (players.length === 1) {
+      deleteRoom()
+    } else {
+      // ! Feel like there could be async issues below but need revision
+      // * remove current player from player list 
+      const currentPlayerIndex: number = players.findIndex((player: any) => player.number === currentPlayer.number)
+      console.log("current player index",currentPlayerIndex)
+      const updatePlayers = [...players]
+      updatePlayers.splice(currentPlayerIndex, 1)
+      console.log("updated players", updatePlayers)
+      
+      // changing host number
+      if (currentPlayer.number === roomHost) {
+        await updateDoc(doc(gameState.roomId), {
+          host: updatePlayers[0].number,
+          players: updatePlayers
+        })
+        setRoomHost(updatePlayers[0].number)
+        console.log("setting room host", updatePlayers[0].number)
+        console.log("room host no updated:",roomHost)
+      } else {
+        await updateDoc(doc(gameState.roomId), {
+          players: updatePlayers
+        })
+      }
+  
+      console.log("current player number", currentPlayer.number)    
+      gameDispatch({ type: "exitRoom" })
+    }
   }
 
   const deleteRoom = () => {
     deleteDoc(doc(gameState.roomId))
     gameDispatch({ type: "exitRoom" })
   }
+
+  useEffect(() => {
+    console.log("re-render for roomhost or players");
+    console.log("room host has been updated (useEffect):",roomHost)
+    console.log("current player number", currentPlayer.number)
+  }, [roomHost, players])
 
   return (
     <>
@@ -106,44 +110,59 @@ const WaitingRoom = ({roomHost, setRoomHost, currentPlayer}: {roomHost: playerNu
             })
             
           }
-          {(roomHost === currentPlayer.number) && 
-            <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
-              <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
-              <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Exit Room</Button>
-              <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-              >
-                <Box sx={style}>
-                  <Box sx={{ display: "flex", justifyContent: 'space-between' }}>
-                    <Typography id="modal-modal-title" variant="h6" component="h2">
-                      Exit Room: {gameState.roomId}
-                    </Typography>
-                    <Button aria-label="close" onClick={handleClose} sx={{padding: "0px"}}><CloseIcon /></Button>
-                  </Box>
+          {
+            <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              <Box sx={{ display: "flex", justifyContent: 'space-between' }}>
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                  Exit Room: {gameState.roomId}
+                </Typography>
+                <Button aria-label="close" onClick={handleClose} sx={{padding: "0px"}}><CloseIcon /></Button>
+              </Box>
+              { (roomHost === currentPlayer.number) && 
+                <Stack>
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                    You are about to exit the room. You must reassign the host or end game for all.
+                  You are about to exit the room. You must reassign the host or end game for all.
                   </Typography>
                   <Stack spacing={2} direction="row" justifyContent="space-between" style={{margin: "20px 0", display: "flex"}}>
                     <Button variant="contained" size="small" id="back" disableElevation onClick={exitRoom}>Re-assign Host and Exit</Button>
                     <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room for all</Button>
                   </Stack>
-                </Box>
-              </Modal>              
+                </Stack>
+              }
+              { (roomHost !== currentPlayer.number) &&
+                <Stack>
+                  <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                  You are about to exit the room. Confirm?
+                  </Typography>
+                  <Button variant="contained" size="small" id="back" disableElevation onClick={exitRoom}>Exit Room</Button>
+                </Stack>
+              }
+              
+            </Box>
+          </Modal>    
+          }
+          {(roomHost === currentPlayer.number) && 
+            <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
+              <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
+              <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Exit Room</Button>          
               <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room</Button>
             </Stack>
           }
-          {(roomHost !== currentPlayer.number) && players.length == 0 && 
+          {(roomHost !== currentPlayer.number) && players.length === 0 && 
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
               <Alert severity="info" style={{margin: "20px"}}>This game has been deleted. Please click "back" to return to the Lobby area</Alert>
             </Stack>
           }
-          {(roomHost !== currentPlayer.number)&&
+          {(roomHost !== currentPlayer.number) &&
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
               <Box textAlign='center'>
-                <Button variant="contained" size="small" id="back" disableElevation onClick={exitRoom}>Back</Button>
+                <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Back</Button>
               </Box>
             </Stack>
           }

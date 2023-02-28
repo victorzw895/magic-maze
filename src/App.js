@@ -7,7 +7,6 @@ import { useGameStartedDocState } from './Contexts/FirestoreContext';
 function App() {
   const { gameState } = useGame();
   const gameStarted = useGameStartedDocState()
-  console.log("gameState, gameStarted", gameState.roomId, gameStarted)
 
   return (
     <div className="MMApp">

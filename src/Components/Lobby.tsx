@@ -92,6 +92,10 @@ const Lobby = () => {
           players: playersInRoom
         },
       )
+      console.log("setting current player in join room", player)
+      setCurrentPlayer(player)
+      setRoomHost(roomFound.host)
+      
 
     }
     else if (!roomFound) {
