@@ -70,6 +70,8 @@ export const roomDefaultValues: Room = {
   pings: [],
   gameStarted: false,
   gamePaused: false,
+  gameOver: false,
+  gameWon: false,
   weaponsStolen: [],
   heroesEscaped: [],
   timeLeft: 200,

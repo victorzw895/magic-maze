@@ -81,7 +81,8 @@ export interface DBPawns {
 export interface Room {
   // timerRunning: boolean
   // minutesLeft: number,
-  // gameOver: boolean,
+  gameOver: boolean,
+  gameWon: boolean,
   gamePaused: boolean,
   gameStarted: boolean,
   timeLeft: number,

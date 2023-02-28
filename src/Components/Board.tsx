@@ -15,6 +15,7 @@ import { usePlayerDocState } from '../Contexts/FirestoreContext';
 import { getDoc } from '../utils/useFirestore';
 import { Room } from '../types';
 import Objectives from './Objectives';
+import GameOver from './GameOver';
 
 const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: ReactNode, children: ReactNode}) => {
   console.log('*** Board Component re render')
@@ -63,7 +64,6 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
         </div>
       </Draggable>
       <PlayerArea highlightNewTileArea={highlightNewTileArea}>
-        {/* TODO take pinged value from room as props*/}
         {pinged}
       </PlayerArea>
     </>
@@ -83,6 +83,7 @@ const Board = () => {
         <Pawns />
       </BoardComponent>
       {/* IF WON Component use MUI Backdrop and Win message or modal*/}
+      <GameOver />
     </div>
   );
 };
