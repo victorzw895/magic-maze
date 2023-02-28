@@ -77,7 +77,10 @@ const Lobby = () => {
 
     // if found
     if (roomFound && !roomFound.gameStarted && roomFound.players.length <= 8) {
-      const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, roomFound.players.length);
+      // add player Number
+      let newPlayerNo = Math.max(...roomFound.players.map( obj => obj.number));
+
+      const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, newPlayerNo);
       const playersInRoom = [
         ...roomFound.players, 
         dbPlayer
