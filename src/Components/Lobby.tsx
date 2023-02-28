@@ -10,8 +10,6 @@ import { roomDefaultValues } from '../constants';
 
 const Lobby = () => {
   console.log('re-render Lobby');
-  // const gameStarted = useGameStartedDocState()
-  // console.log('gameStarted', gameStarted)
 
   const { gameState, gameDispatch } = useGame();
   const playerDispatch = usePlayerDispatch();

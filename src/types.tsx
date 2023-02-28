@@ -91,12 +91,13 @@ export interface Room {
   host: playerNumber,
   tiles: DBTile[],
   pawns: DBPawns,
+  pings: playerNumber[] // ?? add debouncer or throttle, or batch update/consume from firestore
 }
 
 
 export interface DBPlayer extends Player {
   name: string,
-  pinged: boolean,
+  // pinged: boolean,
   playerDirections: direction[],
   playerAbilities: basicAbility[],
 }

@@ -108,11 +108,9 @@ const WaitingRoom = ({currentPlayer}: {currentPlayer: any}) => {
       <Paper sx={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '100%', minHeight: '135px', maxWidth: '360px', bgcolor: '#63B0CD' }}>
         <List>
           {
-            players && players.map((player: any) => {
-              return <ListItem key={player.number}>{`${player.number}  ${player.name}`}</ListItem>
-              // TODO: back button for non-host players
-            })
-            
+            players && players.map((player: any) => 
+              <ListItem key={player.number}>{`${player.number}  ${player.name}`}</ListItem>
+            )
           }
           {
             <Modal

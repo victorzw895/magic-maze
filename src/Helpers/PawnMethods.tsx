@@ -73,22 +73,20 @@ const filterSpacesFromRows = (rows: Space[][], pawn: DBHeroPawn, direction: dire
 
 const getAllDirectionalSpaces = (tiles: DBTile[], pawn: DBHeroPawn, direction: direction) => {
   const directionalSpaces = [];
-  const currentTile = tiles.find((tile: any) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
-  const rows = filterRowsOfTargetDirection(currentTile!, pawn, direction) || [];
-  const spaces = filterSpacesFromRows(rows, pawn, direction) || [];
+  const currentTile = tiles.find((tile) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
 
   let adjacentTileFound;
   let extraSpaces = [];
   
   if (
-    (direction === "up" && pawn.position[0] === 2) ||
+    (direction === "up" && pawn.position[0] === 2 ) ||
     (direction === "down" && pawn.position[0] === 1)
   ) {
     adjacentTileFound = findDirectionAdjacentTile(tiles, pawn, "col", direction);
   }
   else if (
     (direction === "left" && pawn.position[1] === 1) ||
-    (direction === "right" && pawn.position[1] === 2)
+    (direction === "right" && pawn.position[1] === 2) 
   ) {
     adjacentTileFound = findDirectionAdjacentTile(tiles, pawn, "row", direction);
   }
@@ -96,7 +94,8 @@ const getAllDirectionalSpaces = (tiles: DBTile[], pawn: DBHeroPawn, direction: d
   if (adjacentTileFound) {
     extraSpaces.push(...getExtraDirectionalSpaces(adjacentTileFound, pawn, direction) || []);
   }
-
+  const rows = filterRowsOfTargetDirection(currentTile!, pawn, direction) || [];
+  const spaces = filterSpacesFromRows(rows, pawn, direction) || [];
 
   if (direction === "right" || direction === "down") {
     directionalSpaces.push(...spaces, ...extraSpaces);
@@ -220,13 +219,15 @@ export const getFirstBlockedSpace = (tiles: DBTile[], pawns: DBPawns,  pawn: DBH
   let firstBlockedSpacePosition = null;
   let blockedSpaceGridPosition = null;
 
-  const currentTile = tiles.find((tile: any) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
+  const currentTile = tiles.find((tile) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
   if (currentTile) {
-    const tileRow = Object.values(currentTile.spaces!).find((row, rowIndex) => rowIndex === startRow);
+    const tileRow = Object.values(currentTile.spaces).find((row, rowIndex) => rowIndex === startRow);
     const currentSpace = (tileRow as any).find((col: any, colIndex: number) => colIndex === startCol);
     if (currentSpace && currentSpace.details?.sideWalls?.includes(direction)) {
-      firstBlockedSpacePosition = [startCol, startRow];
-      blockedSpaceGridPosition = currentTile.gridPosition;
+      return {
+        position: [startCol, startRow],
+        gridPosition: currentTile.gridPosition
+      }
     }
   }
 
@@ -260,6 +261,8 @@ export const getFirstBlockedSpace = (tiles: DBTile[], pawns: DBPawns,  pawn: DBH
     wallDirection = "right"
   }
 
+  let blockNextSpace = false;
+
   for (let i = 0; i <= allSpaces.length - 1; i++) {
     const indexInCurrentTile = readArrayBackwards ? startIndexAlignment - i : startIndexAlignment + i;
     const indexInAdjacentTile = readArrayBackwards ? allSpaces.length - 1 - i : i - spacesInCurrentTile;
@@ -283,7 +286,12 @@ export const getFirstBlockedSpace = (tiles: DBTile[], pawns: DBPawns,  pawn: DBH
         gridColIndex = pawn.gridPosition[0] + gridChangeIndex;
       }
     }
-    
+
+    if (blockNextSpace) {
+      firstBlockedSpacePosition = [colIndex , rowIndex];
+      blockedSpaceGridPosition = [gridColIndex, gridRowIndex];
+      break;
+    }
     if (allSpaces[i].details?.sideWalls?.includes(wallDirection) || allSpaces[i].type === "barrier") {
       firstBlockedSpacePosition = [colIndex , rowIndex];
       blockedSpaceGridPosition = [gridColIndex, gridRowIndex];
@@ -293,6 +301,9 @@ export const getFirstBlockedSpace = (tiles: DBTile[], pawns: DBPawns,  pawn: DBH
       firstBlockedSpacePosition = [colIndex, rowIndex];
       blockedSpaceGridPosition = [gridColIndex, gridRowIndex];
       break;
+    }
+    else if (allSpaces[i].details?.sideWalls?.includes(direction)) {
+      blockNextSpace = true;
     }
   }
 
