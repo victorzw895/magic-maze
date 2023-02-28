@@ -17,7 +17,6 @@ const Lobby = () => {
   const playerDispatch = usePlayerDispatch();
 
   const [playerName, setPlayerName] = useState("");
-  const [roomHost, setRoomHost] = useState<playerNumber>(null);
   const [promptCode, setPromptCode] = useState(false);
   const [existingRoomCode, setExistingRoomCode] = useState("");
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState("");
@@ -49,10 +48,9 @@ const Lobby = () => {
 
     await setDoc(newGameCode, {
       ...roomDefaultValues,
-      players: [dbPlayer]
+      players: [dbPlayer],
+      // host: player.number
     })
-    console.log("setting host num", player.number)
-    setRoomHost(player.number)
   }
 
   // check room code typed
@@ -93,10 +91,7 @@ const Lobby = () => {
         },
       )
       console.log("setting current player in join room", player)
-      setCurrentPlayer(player)
-      setRoomHost(roomFound.host)
-      
-
+      setCurrentPlayer(player)   
     }
     else if (!roomFound) {
       setFailJoinRoomMessage("Room code not found");
@@ -116,7 +111,7 @@ const Lobby = () => {
       </h3>
       
       {gameState.roomId ?
-        <WaitingRoom roomHost={roomHost} currentPlayer={currentPlayer} setRoomHost={setRoomHost} />
+        <WaitingRoom currentPlayer={currentPlayer}/>
           :
         <Paper className="lobby-actions" sx={{ width: '100%', maxWidth: 360, bgcolor: '#63B0CD' }}>
           {

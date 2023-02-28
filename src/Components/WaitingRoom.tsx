@@ -3,13 +3,14 @@ import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
 import { Paper, Stack, Button, List, ListItem, Alert, Box, Modal, Typography } from '@mui/material';
 import { DBPlayer, playerNumber } from '../types';
-import { setDoc, useDocData, getDoc } from "../utils/useFirestore"; 
+import { setDoc, useDocData } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
 import { doc } from '../utils/useFirestore'
 import { deleteDoc, updateDoc } from "firebase/firestore";
 import CloseIcon from '@mui/icons-material/Close';
+import { useRoomHostDocState } from '../Contexts/FirestoreContext';
 
-const WaitingRoom = ({roomHost, setRoomHost, currentPlayer}: {roomHost: playerNumber; setRoomHost: any; currentPlayer: any}) => {
+const WaitingRoom = ({currentPlayer}: {currentPlayer: any}) => {
   const { gameState, gameDispatch } = useGame();
 
   const [open, setOpen] = useState<boolean>(false)
@@ -18,6 +19,12 @@ const WaitingRoom = ({roomHost, setRoomHost, currentPlayer}: {roomHost: playerNu
 
   const [room] = useDocData(gameState.roomId);
   const { players } = room;
+  
+  const host = useRoomHostDocState()
+
+  useEffect(() => {
+    console.log('host',host)
+  }, [host])
   
   // Assign actions to existing players ->
   // set initial tile ->
@@ -68,14 +75,12 @@ const WaitingRoom = ({roomHost, setRoomHost, currentPlayer}: {roomHost: playerNu
       console.log("updated players", updatePlayers)
       
       // changing host number
-      if (currentPlayer.number === roomHost) {
+      if (currentPlayer.number === host) {
         await updateDoc(doc(gameState.roomId), {
           host: updatePlayers[0].number,
           players: updatePlayers
         })
-        setRoomHost(updatePlayers[0].number)
         console.log("setting room host", updatePlayers[0].number)
-        console.log("room host no updated:",roomHost)
       } else {
         await updateDoc(doc(gameState.roomId), {
           players: updatePlayers
@@ -94,9 +99,8 @@ const WaitingRoom = ({roomHost, setRoomHost, currentPlayer}: {roomHost: playerNu
 
   useEffect(() => {
     console.log("re-render for roomhost or players");
-    console.log("room host has been updated (useEffect):",roomHost)
     console.log("current player number", currentPlayer.number)
-  }, [roomHost, players])
+  }, [players])
 
   return (
     <>
@@ -124,7 +128,7 @@ const WaitingRoom = ({roomHost, setRoomHost, currentPlayer}: {roomHost: playerNu
                 </Typography>
                 <Button aria-label="close" onClick={handleClose} sx={{padding: "0px"}}><CloseIcon /></Button>
               </Box>
-              { (roomHost === currentPlayer.number) && 
+              { (host === currentPlayer.number) && 
                 <Stack>
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                   You are about to exit the room. You must reassign the host or end game for all.
@@ -135,7 +139,7 @@ const WaitingRoom = ({roomHost, setRoomHost, currentPlayer}: {roomHost: playerNu
                   </Stack>
                 </Stack>
               }
-              { (roomHost !== currentPlayer.number) &&
+              { (host !== currentPlayer.number) &&
                 <Stack>
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                   You are about to exit the room. Confirm?
@@ -147,19 +151,19 @@ const WaitingRoom = ({roomHost, setRoomHost, currentPlayer}: {roomHost: playerNu
             </Box>
           </Modal>    
           }
-          {(roomHost === currentPlayer.number) && 
+          {(host === currentPlayer.number) && 
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
               <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
               <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Exit Room</Button>          
               <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room</Button>
             </Stack>
           }
-          {(roomHost !== currentPlayer.number) && players.length === 0 && 
+          {(host !== currentPlayer.number) && players.length === 0 && 
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
               <Alert severity="info" style={{margin: "20px"}}>This game has been deleted. Please click "back" to return to the Lobby area</Alert>
             </Stack>
           }
-          {(roomHost !== currentPlayer.number) &&
+          {(host !== currentPlayer.number) &&
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
               <Box textAlign='center'>
                 <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Back</Button>

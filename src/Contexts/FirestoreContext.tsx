@@ -6,6 +6,7 @@ import useGamePaused from '../utils/useGamePaused';
 import useTiles from '../utils/useTiles';
 import usePlayer from '../utils/usePlayer';
 import usePawns from '../utils/usePawns';
+import useRoomHost from '../utils/useRoomHost';
 
 // type Action = {type: 'update', value: string} | undefined;
 // type Dispatch = (action: Action) => void;
@@ -24,6 +25,7 @@ const PurplePawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
 const OrangePawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
 const TilesDocContext = createContext<any>(undefined);
 const PlayerDocContext = createContext<{ player: DBPlayer, setPlayer: Dispatch<SetStateAction<DBPlayer>>} | undefined>(undefined);
+const RoomHostDocContext = createContext<any>(undefined);
 
 const FirestoreProvider = ({children}: DBProviderProps) => {
   const { gameState } = useGame();
@@ -34,6 +36,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [weaponsStolen, setWeaponsStolen] = useState([]);
   
   const [gamePaused] = useGamePaused(room);
+  const [roomHost] = useRoomHost(room);
   const [tiles] = useTiles(room);
   const [player, setPlayer, pinged] = usePlayer(room);
   const pawns = usePawns(room);
@@ -58,6 +61,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   return (
     <GameStartedDocContext.Provider value={gameStarted}>
       <GamePausedDocContext.Provider value={gamePaused}>
+        <RoomHostDocContext.Provider value={roomHost}>
         <TilesDocContext.Provider value={tiles}>
           <PlayerDocContext.Provider value={playerProviderValue}>
             <GreenPawnDocContext.Provider value={green}>
@@ -77,6 +81,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
             </GreenPawnDocContext.Provider>
           </PlayerDocContext.Provider>
         </TilesDocContext.Provider>
+        </RoomHostDocContext.Provider>
       </GamePausedDocContext.Provider>
     </GameStartedDocContext.Provider>
   )
@@ -95,6 +100,14 @@ const useGamePausedDocState = () => {
   const context = useContext(GamePausedDocContext)
   if (context === undefined) {
     throw new Error('useGamePausedDocState must be used within a GamePausedDocContext');
+  }
+  return context;
+}
+
+const useRoomHostDocState = () => {
+  const context = useContext(RoomHostDocContext)
+  if (context === undefined) {
+    throw new Error('useRoomHostDocState must be used within a RoomHostDocContext');
   }
   return context;
 }
@@ -184,4 +197,5 @@ export {
   usePlayerHeldPawnDocState,
   useWeaponsStolenDocState,
   useHeroesEscapedDocState,
+  useRoomHostDocState
 };
