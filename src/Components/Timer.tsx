@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { useTimer } from 'react-timer-hook';
 import { useGame } from '../Contexts/GameContext';
-import { useGamePausedDocState, useWeaponsStolenDocState } from '../Contexts/FirestoreContext';
+import { useGamePausedDocState, useGameOverDocState, useWeaponsStolenDocState } from '../Contexts/FirestoreContext';
 import gameSound from '../assets/game.mp3'; // download file from firestore storage instead
 import escapeSound from '../assets/escape.wav'; // download file from firestore storage instead
 import warningSound from '../assets/warning.wav'; // download file from firestore storage instead
+import { setDoc } from '../utils/useFirestore';
 
 const playWarning = () => {
   const audio = new Audio(warningSound);
@@ -26,7 +27,8 @@ let gameAudio = loadGameSoundtrack()
 
 const Timer = () => {
   console.count('Render timer') // 28 times
-  const { gameDispatch } = useGame();
+  const { gameState, gameDispatch } = useGame();
+  const gameOver = useGameOverDocState();
   const gamePaused = useGamePausedDocState();
   const weaponsStolen = useWeaponsStolenDocState();
   const time = new Date();
@@ -60,9 +62,22 @@ const Timer = () => {
     restart
   // } = useTimer({ expiryTimestamp: time, onExpire: () => gameDispatch({type: "gameOver"}) });
   // autoStart: false after attaching start() to waiting room start
-  } = useTimer({ expiryTimestamp: time, autoStart: false, onExpire: () => gameDispatch({type: "gameOver"}) });
+  } = useTimer({ expiryTimestamp: time, autoStart: false, onExpire: async () => {
+    gameDispatch({type: "gameOver"})
+    gameAudio.pause();
+    await setDoc(gameState.roomId, {
+      gameOver: true,
+      gameWon: false,
+    })
+  } });
   const startSeconds = 200;
 
+  useEffect(() => {
+    if (gameOver) {
+      pause();
+      gameAudio.pause();
+    }
+  }, [gameOver])
 
   const toggleTimer = (pauseGame: boolean) => {
     if (pauseGame) {

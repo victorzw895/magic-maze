@@ -15,6 +15,8 @@ type DBProviderProps = {children: React.ReactNode}
 
 const GameStartedDocContext = createContext<any>(undefined);
 const GamePausedDocContext = createContext<any>(undefined);
+const GameOverDocContext = createContext<any>(false);
+const GameWonDocContext = createContext<any>(false);
 const WeaponsStolenDocContext = createContext<any>(undefined);
 const HeroesEscapedDocContext = createContext<any>(undefined);
 const PlayerHeldPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
@@ -37,7 +39,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [heroesEscaped, setHeroesEscaped] = useState([]);
   const [weaponsStolen, setWeaponsStolen] = useState([]);
   
-  const [gamePaused] = useGamePaused(room);
+  const [gamePaused, gameOver, gameWon] = useGamePaused(room);
   const [tiles] = useTiles(room);
   const [players, setPlayers, player, setPlayer] = usePlayer();
   const pawns = usePawns(room);
@@ -73,6 +75,8 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   return (
     <GameStartedDocContext.Provider value={gameStarted}>
       <GamePausedDocContext.Provider value={gamePaused}>
+      <GameOverDocContext.Provider value={gameOver}>
+      <GameWonDocContext.Provider value={gameWon}>
         <TilesDocContext.Provider value={tiles}>
           <PlayerDocContext.Provider value={playerProviderValue}>
             <GreenPawnDocContext.Provider value={green}>
@@ -94,6 +98,8 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
             </GreenPawnDocContext.Provider>
           </PlayerDocContext.Provider>
         </TilesDocContext.Provider>
+      </GameWonDocContext.Provider>
+      </GameOverDocContext.Provider>
       </GamePausedDocContext.Provider>
     </GameStartedDocContext.Provider>
   )
@@ -112,6 +118,22 @@ const useGamePausedDocState = () => {
   const context = useContext(GamePausedDocContext)
   if (context === undefined) {
     throw new Error('useGamePausedDocState must be used within a GamePausedDocContext');
+  }
+  return context;
+}
+
+const useGameOverDocState = () => {
+  const context = useContext(GameOverDocContext)
+  if (context === undefined) {
+    throw new Error('useGameOverDocState must be used within a GameOverDocContext');
+  }
+  return context;
+}
+
+const useGameWonDocState = () => {
+  const context = useContext(GameWonDocContext)
+  if (context === undefined) {
+    throw new Error('useGameWonDocState must be used within a GameWonDocContext');
   }
   return context;
 }
@@ -210,4 +232,6 @@ export {
   useWeaponsStolenDocState,
   useHeroesEscapedDocState,
   usePingedDocState,
+  useGameOverDocState,
+  useGameWonDocState,
 };

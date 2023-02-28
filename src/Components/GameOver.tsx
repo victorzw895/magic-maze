@@ -1,15 +1,24 @@
-import * as React from 'react';
+import {useEffect} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { usePlayerDispatch } from '../Contexts/PlayerContext';
-import { usePlayerDocState } from '../Contexts/FirestoreContext';
+import { usePlayerDocState, useGameOverDocState, useGameWonDocState } from '../Contexts/FirestoreContext';
 import { DBPlayer, Player } from '../types';
 import { useGame } from '../Contexts/GameContext';
+import cheeringSound from '../assets/cheering.wav'; // download file from firestore storage instead
+import loseSound from '../assets/lose.wav'; // download file from firestore storage instead
 
-const gameOver = true;
-const gameWon = true;
+const playLose = () => {
+  const audio = new Audio(loseSound);
+  audio.play();
+}
+
+const playCheering = () => {
+  const audio = new Audio(cheeringSound);
+  audio.play();
+}
 
 const style = {
   position: 'absolute',
@@ -26,7 +35,14 @@ const style = {
 const GameOver = () => {
   const playerDispatch = usePlayerDispatch();
   const {setPlayer, setPlayers} = usePlayerDocState();
-  const { gameDispatch } = useGame();
+  const {gameDispatch} = useGame();
+  const gameOver = useGameOverDocState();
+  const gameWon = useGameWonDocState();
+
+  useEffect(() => {
+    if (gameOver && gameWon) playCheering();
+    else if (gameOver && !gameWon) playLose();
+  }, [gameOver, gameWon])
 
   const handleClick = async () => {
     playerDispatch({type: 'setPlayer', value: {} as Player});
