@@ -140,6 +140,7 @@ const useGameWonDocState = () => {
   if (context === undefined) {
     throw new Error('useGameWonDocState must be used within a GameWonDocContext');
   }
+  return context;
 }
 
 const useRoomHostDocState = () => {
