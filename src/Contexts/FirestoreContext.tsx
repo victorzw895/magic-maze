@@ -15,9 +15,9 @@ type DBProviderProps = {children: React.ReactNode}
 
 
 const GameStartedDocContext = createContext<any>(undefined);
-const GamePausedDocContext = createContext<any>(undefined);
-const GameOverDocContext = createContext<any>(false);
-const GameWonDocContext = createContext<any>(false);
+const GamePausedDocContext = createContext<boolean>(false);
+const GameOverDocContext = createContext<boolean>(false);
+const GameWonDocContext = createContext<boolean>(false);
 const WeaponsStolenDocContext = createContext<any>(undefined);
 const HeroesEscapedDocContext = createContext<any>(undefined);
 const PlayerHeldPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
@@ -140,6 +140,7 @@ const useGameWonDocState = () => {
   if (context === undefined) {
     throw new Error('useGameWonDocState must be used within a GameWonDocContext');
   }
+  return context;
 }
 
 const useRoomHostDocState = () => {

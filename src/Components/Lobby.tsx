@@ -41,7 +41,7 @@ const Lobby = () => {
     // save Room Code
     gameDispatch({type: "joinRoom", value: newGameCode});
     // create new player
-    const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, 0)
+    const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, [])
 
     console.log("dbPlayer", dbPlayer);
     console.log("player", player.number)
@@ -80,8 +80,9 @@ const Lobby = () => {
     // if found
     if (roomFound && !roomFound.gameStarted && roomFound.players.length <= 8) {
       // add player Number
-      let newPlayerNo = Math.max(...roomFound.players.map( obj => obj.number));
-      const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, newPlayerNo);
+      const currentPlayers = roomFound.players.map(player => player.number);
+
+      const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, currentPlayers);
       const playersInRoom = [
         ...roomFound.players, 
         dbPlayer

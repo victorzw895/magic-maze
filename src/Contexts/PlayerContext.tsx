@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { heroColor, Player, playerNumber, direction, Escalator, DBPlayer } from '../types';
+import difference from 'lodash/difference';
+
+const playerNumbers = Array.from({length: 8}, (_, i) => i + 1);
 
 export type Action = 
   // {type: 'playerHeld', value: number | null, color: heroColor} | 
@@ -18,9 +21,11 @@ export interface PlayerFactoryType {
   dbPlayer: DBPlayer
 }
 
-export const PlayerFactory = (playerName: string, currentPlayers: number) => {
+export const PlayerFactory = (playerName: string, currentPlayers: playerNumber[]) => {
+  const newPlayerNumber = difference(playerNumbers, currentPlayers)[0];
+
   const localPlayerState: Player = {
-    number: currentPlayers + 1 as playerNumber,
+    number: newPlayerNumber as playerNumber,
     // showMovableDirections: [],
     // showTeleportSpaces: null,
     // showEscalatorSpaces: [], // TODO revisit this (trim down data)
@@ -28,7 +33,7 @@ export const PlayerFactory = (playerName: string, currentPlayers: number) => {
 
   const dbPlayerState: DBPlayer = {
     name: playerName,
-    number: currentPlayers + 1 as playerNumber,
+    number: newPlayerNumber as playerNumber,
     playerDirections: [], 
     playerAbilities: [],
     // pinged: false
