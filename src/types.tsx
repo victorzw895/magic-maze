@@ -89,6 +89,7 @@ export interface Room {
   weaponsStolen: heroColor[],
   heroesEscaped: heroColor[],
   players: DBPlayer[],
+  host: playerNumber,
   tiles: DBTile[],
   pawns: DBPawns,
   pings: playerNumber[] // ?? add debouncer or throttle, or batch update/consume from firestore
