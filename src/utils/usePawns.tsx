@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { DBHeroPawn, Room } from '../types';
+import { DBHeroPawn, Room, PlayerHeldPawn } from '../types';
 import { pawnDefaultValues } from '../constants';
 import { usePlayerState } from '../Contexts/PlayerContext';
 import { setDoc } from '../utils/useFirestore';
@@ -12,7 +12,7 @@ const initPlayerHeldPawn = {
 
 const usePawns = (room: Room, roomId: string): any => {
   const player = usePlayerState();
-  const [playerHeldPawn, setPlayerHeldPawn] = useState<any>(initPlayerHeldPawn);
+  const [playerHeldPawn, setPlayerHeldPawn] = useState<DBHeroPawn | PlayerHeldPawn>(initPlayerHeldPawn);
   const [green, setGreen] = useState<DBHeroPawn>({} as DBHeroPawn);
   const [yellow, setYellow] = useState<DBHeroPawn>({} as DBHeroPawn);
   const [purple, setPurple] = useState<DBHeroPawn>({} as DBHeroPawn);
