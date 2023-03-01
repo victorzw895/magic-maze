@@ -5,9 +5,10 @@ import { tileWallSize } from '../constants';
 import isEqual from 'lodash/isEqual';
 import { 
   usePlayerDocState,
-  usePlayerHeldPawnDocState 
+  usePlayerHeldPawnDocState,
+  useWeaponsStolenDocState,
 } from '../Contexts/FirestoreContext';
-import { getDisplacementValue, tileHasBlockedSpace, shouldHighlightSpace } from '../Helpers/TileMethods';
+import { getDisplacementValue, shouldHighlightSpace } from '../Helpers/TileMethods';
 
 interface tileProps {
   tileData: DBTile,
@@ -22,6 +23,7 @@ const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
 const Tile = ({tileIndex, tileData}: tileProps) => {
   const { player } = usePlayerDocState();
   const playerHeldPawn = usePlayerHeldPawnDocState()
+  const weaponsStolen = useWeaponsStolenDocState();
   
   return (
     <>
@@ -45,7 +47,11 @@ const Tile = ({tileIndex, tileData}: tileProps) => {
                   const highlightSpace = shouldHighlightSpace(playerHeldPawn, player, tileData, colIndex, rowIndex);
                   const {type, details} = space;
                   const playerHeldPawnColor = playerHeldPawn?.color;
-                  const highlightTeleporter = type === 'teleporter' && (details as TeleporterSpace).color === playerHeldPawnColor;
+                  const disableTeleporter = weaponsStolen.length === 4
+                  const highlightTeleporter = 
+                    type === 'teleporter' && 
+                    !disableTeleporter &&
+                    (details as TeleporterSpace).color === playerHeldPawnColor;
                   const highlightEscalator = details?.hasEscalator && playerHeldPawn?.showEscalatorSpaces.length;
                   
                   return (
@@ -66,6 +72,7 @@ const Tile = ({tileIndex, tileData}: tileProps) => {
                       tileIndex={tileIndex}
                       showMovableArea={highlightSpace} 
                       colorSelected={(highlightSpace || highlightTeleporter || highlightEscalator) && playerHeldPawn ? playerHeldPawn.color : null}
+                      disableTeleporter={type === 'teleporter' && disableTeleporter}
                       highlightTeleporter={highlightTeleporter ? playerHeldPawn.showTeleportSpaces: null}
                       highlightEscalator={highlightEscalator ? playerHeldPawn.showEscalatorSpaces: []}
                     />

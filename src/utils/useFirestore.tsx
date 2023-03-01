@@ -45,6 +45,9 @@ const downloadAsset = (file: string) => {
 }
 
 export const downloadAssets = async () => {
+  const test = await downloadAsset(`${svgAssets[0]}.svg`);
+  console.log('test url', test)
+
   // const svgUrls = svgAssets.map(async (asset) => await downloadAsset(`${asset}.svg`))
   // const pngUrls = pngAssets.map(async (asset) => await downloadAsset(`${asset}.png`))
   // const jpgUrls = jpgAssets.map(async (asset) => await downloadAsset(`${asset}.jpg`))
