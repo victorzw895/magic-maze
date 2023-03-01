@@ -3,10 +3,11 @@ import cryptoRandomString from 'crypto-random-string';
 import { useGame } from '../Contexts/GameContext';
 import { usePlayerDispatch, PlayerFactory, PlayerFactoryType } from '../Contexts/PlayerContext';
 import { Stack, Button, TextField, Paper, Alert } from '@mui/material';
-import { Room } from '../types';
+import { playerNumber, Room } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import WaitingRoom from './WaitingRoom';
 import { roomDefaultValues } from '../constants';
+import { usePlayerDocState } from '../Contexts/FirestoreContext';
 
 const Lobby = () => {
   console.log('re-render Lobby');
@@ -15,10 +16,11 @@ const Lobby = () => {
   const playerDispatch = usePlayerDispatch();
 
   const [playerName, setPlayerName] = useState("");
-  const [isHost, setIsHost] = useState(false);
   const [promptCode, setPromptCode] = useState(false);
   const [existingRoomCode, setExistingRoomCode] = useState("");
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState<string>("");
+  const [currentPlayer, setCurrentPlayer] = useState({})
+  const { players, setPlayers, player, setPlayer } = usePlayerDocState()
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -34,17 +36,21 @@ const Lobby = () => {
   // create new Document, save player (DB)
   const createNewGame = async () => {
     const newGameCode = cryptoRandomString({length: 5, type: 'distinguishable'});
-    setIsHost(true);
+    // setIsHost(true);
     // save Room Code
     gameDispatch({type: "joinRoom", value: newGameCode});
     // create new player
     const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, 0)
 
+    console.log("dbPlayer", dbPlayer);
+    console.log("player", player.number)
+    setPlayer(dbPlayer)
     playerDispatch({type: "setPlayer", value: player});
 
     await setDoc(newGameCode, {
       ...roomDefaultValues,
-      players: [dbPlayer]
+      players: [dbPlayer],
+      // host: player.number
     })
   }
 
@@ -70,7 +76,9 @@ const Lobby = () => {
 
     // if found
     if (roomFound && !roomFound.gameStarted && roomFound.players.length <= 8) {
-      const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, roomFound.players.length);
+      // add player Number
+      let newPlayerNo = Math.max(...roomFound.players.map( obj => obj.number));
+      const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, newPlayerNo);
       const playersInRoom = [
         ...roomFound.players, 
         dbPlayer
@@ -83,6 +91,9 @@ const Lobby = () => {
           players: playersInRoom
         },
       )
+      console.log("setting current player in join room", dbPlayer)
+      setPlayer(dbPlayer)
+
     }
     else if (!roomFound) {
       setFailJoinRoomMessage("Room code not found");
@@ -106,7 +117,7 @@ const Lobby = () => {
       </h3>
       
       {gameState.roomId ?
-        <WaitingRoom isHost={isHost} />
+        <WaitingRoom />
           :
         <Paper className="lobby-actions" sx={{ width: '100%', maxWidth: 360, bgcolor: '#63B0CD' }}>
           {
