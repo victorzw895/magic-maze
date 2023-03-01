@@ -18,8 +18,7 @@ const Lobby = () => {
   const [playerName, setPlayerName] = useState("");
   const [promptCode, setPromptCode] = useState(false);
   const [existingRoomCode, setExistingRoomCode] = useState("");
-  const [failJoinRoomMessage, setFailJoinRoomMessage] = useState("");
-  const [alert, setAlert] = useState<boolean>(false)
+  const [failJoinRoomMessage, setFailJoinRoomMessage] = useState<string>("");
   const [currentPlayer, setCurrentPlayer] = useState({})
   const { players, setPlayers, player, setPlayer } = usePlayerDocState()
 
@@ -69,10 +68,8 @@ const Lobby = () => {
 
 
     if (!docSnap.exists()) {
-      setAlert(true)
-      return // TODO error message
-      
-      // setFailJoinRoomMessage("Room code not found");
+      setFailJoinRoomMessage("Room code not found");
+      return 
     }
 
     const roomFound = docSnap.data() as Room;
@@ -109,6 +106,10 @@ const Lobby = () => {
     }
   }
 
+  useEffect(() => {
+
+  }, [failJoinRoomMessage])
+
   return (
     <header className="App-header">
       <h3>
@@ -122,11 +123,11 @@ const Lobby = () => {
           {
             promptCode ? 
               <>
-                <> { alert ? <Alert severity="warning" style={{marginTop: "20px"}}>Room code not found</Alert> : "" }</>
+                <> { failJoinRoomMessage !== "" ? <Alert severity="warning" style={{marginTop: "20px"}}>{failJoinRoomMessage}</Alert> : "" }</>
                 <TextField margin="normal" size="small" type="text" variant="filled" label="Enter Room Code" onChange={_handleRoomCode} value={existingRoomCode}></TextField>
                 <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
                   <Button variant="contained" size="small" disableElevation onClick={joinRoom}>Join</Button>
-                  <Button variant="contained" size="small" id="back" disableElevation onClick={() => {setPromptCode(false); setAlert(false)}}>Back</Button>
+                  <Button variant="contained" size="small" id="back" disableElevation onClick={() => {setPromptCode(false); setFailJoinRoomMessage("")}}>Back</Button>
                   
                 </Stack>
               </>
