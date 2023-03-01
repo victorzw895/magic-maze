@@ -23,9 +23,9 @@ const usePawns = (room: Room, roomId: string): any => {
 
   useEffect(() => {
     const currentHeldPawn = Object.values(pawns).find(pawn => pawn.playerHeld === player.number);
-    if (!currentHeldPawn) return;
     setPlayerHeldPawn(() => currentHeldPawn || initPlayerHeldPawn);
 
+    if (!currentHeldPawn) return;
     const timer = setTimeout(async() => {
       await setDoc(roomId, {
         pawns: {
