@@ -44,13 +44,6 @@
   &.stolen, &.escaped {
     filter: brightness(0.2);
     border: none;
-    // background-color: grey;
-    // height: 100%;
-    // width: 100%;
-    // position:absolute;
-    // background-color:#000;
-    // border-radius: 5%;
-    // opacity:0.5;
   }
 }
 
@@ -99,6 +92,7 @@
 
 .space {
   box-sizing: border-box;
+  position: relative;
 
   &.active {
     z-index: 1;
@@ -125,7 +119,6 @@
       width: 70%;
       height: 70%;
       border-radius: 50%;
-      // position: relative;
       box-sizing: border-box;
       transition : border 600ms ease-in-out;
 
@@ -145,6 +138,21 @@
         background-color: rgba(50,205,50,0.2);
       }
     }
+  }
+
+  &.disabled-teleporter::after {
+    width: 80%;
+    height: 80%;
+    content: "";
+    position: absolute;
+    background-color: black;
+    opacity: 0.2;
+    z-index: 2;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    margin-left: -18.5px;
+    margin-top: -18.5px;
   }
 }
 

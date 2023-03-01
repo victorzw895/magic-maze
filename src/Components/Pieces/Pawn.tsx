@@ -27,9 +27,11 @@ const Pawn = ({pawnData}: pawnProps) => {
     const docSnap = await getDoc(gameState.roomId);
     if (!docSnap.exists()) return;
     const roomFound: Room = docSnap.data() as Room;
-    const { pawns } = roomFound;
+    const { pawns, weaponsStolen } = roomFound;
 
-    await showMovableSpaces(gameState.roomId, pawns, player, pawnData, tiles)
+    const disableTeleport = weaponsStolen.length === 4;
+
+    await showMovableSpaces(gameState.roomId, pawns, player, pawnData, tiles, disableTeleport)
   }
 
   return (

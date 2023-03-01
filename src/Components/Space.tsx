@@ -47,6 +47,7 @@ interface SpaceProps {
   colorSelected: heroColor | null,
   gridPosition: number[],
   highlightTeleporter: heroColor | null,
+  disableTeleporter: boolean,
   highlightEscalator: Escalator[],
   tileIndex: number,
 }
@@ -68,6 +69,7 @@ const Space = memo(({
   colorSelected,
   gridPosition,
   highlightTeleporter,
+  disableTeleporter,
   highlightEscalator,
   tileIndex
 }: SpaceProps) => {
@@ -88,7 +90,6 @@ const Space = memo(({
   //   tileIndex
   // });
   const { gameState } = useGame();
-
   const isTeleporter = spaceType === "teleporter";
   const teleporterColor = isTeleporter ? spaceColor : "";
 
@@ -108,6 +109,10 @@ const Space = memo(({
   useEffect(() => {
     (async () => {
       if (!isTeleporter) return;
+      if (disableTeleporter) {
+        setShowEscalator(false);
+        return;
+      }
       if (highlightTeleporter === teleporterColor) {
         let isOccupied = false;
         const docSnap = await getDoc(gameState.roomId);
@@ -127,7 +132,7 @@ const Space = memo(({
         setShowTeleport(false)
       }
     })()
-  }, [highlightTeleporter, colorSelected])
+  }, [highlightTeleporter, colorSelected, disableTeleporter])
 
 
   useEffect(() => {
@@ -235,11 +240,11 @@ const Space = memo(({
 
   return (
     <div 
-      className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}`}
+      className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}${disableTeleporter ? " disabled-teleporter" : ""}`}
       onClick={showMovableArea || showTeleport || showEscalator ? movePawn : () => {}}
        // TODO: disable if game paused
     >
-      <div className={`${teleporterColor}${showTeleport ? ' circle-multiple' : ''}`}>
+      <div className={`${teleporterColor}${showTeleport? ' circle-multiple' : ''}`}>
         {
           showTeleport ?
             <>

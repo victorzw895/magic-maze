@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { DBHeroPawn, Room } from '../types';
+import { DBHeroPawn, Room, PlayerHeldPawn } from '../types';
 import { pawnDefaultValues } from '../constants';
 import { usePlayerState } from '../Contexts/PlayerContext';
+import { setDoc } from '../utils/useFirestore';
 
 const initPlayerHeldPawn = {
   ...pawnDefaultValues,
@@ -9,9 +10,9 @@ const initPlayerHeldPawn = {
   gridPosition: [8, 8],
 }
 
-const usePawns = (room: Room): any => {
+const usePawns = (room: Room, roomId: string): any => {
   const player = usePlayerState();
-  const [playerHeldPawn, setPlayerHeldPawn] = useState({});
+  const [playerHeldPawn, setPlayerHeldPawn] = useState<PlayerHeldPawn>(initPlayerHeldPawn);
   const [green, setGreen] = useState<DBHeroPawn>({} as DBHeroPawn);
   const [yellow, setYellow] = useState<DBHeroPawn>({} as DBHeroPawn);
   const [purple, setPurple] = useState<DBHeroPawn>({} as DBHeroPawn);
@@ -22,14 +23,24 @@ const usePawns = (room: Room): any => {
 
   useEffect(() => {
     const currentHeldPawn = Object.values(pawns).find(pawn => pawn.playerHeld === player.number);
-    setPlayerHeldPawn(currentHeldPawn || initPlayerHeldPawn);
+    setPlayerHeldPawn(() => currentHeldPawn || initPlayerHeldPawn);
+
+    const timer = setTimeout(async() => {
+      await setDoc(roomId, {
+        pawns: {
+          ...pawns,
+          [currentHeldPawn.color]: {
+            ...currentHeldPawn,
+            playerHeld: null,
+          }
+        }
+      })
+    }, 8000);
+    return () => clearTimeout(timer);
   }, [pawns])
 
   useEffect(() => {
     setGreen(greenPawn)
-    if (greenPawn.playerHeld === player.number){
-      setPlayerHeldPawn(greenPawn)
-    }
   },
   [
     greenPawn.playerHeld, 
@@ -41,9 +52,6 @@ const usePawns = (room: Room): any => {
 
   useEffect(() => {
     setYellow(yellowPawn)
-    if (yellowPawn.playerHeld === player.number){
-      setPlayerHeldPawn(yellowPawn)
-    }
   },
   [
     yellowPawn.playerHeld, 
@@ -55,9 +63,6 @@ const usePawns = (room: Room): any => {
 
   useEffect(() => {
     setPurple(purplePawn)
-    if (purplePawn.playerHeld === player.number){
-      setPlayerHeldPawn(purplePawn)
-    }
   },
   [
     purplePawn.playerHeld, 
@@ -69,9 +74,6 @@ const usePawns = (room: Room): any => {
 
   useEffect(() => {
     setOrange(orangePawn)
-    if (orangePawn.playerHeld === player.number){
-      setPlayerHeldPawn(orangePawn)
-    }
   },
   [
     orangePawn.playerHeld, 
