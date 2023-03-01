@@ -68,7 +68,7 @@ const Pawn = ({pawnData}: pawnProps) => {
                 border: 
                   `${pawnData?.playerHeld ? 
                     (pawnData?.playerHeld === player.number ?
-                      "2px solid blue" 
+                      "2px solid blue"
                         : 
                       "2px solid grey")
                     :
