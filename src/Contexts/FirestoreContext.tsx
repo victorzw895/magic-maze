@@ -43,7 +43,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [roomHost] = useRoomHost(room);
   const [tiles] = useTiles(room);
   const [players, setPlayers, player, setPlayer] = usePlayer();
-  const pawns = usePawns(room);
+  const pawns = usePawns(room, gameState.roomId);
   const {green, yellow, purple, orange, playerHeldPawn} = pawns;
 
   const [pinged, setPinged] = useState(false);

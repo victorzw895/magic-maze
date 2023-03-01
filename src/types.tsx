@@ -102,9 +102,8 @@ export interface DBPlayer extends Player {
   playerAbilities: basicAbility[],
 }
 
-
-export interface DBHeroPawn extends PawnActions {
-  color: heroColor,
+interface HeroPawnState<T> extends PawnActions {
+  color: T,
   playerHeld: playerNumber | null,
   position: number[],
   gridPosition: number[],
@@ -112,7 +111,9 @@ export interface DBHeroPawn extends PawnActions {
   canUseAbility: boolean,
 }
 
+export interface DBHeroPawn extends HeroPawnState<heroColor> {}
 
+export interface PlayerHeldPawn extends HeroPawnState<heroColor | null> {}
 
 export interface PawnActions {
   blockedPositions: BlockedPositions,
