@@ -6,25 +6,24 @@ import { DBPlayer, playerNumber } from '../types';
 import { setDoc, useDocData } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
 import { doc } from '../utils/useFirestore'
-import { deleteDoc, updateDoc } from "firebase/firestore";
+import { deleteDoc } from "firebase/firestore";
 import CloseIcon from '@mui/icons-material/Close';
 import { useRoomHostDocState } from '../Contexts/FirestoreContext';
+import { usePlayerDocState } from '../Contexts/FirestoreContext';
 
-const WaitingRoom = ({currentPlayer}: {currentPlayer: any}) => {
+const WaitingRoom = () => {
   const { gameState, gameDispatch } = useGame();
-
   const [open, setOpen] = useState<boolean>(false)
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
   const [room] = useDocData(gameState.roomId);
   const { players } = room;
-  
   const host = useRoomHostDocState()
+  const { player: currentPlayer } = usePlayerDocState()
 
   useEffect(() => {
-    console.log('host',host)
-  }, [host])
+   
+  }, [host, players])
   
   // Assign actions to existing players ->
   // set initial tile ->
@@ -68,26 +67,19 @@ const WaitingRoom = ({currentPlayer}: {currentPlayer: any}) => {
     } else {
       // ! Feel like there could be async issues below but need revision
       // * remove current player from player list 
-      const currentPlayerIndex: number = players.findIndex((player: any) => player.number === currentPlayer.number)
-      console.log("current player index",currentPlayerIndex)
-      const updatePlayers = [...players]
-      updatePlayers.splice(currentPlayerIndex, 1)
-      console.log("updated players", updatePlayers)
+      const updatePlayers = players.filter((dbPlayer: any) => dbPlayer.number !== currentPlayer.number)
       
       // changing host number
       if (currentPlayer.number === host) {
-        await updateDoc(doc(gameState.roomId), {
+        await setDoc(gameState.roomId, {
           host: updatePlayers[0].number,
           players: updatePlayers
         })
-        console.log("setting room host", updatePlayers[0].number)
       } else {
-        await updateDoc(doc(gameState.roomId), {
+        await setDoc(gameState.roomId, {
           players: updatePlayers
         })
       }
-  
-      console.log("current player number", currentPlayer.number)    
       gameDispatch({ type: "exitRoom" })
     }
   }
@@ -97,10 +89,6 @@ const WaitingRoom = ({currentPlayer}: {currentPlayer: any}) => {
     gameDispatch({ type: "exitRoom" })
   }
 
-  useEffect(() => {
-    console.log("re-render for roomhost or players");
-    console.log("current player number", currentPlayer.number)
-  }, [players])
 
   return (
     <>
@@ -126,15 +114,24 @@ const WaitingRoom = ({currentPlayer}: {currentPlayer: any}) => {
                 </Typography>
                 <Button aria-label="close" onClick={handleClose} sx={{padding: "0px"}}><CloseIcon /></Button>
               </Box>
-              { (host === currentPlayer.number) && 
+              { (host === currentPlayer.number) &&
                 <Stack>
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                   You are about to exit the room. You must reassign the host or end game for all.
                   </Typography>
-                  <Stack spacing={2} direction="row" justifyContent="space-between" style={{margin: "20px 0", display: "flex"}}>
-                    <Button variant="contained" size="small" id="back" disableElevation onClick={exitRoom}>Re-assign Host and Exit</Button>
-                    <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room for all</Button>
-                  </Stack>
+                  {
+                    (players.length > 1) &&
+                      <Stack spacing={2} direction="row" justifyContent="space-between" style={{margin: "20px 0", display: "flex"}}>
+                        <Button variant="contained" size="small" id="back" disableElevation onClick={exitRoom}>Re-assign Host and Exit</Button>
+                        <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room for all</Button>
+                      </Stack>
+                  }
+                  {
+                    (players.length === 1) &&
+                      <Stack spacing={2} direction="row" justifyContent="space-between" style={{margin: "20px 0", display: "flex"}}>
+                        <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room</Button>
+                      </Stack>
+                  }
                 </Stack>
               }
               { (host !== currentPlayer.number) &&

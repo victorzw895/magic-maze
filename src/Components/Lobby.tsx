@@ -7,6 +7,7 @@ import { playerNumber, Room } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import WaitingRoom from './WaitingRoom';
 import { roomDefaultValues } from '../constants';
+import { usePlayerDocState } from '../Contexts/FirestoreContext';
 
 const Lobby = () => {
   console.log('re-render Lobby');
@@ -20,6 +21,7 @@ const Lobby = () => {
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState("");
   const [alert, setAlert] = useState<boolean>(false)
   const [currentPlayer, setCurrentPlayer] = useState({})
+  const { players, setPlayers, player, setPlayer } = usePlayerDocState()
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -41,7 +43,9 @@ const Lobby = () => {
     // create new player
     const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, 0)
 
-    setCurrentPlayer(player)
+    console.log("dbPlayer", dbPlayer);
+    console.log("player", player.number)
+    setPlayer(dbPlayer)
     playerDispatch({type: "setPlayer", value: player});
 
     await setDoc(newGameCode, {
@@ -77,7 +81,6 @@ const Lobby = () => {
     if (roomFound && !roomFound.gameStarted && roomFound.players.length <= 8) {
       // add player Number
       let newPlayerNo = Math.max(...roomFound.players.map( obj => obj.number));
-
       const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, newPlayerNo);
       const playersInRoom = [
         ...roomFound.players, 
@@ -91,8 +94,9 @@ const Lobby = () => {
           players: playersInRoom
         },
       )
-      console.log("setting current player in join room", player)
-      setCurrentPlayer(player)   
+      console.log("setting current player in join room", dbPlayer)
+      setPlayer(dbPlayer)
+
     }
     else if (!roomFound) {
       setFailJoinRoomMessage("Room code not found");
@@ -112,7 +116,7 @@ const Lobby = () => {
       </h3>
       
       {gameState.roomId ?
-        <WaitingRoom currentPlayer={currentPlayer}/>
+        <WaitingRoom />
           :
         <Paper className="lobby-actions" sx={{ width: '100%', maxWidth: 360, bgcolor: '#63B0CD' }}>
           {
