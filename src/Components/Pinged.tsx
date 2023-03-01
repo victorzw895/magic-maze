@@ -22,6 +22,7 @@ const playAlert = () => {
 
 const Pinged = () => {
   const { gameState } = useGame();
+  const gamePaused = useGamePausedDocState();
   const { player, players } = usePlayerDocState();
   const pinged = usePingedDocState();
 
@@ -115,7 +116,7 @@ const Pinged = () => {
                           return (
                             <ListItemButton onClick={() => {
                                 popupState.close()
-                                handleClick(dbPlayer.number)
+                                if (!gamePaused) handleClick(dbPlayer.number)
                               }} >
                               <ListItemIcon>
                                 <NotificationsIcon />

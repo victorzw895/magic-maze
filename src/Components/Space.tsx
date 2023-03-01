@@ -8,6 +8,12 @@ import achievementSound from '../assets/achievement.mp3'; // download file from 
 import teleporterSound from '../assets/teleporter.mp3'; // download file from firestore storage instead
 import exitSound from '../assets/exit.mp3'; // download file from firestore storage instead
 import selectSound from '../assets/select.mp3'; // download file from firestore storage instead
+import winSound from '../assets/win.wav'; // download file from firestore storage instead
+
+const playWin = () => {
+  const audio = new Audio(winSound);
+  audio.play();
+}
 
 const playSelect = () => {
   const audio = new Audio(selectSound);
@@ -195,7 +201,6 @@ const Space = memo(({
         }
         // Might not require weaponStolen boolean on space, weaponStolen array may be enough
         else if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
-          // playGrab();
           playAchievement();
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.weaponStolen = true;
           newRoomValue.weaponsStolen = [...newRoomValue.weaponsStolen, colorSelected]
@@ -205,6 +210,13 @@ const Space = memo(({
             newRoomValue.heroesEscaped = [...newRoomValue.heroesEscaped, colorSelected]
             playExit();
             // if last exit, celebration soundtrack
+            if (newRoomValue.heroesEscaped.length === 4) {
+              playWin();
+              await setDoc(gameState.roomId, {
+                gameOver: true,
+                gameWon: true,
+              })
+            }
           }
         }
         else {
