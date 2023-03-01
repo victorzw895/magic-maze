@@ -25,7 +25,8 @@ export const showMovableSpaces = async (
   pawns: DBPawns,
   player: DBPlayer,
   pawnData: DBHeroPawn,
-  tiles: DBTile[]
+  tiles: DBTile[],
+  disableTeleport: boolean
 ) => {
     const { color } = pawnData;
     const newPawns = {...pawns}
@@ -40,7 +41,9 @@ export const showMovableSpaces = async (
         pawn.blockedPositions = playerPawnActions.blockedPositions
         pawn.showMovableDirections = playerPawnActions.showMovableDirections
         pawn.showEscalatorSpaces = playerPawnActions.showEscalatorSpaces
-        pawn.showTeleportSpaces = playerPawnActions.showTeleportSpaces
+        if (!disableTeleport) {
+          pawn.showTeleportSpaces = playerPawnActions.showTeleportSpaces
+        }
       } 
       else if (pawn.playerHeld === player.number) {
         pawn.playerHeld = null;
