@@ -95,4 +95,5 @@ export const roomDefaultValues: Room = {
       color: "purple",
     }
   },
+  createdDate: new Date()
 }

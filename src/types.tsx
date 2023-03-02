@@ -92,7 +92,8 @@ export interface Room {
   host: playerNumber,
   tiles: DBTile[],
   pawns: DBPawns,
-  pings: playerNumber[] // ?? add debouncer or throttle, or batch update/consume from firestore
+  pings: playerNumber[], // ?? add debouncer or throttle, or batch update/consume from firestore
+  createdDate: Date
 }
 
 
