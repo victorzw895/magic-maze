@@ -24,9 +24,10 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
   const gameStarted = useGameStartedDocState();
   const [availableArea, highlightNewTileArea, clearHighlightAreas] = useHighlightArea(gameState.roomId);
 
-  const playerState = usePlayerState();
-  const {setPlayer, setPlayers} = usePlayerDocState();
+  const { players, setPlayers, player: currentPlayer, setPlayer } = usePlayerDocState()
+  // const playerState = usePlayerState();
 
+  // TODO revist, might need to refactor out
   useEffect(() => {
     (async () => {
       if (!gameStarted) return;
@@ -36,9 +37,9 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
       const roomFound = docSnap.data() as Room;
 
       setPlayers(roomFound.players);
-      const currentPlayer = roomFound.players.find((player) => player.number === playerState.number);
-      if (!currentPlayer) return;
-      setPlayer(currentPlayer);
+      const newCurrentPlayer = roomFound.players.find((player) => player.id === currentPlayer.id);
+      if (!newCurrentPlayer) return;
+      setPlayer(newCurrentPlayer);
     })()
   }, [gameStarted])
 

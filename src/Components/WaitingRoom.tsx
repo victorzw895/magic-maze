@@ -10,6 +10,7 @@ import { deleteDoc } from "firebase/firestore";
 import CloseIcon from '@mui/icons-material/Close';
 import { useRoomHostDocState } from '../Contexts/FirestoreContext';
 import { usePlayerDocState } from '../Contexts/FirestoreContext';
+import { update } from 'lodash';
 
 const WaitingRoom = () => {
   const { gameState, gameDispatch } = useGame();
@@ -67,17 +68,18 @@ const WaitingRoom = () => {
     } else {
       // ! Feel like there could be async issues below but need revision
       // * remove current player from player list 
-      const updatePlayers = players.filter((dbPlayer: any) => dbPlayer.id !== currentPlayer.id)
+      const updatedPlayers = players.filter((dbPlayer: any) => dbPlayer.id !== currentPlayer.id)
+      updatedPlayers.map((player: any, i: number) => player.number = i+1)
       
       // changing host number
       if (currentPlayer.number === host) {
         await setDoc(gameState.roomId, {
-          host: updatePlayers[0].number,
-          players: updatePlayers
+          host: updatedPlayers[0].number,
+          players: updatedPlayers
         })
       } else {
         await setDoc(gameState.roomId, {
-          players: updatePlayers
+          players: updatedPlayers
         })
       }
       gameDispatch({ type: "exitRoom" })
