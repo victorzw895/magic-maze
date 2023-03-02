@@ -40,12 +40,12 @@ const Lobby = () => {
     // save Room Code
     gameDispatch({type: "joinRoom", value: newGameCode});
     // create new player
-    const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, [])
+    const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, 0)
 
     console.log("dbPlayer", dbPlayer);
     console.log("player", player.number)
     setPlayer(dbPlayer)
-    playerDispatch({type: "setPlayer", value: player});
+    playerDispatch({type: "setPlayer", value: player}); // TODO most likely needs id / or same change
 
     await setDoc(newGameCode, {
       ...roomDefaultValues,
@@ -77,15 +77,15 @@ const Lobby = () => {
     // if found
     if (roomFound && !roomFound.gameStarted && roomFound.players.length <= 8) {
       // add player Number
-      const currentPlayers = roomFound.players.map(player => player.number);
+      const playerInLobby = roomFound.players.length
 
-      const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, currentPlayers);
+      const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, playerInLobby);
       const playersInRoom = [
         ...roomFound.players, 
         dbPlayer
       ];
       gameDispatch({type: "joinRoom", value: existingRoomCode});
-      playerDispatch({type: "setPlayer", value: player});
+      playerDispatch({type: "setPlayer", value: player});  // TODO most likely needs id / or same change
       await setDoc(existingRoomCode, 
         {
           ...roomFound,

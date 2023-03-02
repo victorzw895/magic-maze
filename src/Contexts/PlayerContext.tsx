@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { heroColor, Player, playerNumber, direction, Escalator, DBPlayer } from '../types';
+import cryptoRandomString from 'crypto-random-string';
 import difference from 'lodash/difference';
 
 const playerNumbers = Array.from({length: 8}, (_, i) => i + 1);
@@ -21,19 +22,20 @@ export interface PlayerFactoryType {
   dbPlayer: DBPlayer
 }
 
-export const PlayerFactory = (playerName: string, currentPlayers: playerNumber[]) => {
-  const newPlayerNumber = difference(playerNumbers, currentPlayers)[0];
+export const PlayerFactory = (playerName: string, playersInLobby: number) => {
+  // const newPlayerNumber = difference(playerNumbers, currentPlayers)[0];
 
   const localPlayerState: Player = {
-    number: newPlayerNumber as playerNumber,
+    number: playersInLobby + 1 as playerNumber,
     // showMovableDirections: [],
     // showTeleportSpaces: null,
     // showEscalatorSpaces: [], // TODO revisit this (trim down data)
   }
 
   const dbPlayerState: DBPlayer = {
+    id: cryptoRandomString({length: 10, type: 'alphanumeric'}),
     name: playerName,
-    number: newPlayerNumber as playerNumber,
+    number: playersInLobby + 1 as playerNumber,
     playerDirections: [], 
     playerAbilities: [],
     // pinged: false

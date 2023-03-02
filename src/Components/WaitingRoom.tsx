@@ -67,7 +67,7 @@ const WaitingRoom = () => {
     } else {
       // ! Feel like there could be async issues below but need revision
       // * remove current player from player list 
-      const updatePlayers = players.filter((dbPlayer: any) => dbPlayer.number !== currentPlayer.number)
+      const updatePlayers = players.filter((dbPlayer: any) => dbPlayer.id !== currentPlayer.id)
       
       // changing host number
       if (currentPlayer.number === host) {
