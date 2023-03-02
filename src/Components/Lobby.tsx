@@ -20,7 +20,7 @@ const Lobby = () => {
   const [existingRoomCode, setExistingRoomCode] = useState("");
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState<string>("");
   const [currentPlayer, setCurrentPlayer] = useState({})
-  const { players, setPlayers, player, setPlayer } = usePlayerDocState()
+  const { players, player, setPlayer } = usePlayerDocState()
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -43,8 +43,8 @@ const Lobby = () => {
     const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, 0)
 
     console.log("dbPlayer", dbPlayer);
-    console.log("player", player.number)
-    setPlayer(dbPlayer)
+    console.log("player", player.id)
+    // setPlayer(dbPlayer)
     playerDispatch({type: "setPlayer", value: player}); // TODO most likely needs id / or same change
 
     await setDoc(newGameCode, {
@@ -80,6 +80,8 @@ const Lobby = () => {
       const playerInLobby = roomFound.players.length
 
       const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, playerInLobby);
+
+      console.log('joining room', {player, dbPlayer})
       const playersInRoom = [
         ...roomFound.players, 
         dbPlayer
@@ -93,8 +95,7 @@ const Lobby = () => {
         },
       )
       console.log("setting current player in join room", dbPlayer)
-      setPlayer(dbPlayer)
-
+      // setPlayer(dbPlayer)
     }
     else if (!roomFound) {
       setFailJoinRoomMessage("Room code not found");

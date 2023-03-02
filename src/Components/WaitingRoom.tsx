@@ -10,7 +10,7 @@ import { deleteDoc } from "firebase/firestore";
 import CloseIcon from '@mui/icons-material/Close';
 import { useRoomHostDocState } from '../Contexts/FirestoreContext';
 import { usePlayerDocState } from '../Contexts/FirestoreContext';
-import { update } from 'lodash';
+import { usePlayerDispatch, PlayerFactory, PlayerFactoryType } from '../Contexts/PlayerContext';
 
 const WaitingRoom = () => {
   const { gameState, gameDispatch } = useGame();
@@ -20,10 +20,11 @@ const WaitingRoom = () => {
   const [room] = useDocData(gameState.roomId);
   const { players } = room;
   const host = useRoomHostDocState()
+  const playerDispatch = usePlayerDispatch();
   const { player: currentPlayer } = usePlayerDocState()
 
   useEffect(() => {
-   
+   console.log("current player", currentPlayer)
   }, [host, players])
   
   // Assign actions to existing players ->
@@ -71,6 +72,7 @@ const WaitingRoom = () => {
       const updatedPlayers = players.filter((dbPlayer: any) => dbPlayer.id !== currentPlayer.id)
       updatedPlayers.map((player: any, i: number) => player.number = i+1)
       
+      console.log('updatedPlayers', updatedPlayers)
       // changing host number
       if (currentPlayer.number === host) {
         await setDoc(gameState.roomId, {
@@ -82,6 +84,7 @@ const WaitingRoom = () => {
           players: updatedPlayers
         })
       }
+      playerDispatch({type: "setPlayer", value: undefined});  // TODO most likely needs id / or same change
       gameDispatch({ type: "exitRoom" })
     }
   }
@@ -116,7 +119,7 @@ const WaitingRoom = () => {
                 </Typography>
                 <Button aria-label="close" onClick={handleClose} sx={{padding: "0px"}}><CloseIcon /></Button>
               </Box>
-              { (host === currentPlayer.number) &&
+              { (currentPlayer.number === 1) &&
                 <Stack>
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                   You are about to exit the room. You must reassign the host or end game for all.
@@ -136,7 +139,7 @@ const WaitingRoom = () => {
                   }
                 </Stack>
               }
-              { (host !== currentPlayer.number) &&
+              { (currentPlayer.number !== 1) &&
                 <Stack>
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                   You are about to exit the room. Confirm?
@@ -148,19 +151,19 @@ const WaitingRoom = () => {
             </Box>
           </Modal>    
           }
-          {(host === currentPlayer.number) && 
+          {(currentPlayer.number === 1) && 
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
               <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
               <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Exit Room</Button>          
               <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room</Button>
             </Stack>
           }
-          {(host !== currentPlayer.number) && players.length === 0 && 
+          {(currentPlayer.number !== 1) && players.length === 0 && 
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
               <Alert severity="info" style={{margin: "20px"}}>This game has been deleted. Please click "back" to return to the Lobby area</Alert>
             </Stack>
           }
-          {(host !== currentPlayer.number) &&
+          {(currentPlayer.number !== 1) &&
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
               <Box textAlign='center'>
                 <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Back</Button>

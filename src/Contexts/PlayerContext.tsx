@@ -10,7 +10,7 @@ export type Action =
   // {type: 'showMovableSpaces', value: direction[]} | 
   // {type: 'showEscalatorSpaces', value: Escalator[]} | 
   // {type: 'showTeleportSpaces', color: heroColor | null} | 
-  {type: 'setPlayer', value: Player} |
+  {type: 'setPlayer', value: Player | undefined} |
   // {type: 'assignActions', value: Player} | 
   undefined;
 export type Dispatch = (action: Action) => void;
@@ -24,16 +24,17 @@ export interface PlayerFactoryType {
 
 export const PlayerFactory = (playerName: string, playersInLobby: number) => {
   // const newPlayerNumber = difference(playerNumbers, currentPlayers)[0];
+  const id = cryptoRandomString({length: 10, type: 'alphanumeric'});
 
   const localPlayerState: Player = {
-    number: playersInLobby + 1 as playerNumber,
+    id,
     // showMovableDirections: [],
     // showTeleportSpaces: null,
     // showEscalatorSpaces: [], // TODO revisit this (trim down data)
   }
 
   const dbPlayerState: DBPlayer = {
-    id: cryptoRandomString({length: 10, type: 'alphanumeric'}),
+    id,
     name: playerName,
     number: playersInLobby + 1 as playerNumber,
     playerDirections: [], 

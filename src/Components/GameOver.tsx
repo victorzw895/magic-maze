@@ -34,7 +34,7 @@ const style = {
 
 const GameOver = () => {
   const playerDispatch = usePlayerDispatch();
-  const {setPlayer, setPlayers} = usePlayerDocState();
+  const {setPlayer} = usePlayerDocState();
   const {gameDispatch} = useGame();
   const gameOver = useGameOverDocState();
   const gameWon = useGameWonDocState();
@@ -48,7 +48,7 @@ const GameOver = () => {
     playerDispatch({type: 'setPlayer', value: {} as Player});
     gameDispatch({type: "exitRoom"});
     setPlayer({} as DBPlayer);
-    setPlayers([]);
+    // setPlayers([]); // FIX
   }
 
   return (

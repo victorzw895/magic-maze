@@ -24,7 +24,7 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
   const gameStarted = useGameStartedDocState();
   const [availableArea, highlightNewTileArea, clearHighlightAreas] = useHighlightArea(gameState.roomId);
 
-  const { players, setPlayers, player: currentPlayer, setPlayer } = usePlayerDocState()
+  const { players, player: currentPlayer, setPlayer } = usePlayerDocState()
   // const playerState = usePlayerState();
 
   // TODO revist, might need to refactor out
@@ -32,12 +32,8 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
     (async () => {
       if (!gameStarted) return;
 
-      const docSnap = await getDoc(gameState.roomId);
-      if (!docSnap.exists()) return;
-      const roomFound = docSnap.data() as Room;
-
-      setPlayers(roomFound.players);
-      const newCurrentPlayer = roomFound.players.find((player) => player.id === currentPlayer.id);
+      // setPlayers(roomFound.players); // NEED TO Fix
+      const newCurrentPlayer = players.find((player) => player.id === currentPlayer.id);
       if (!newCurrentPlayer) return;
       setPlayer(newCurrentPlayer);
     })()
