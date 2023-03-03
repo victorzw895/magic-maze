@@ -2,13 +2,13 @@ import { Dispatch, useEffect, SetStateAction, useState } from 'react';
 import { usePlayerState, usePlayerDispatch } from '../Contexts/PlayerContext';
 import { DBPlayer, Room } from '../types';
 
-const usePlayer = (room: Room): [DBPlayer[], DBPlayer, Dispatch<SetStateAction<DBPlayer>>] => {
+const usePlayer = (room: Room): [DBPlayer[], DBPlayer] => {
   // const playerDispatch = usePlayerDispatch();
   const playerState = usePlayerState();
   // Players array should be firestore real time values, only updated by firestore changes
   const [players, setPlayers] = useState<DBPlayer[]>([{} as DBPlayer]);
   // player object should be local
-  const [player, setPlayer] = useState<DBPlayer>({} as DBPlayer);
+  const [currentPlayer, setCurrentPlayer] = useState<DBPlayer>({} as DBPlayer);
 
 
   useEffect(() => {
@@ -20,10 +20,10 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer, Dispatch<SetStateAction<D
   useEffect(() => {
     const currentPlayer = players.find(dbPlayer => dbPlayer.id === playerState?.id)
     if (!currentPlayer) return;
-    setPlayer(currentPlayer)
-  }, [players])
+    setCurrentPlayer(currentPlayer)
+  }, [players.length, room.gameStarted])
 
-  return [players, player, setPlayer];
+  return [players, currentPlayer];
 };
 
 export default usePlayer;

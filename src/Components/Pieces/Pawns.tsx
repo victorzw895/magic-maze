@@ -15,7 +15,7 @@ import Pawn from './Pawn';
 
 const Pawns = () => {
   const { gameState } = useGame();
-  const { player } = usePlayerDocState();
+  const { currentPlayer } = usePlayerDocState();
   const tiles: DBTile[] = useTilesDocState();
 
   useEffect(() => {
@@ -29,8 +29,8 @@ const Pawns = () => {
       const newPawns = roomFound.pawns;
 
       Object.values(newPawns).forEach((pawn: DBHeroPawn) => {
-        const playerPawnActions = getPlayerPawnActions(player, tiles, newPawns, pawn);
-        if (pawn.playerHeld === player.number) {
+        const playerPawnActions = getPlayerPawnActions(currentPlayer, tiles, newPawns, pawn);
+        if (pawn.playerHeld === currentPlayer.number) {
           pawn.blockedPositions = playerPawnActions.blockedPositions
           pawn.showMovableDirections = playerPawnActions.showMovableDirections
           pawn.showEscalatorSpaces = playerPawnActions.showEscalatorSpaces

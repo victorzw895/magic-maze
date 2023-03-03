@@ -10,10 +10,6 @@ import useHighlightArea from '../utils/useHighlightArea';
 import Timer from './Timer';
 import Pinged from './Pinged';
 import { useGameStartedDocState } from '../Contexts/FirestoreContext';
-import { usePlayerState } from '../Contexts/PlayerContext';
-import { usePlayerDocState } from '../Contexts/FirestoreContext';
-import { getDoc } from '../utils/useFirestore';
-import { Room } from '../types';
 import Objectives from './Objectives';
 import GameOver from './GameOver';
 
@@ -23,21 +19,6 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
   const { gameState } = useGame();
   const gameStarted = useGameStartedDocState();
   const [availableArea, highlightNewTileArea, clearHighlightAreas] = useHighlightArea(gameState.roomId);
-
-  const { players, player: currentPlayer, setPlayer } = usePlayerDocState()
-  // const playerState = usePlayerState();
-
-  // TODO revist, might need to refactor out
-  useEffect(() => {
-    (async () => {
-      if (!gameStarted) return;
-
-      // setPlayers(roomFound.players); // NEED TO Fix
-      const newCurrentPlayer = players.find((player) => player.id === currentPlayer.id);
-      if (!newCurrentPlayer) return;
-      setPlayer(newCurrentPlayer);
-    })()
-  }, [gameStarted])
 
   return (
     <>

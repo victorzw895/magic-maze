@@ -19,13 +19,8 @@ const WaitingRoom = () => {
   const handleClose = () => setOpen(false);
   const [room] = useDocData(gameState.roomId);
   const { players } = room;
-  const host = useRoomHostDocState()
   const playerDispatch = usePlayerDispatch();
-  const { player: currentPlayer } = usePlayerDocState()
-
-  useEffect(() => {
-   console.log("current player", currentPlayer)
-  }, [host, players])
+  const { currentPlayer } = usePlayerDocState()
   
   // Assign actions to existing players ->
   // set initial tile ->
@@ -70,13 +65,14 @@ const WaitingRoom = () => {
       // ! Feel like there could be async issues below but need revision
       // * remove current player from player list 
       const updatedPlayers = players.filter((dbPlayer: any) => dbPlayer.id !== currentPlayer.id)
-      updatedPlayers.map((player: any, i: number) => player.number = i+1)
+      // re-assign player numbers
+      updatedPlayers.map((player: any, playerNumber: number) => player.number = playerNumber + 1)
       
-      console.log('updatedPlayers', updatedPlayers)
-      // changing host number
+      // Update players and numbers
       await setDoc(gameState.roomId, {
         players: updatedPlayers
       })
+      // remove player id locally
       playerDispatch({type: "setPlayer", value: null});  // TODO most likely needs id / or same change
       gameDispatch({ type: "exitRoom" })
     }

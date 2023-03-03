@@ -183,7 +183,6 @@ const Space = memo(({
         newRoomValue.pawns[colorSelected].showEscalatorSpaces = [];
         newRoomValue.pawns[colorSelected].showMovableDirections = [];
         newRoomValue.pawns[colorSelected].showTeleportSpaces = null;
-        newRoomValue.pawns[colorSelected].playerHeld = null;
         newRoomValue.pawns[colorSelected].blockedPositions = {
           up: {position: null, gridPosition: null},
           down: {position: null, gridPosition: null},
