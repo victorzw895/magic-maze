@@ -3,13 +3,12 @@ import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
 import { Paper, Stack, Button, List, ListItem, Alert, Box, Modal, Typography } from '@mui/material';
 import { DBPlayer, playerNumber } from '../types';
-import { setDoc, useDocData } from "../utils/useFirestore"; 
+import { setDoc, useDocData, doc } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
-import { doc } from '../utils/useFirestore'
-import { deleteDoc } from "firebase/firestore";
 import CloseIcon from '@mui/icons-material/Close';
-import { useRoomHostDocState } from '../Contexts/FirestoreContext';
-import { usePlayerDocState } from '../Contexts/FirestoreContext';
+import { useRoomHostDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
+import { query, where, getDocs, Timestamp, deleteDoc } from "firebase/firestore";
+import { gamesRef } from '../Firestore';
 
 const WaitingRoom = () => {
   const { gameState, gameDispatch } = useGame();
@@ -22,8 +21,28 @@ const WaitingRoom = () => {
   const { player: currentPlayer } = usePlayerDocState()
 
   useEffect(() => {
-   
+
+    expiredDocs()
   }, [host, players])
+
+  const expiredDocs = async () => {
+    
+    const fireStoreNow = Timestamp.now()
+    const ts = Timestamp.fromMillis(fireStoreNow.toMillis() - 3600000) // 24 hours
+    console.log("firestore time now", fireStoreNow)
+    console.log("time diff - ts", ts)
+
+    const timeNow = new Date().valueOf()
+    const yesterday = timeNow - (24 * 60 * 60 * 1000)
+
+    const snap = query(gamesRef, where("createdDateInSeconds","<", yesterday))
+
+    const snapShot = await getDocs(snap)
+    console.log("snapshot", snapShot)
+    snapShot.forEach((game) => {
+      deleteDoc(doc(game.id))
+    });
+  }
   
   // Assign actions to existing players ->
   // set initial tile ->

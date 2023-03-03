@@ -1,4 +1,5 @@
 import { BlockedPositions, heroColor, Room } from './types';
+import { Timestamp } from 'firebase/firestore';
 
 export const jpgAssets = ['objective_a', 'objective_b'];
 export const pngAssets = [
@@ -95,5 +96,6 @@ export const roomDefaultValues: Room = {
       color: "purple",
     }
   },
+  createdDateInSeconds: Timestamp.fromDate(new Date()).toMillis(),
   createdDate: new Date()
 }
