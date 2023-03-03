@@ -61,7 +61,7 @@ const Lobby = () => {
     const roomFound = docSnap.data() as Room;
 
     // if found
-    if (roomFound && !roomFound.gameStarted && roomFound.players.length <= 8) {
+    if (roomFound && !roomFound.gameStarted && roomFound.players.length < 8) {
       // get current number of players in Lobby
       const playersCount = roomFound.players.length
 
@@ -89,7 +89,7 @@ const Lobby = () => {
     else if (roomFound.gameStarted) {
       setFailJoinRoomMessage("Game has already started");
     }
-    else if (roomFound.players.length > 8) {
+    else if (roomFound.players.length >= 8) {
       setFailJoinRoomMessage("Game Lobby full");
     }
   }
