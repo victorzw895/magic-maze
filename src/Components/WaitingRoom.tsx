@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
 import { Paper, Stack, Button, List, ListItem, Alert, Box, Modal, Typography } from '@mui/material';
-import { DBPlayer, playerNumber } from '../types';
+import { DBPlayer } from '../types';
 import { setDoc, useDocData, doc } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
 import CloseIcon from '@mui/icons-material/Close';
 import { useRoomHostDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
-import { query, where, getDocs, Timestamp, deleteDoc } from "firebase/firestore";
+import { query, where, getDocs, deleteDoc } from "firebase/firestore";
 import { gamesRef } from '../Firestore';
 
 const WaitingRoom = () => {
@@ -26,11 +26,6 @@ const WaitingRoom = () => {
   }, [host, players])
 
   const expiredDocs = async () => {
-    
-    const fireStoreNow = Timestamp.now()
-    const ts = Timestamp.fromMillis(fireStoreNow.toMillis() - 3600000) // 24 hours
-    console.log("firestore time now", fireStoreNow)
-    console.log("time diff - ts", ts)
 
     const timeNow = new Date().valueOf()
     const yesterday = timeNow - (24 * 60 * 60 * 1000)
