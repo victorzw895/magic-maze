@@ -6,6 +6,8 @@ import gameSound from '../assets/game.mp3'; // download file from firestore stor
 import escapeSound from '../assets/escape.wav'; // download file from firestore storage instead
 import warningSound from '../assets/warning.wav'; // download file from firestore storage instead
 import { setDoc } from '../utils/useFirestore';
+import { IconButton } from '@mui/material';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 const playWarning = () => {
   const audio = new Audio(warningSound);
@@ -40,7 +42,7 @@ const Timer = () => {
 
       const warningTimer = setTimeout(async () => {
         gameAudio = loadEscapeSoundtrack()
-        gameAudio.play();
+        // gameAudio.play();
       }, 5100);
 
       return () => clearTimeout(warningTimer);
@@ -95,7 +97,7 @@ const Timer = () => {
         // time.setSeconds(time.getSeconds() + restartTime);
         // restart(time)
       }
-      gameAudio.play();
+      // gameAudio.play();
     }
   }
 
@@ -108,6 +110,7 @@ const Timer = () => {
 
   return (
     <div className="timer">
+      <IconButton color="primary" aria-label="turn off sound" component="label"><VolumeUpIcon /> </IconButton>
       <span>{minutes}</span>:
       <span>{seconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}</span>
     </div>

@@ -44,8 +44,8 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
 
   return (
     <>
-      {gameStarted ? timer : <></>}
       <Objectives /> {/* minimize when playing, can click to expand */}
+      {gameStarted ? timer : <></>}
       <Draggable
         nodeRef={draggableNodeRef}
         defaultPosition={{x: 0, y: 0}}
