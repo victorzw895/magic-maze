@@ -3,11 +3,13 @@ import cryptoRandomString from 'crypto-random-string';
 import { useGame } from '../Contexts/GameContext';
 import { usePlayerDispatch, PlayerFactory, PlayerFactoryType } from '../Contexts/PlayerContext';
 import { Stack, Button, TextField, Paper, Alert } from '@mui/material';
-import { playerNumber, Room } from '../types';
-import { setDoc, getDoc } from '../utils/useFirestore';
+import { Room } from '../types';
+import { setDoc, getDoc, doc } from '../utils/useFirestore';
 import WaitingRoom from './WaitingRoom';
 import { roomDefaultValues } from '../constants';
 import { usePlayerDocState } from '../Contexts/FirestoreContext';
+import { query, where, getDocs, deleteDoc } from "firebase/firestore";
+import { gamesRef } from '../Firestore';
 
 const Lobby = () => {
   console.log('re-render Lobby');
@@ -19,8 +21,9 @@ const Lobby = () => {
   const [promptCode, setPromptCode] = useState(false);
   const [existingRoomCode, setExistingRoomCode] = useState("");
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState<string>("");
-  const [currentPlayer, setCurrentPlayer] = useState({})
-  const { players, setPlayers, player, setPlayer } = usePlayerDocState()
+  const { setPlayer } = usePlayerDocState()
+  const [count, setCount] = useState<number>(0)
+  const [show, setShow] = useState<boolean>(false)
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -107,15 +110,35 @@ const Lobby = () => {
   }
 
   useEffect(() => {
+    if (count === 3) {
+      setShow(true)
+    } else if ( show === true && count > 3) {
+      setCount(0)
+      setShow(false)
+    }
+  }, [failJoinRoomMessage, count])
 
-  }, [failJoinRoomMessage])
+  const expiredDocs = async () => {
+
+    const timeNow = new Date().valueOf()
+    const yesterday = timeNow - (24 * 60 * 60 * 1000)
+
+    const snap = query(gamesRef, where("createdDateInSeconds","<", yesterday))
+
+    const snapShot = await getDocs(snap)
+    console.log("snapshot", snapShot)
+    snapShot.forEach((game) => {
+      // console.log("gameId", game.id)
+      deleteDoc(doc(game.id))
+    });
+  }
 
   return (
     <header className="App-header">
       <h3>
-        Welcome to Magic Maze.
+        Welcome to <span onClick={() => setCount(count +1)}> Magic Maze. </span>
       </h3>
-      
+      { show ? <Button variant='contained' size='small' color='error' disableElevation style={{marginBottom: "20px"}} onClick={expiredDocs}>Delete Expired Documents</Button> : ""}
       {gameState.roomId ?
         <WaitingRoom />
           :

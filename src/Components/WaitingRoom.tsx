@@ -7,8 +7,8 @@ import { setDoc, useDocData, doc } from "../utils/useFirestore";
 import { allTiles } from '../Data/all-tiles-data';
 import CloseIcon from '@mui/icons-material/Close';
 import { useRoomHostDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
-import { query, where, getDocs, deleteDoc } from "firebase/firestore";
-import { gamesRef } from '../Firestore';
+import { deleteDoc } from "firebase/firestore";
+
 
 const WaitingRoom = () => {
   const { gameState, gameDispatch } = useGame();
@@ -22,22 +22,8 @@ const WaitingRoom = () => {
 
   useEffect(() => {
 
-    expiredDocs()
   }, [host, players])
 
-  const expiredDocs = async () => {
-
-    const timeNow = new Date().valueOf()
-    const yesterday = timeNow - (24 * 60 * 60 * 1000)
-
-    const snap = query(gamesRef, where("createdDateInSeconds","<", yesterday))
-
-    const snapShot = await getDocs(snap)
-    console.log("snapshot", snapShot)
-    snapShot.forEach((game) => {
-      deleteDoc(doc(game.id))
-    });
-  }
   
   // Assign actions to existing players ->
   // set initial tile ->
