@@ -9,13 +9,9 @@ import { setDoc } from '../utils/useFirestore';
 import { IconButton } from '@mui/material';
 import { VolumeUp, VolumeMute } from '@mui/icons-material';
 
-// const [soundOn, setSoundOn] = useState<boolean>(true)
-
 const playWarning = () => {
   const audio = new Audio(warningSound);
-  // if (soundOn) {
     audio.play();
-  // }
 }
 const loadGameSoundtrack = () => {
   const audio = new Audio(gameSound);
@@ -47,9 +43,7 @@ const Timer = () => {
 
       const warningTimer = setTimeout(async () => {
         gameAudio = loadEscapeSoundtrack()
-        if (soundOn) {
-          gameAudio.play();
-        }
+        gameAudio.play();
       }, 5100);
 
       return () => clearTimeout(warningTimer);
@@ -61,7 +55,7 @@ const Timer = () => {
     // maybe move timer to firestore ???
     console.log("start timer?")
     time.setSeconds(time.getSeconds() + 200);
-  }, [])
+  }, [soundOn])
 
   const {
     seconds,
@@ -86,7 +80,7 @@ const Timer = () => {
       pause();
       gameAudio.pause();
     }
-  }, [gameOver])
+  }, [gameOver, soundOn])
 
   const toggleTimer = (pauseGame: boolean) => {
     if (pauseGame) {
@@ -104,7 +98,7 @@ const Timer = () => {
         // time.setSeconds(time.getSeconds() + restartTime);
         // restart(time)
       }
-      gameAudio.play();
+        gameAudio.play();
     }
   }
 
@@ -118,9 +112,9 @@ const Timer = () => {
   return (
     <div className="timer">
       { soundOn ? 
-        <IconButton color="primary" aria-label="turn off sound" component="label" onClick={() => setSoundOn(false)}><VolumeUp /> </IconButton> 
+        <IconButton color="primary" aria-label="turn off sound" component="label" onClick={() => {setSoundOn(false); gameAudio.pause()}}><VolumeUp /> </IconButton> 
         : 
-        <IconButton color="primary" aria-label="turn off sound" component="label" onClick={() => setSoundOn(true)}><VolumeMute /> </IconButton> 
+        <IconButton color="primary" aria-label="turn off sound" component="label" onClick={() => {setSoundOn(true); gameAudio.play()}}><VolumeMute /> </IconButton> 
       }
 
       <span>{minutes}</span>:
