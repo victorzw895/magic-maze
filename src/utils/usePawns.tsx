@@ -28,6 +28,7 @@ const usePawns = (room: Room, roomId: string): any => {
     if (!currentHeldPawn) return;
     setPlayerHeldPawn(() => currentHeldPawn || initPlayerHeldPawn);
 
+    if (!currentHeldPawn) return;
     const timer = setTimeout(async() => {
       await setDoc(roomId, {
         pawns: {
