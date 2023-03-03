@@ -21,7 +21,7 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer] => {
     const currentPlayer = players.find(dbPlayer => dbPlayer.id === playerState?.id)
     if (!currentPlayer) return;
     setCurrentPlayer(currentPlayer)
-  }, [players.length, room.gameStarted])
+  }, [players])
 
   return [players, currentPlayer];
 };
