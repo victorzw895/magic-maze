@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTimer } from 'react-timer-hook';
 import { useGame } from '../Contexts/GameContext';
 import { useGamePausedDocState, useGameOverDocState, useWeaponsStolenDocState } from '../Contexts/FirestoreContext';
@@ -7,11 +7,15 @@ import escapeSound from '../assets/escape.wav'; // download file from firestore 
 import warningSound from '../assets/warning.wav'; // download file from firestore storage instead
 import { setDoc } from '../utils/useFirestore';
 import { IconButton } from '@mui/material';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import { VolumeUp, VolumeMute } from '@mui/icons-material';
+
+// const [soundOn, setSoundOn] = useState<boolean>(true)
 
 const playWarning = () => {
   const audio = new Audio(warningSound);
-  audio.play();
+  // if (soundOn) {
+    audio.play();
+  // }
 }
 const loadGameSoundtrack = () => {
   const audio = new Audio(gameSound);
@@ -34,6 +38,7 @@ const Timer = () => {
   const gamePaused = useGamePausedDocState();
   const weaponsStolen = useWeaponsStolenDocState();
   const time = new Date();
+  const [soundOn, setSoundOn] = useState<boolean>(true)
 
   useEffect(() => {
     if (weaponsStolen.length === 4) {
@@ -42,7 +47,9 @@ const Timer = () => {
 
       const warningTimer = setTimeout(async () => {
         gameAudio = loadEscapeSoundtrack()
-        // gameAudio.play();
+        if (soundOn) {
+          gameAudio.play();
+        }
       }, 5100);
 
       return () => clearTimeout(warningTimer);
@@ -97,7 +104,7 @@ const Timer = () => {
         // time.setSeconds(time.getSeconds() + restartTime);
         // restart(time)
       }
-      // gameAudio.play();
+      gameAudio.play();
     }
   }
 
@@ -110,7 +117,12 @@ const Timer = () => {
 
   return (
     <div className="timer">
-      <IconButton color="primary" aria-label="turn off sound" component="label"><VolumeUpIcon /> </IconButton>
+      { soundOn ? 
+        <IconButton color="primary" aria-label="turn off sound" component="label" onClick={() => setSoundOn(false)}><VolumeUp /> </IconButton> 
+        : 
+        <IconButton color="primary" aria-label="turn off sound" component="label" onClick={() => setSoundOn(true)}><VolumeMute /> </IconButton> 
+      }
+
       <span>{minutes}</span>:
       <span>{seconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}</span>
     </div>
