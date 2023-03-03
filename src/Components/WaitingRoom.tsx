@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
 import { Paper, Stack, Button, List, ListItem, Alert, Box, Modal, Typography } from '@mui/material';
-import { DBPlayer, playerNumber } from '../types';
+import { DBPlayer, playerNumber, Player } from '../types';
 import { setDoc, useDocData } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
 import { doc } from '../utils/useFirestore'
@@ -74,17 +74,10 @@ const WaitingRoom = () => {
       
       console.log('updatedPlayers', updatedPlayers)
       // changing host number
-      if (currentPlayer.number === host) {
-        await setDoc(gameState.roomId, {
-          host: updatedPlayers[0].number,
-          players: updatedPlayers
-        })
-      } else {
-        await setDoc(gameState.roomId, {
-          players: updatedPlayers
-        })
-      }
-      playerDispatch({type: "setPlayer", value: undefined});  // TODO most likely needs id / or same change
+      await setDoc(gameState.roomId, {
+        players: updatedPlayers
+      })
+      playerDispatch({type: "setPlayer", value: null});  // TODO most likely needs id / or same change
       gameDispatch({ type: "exitRoom" })
     }
   }

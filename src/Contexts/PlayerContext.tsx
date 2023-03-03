@@ -10,9 +10,9 @@ export type Action =
   // {type: 'showMovableSpaces', value: direction[]} | 
   // {type: 'showEscalatorSpaces', value: Escalator[]} | 
   // {type: 'showTeleportSpaces', color: heroColor | null} | 
-  {type: 'setPlayer', value: Player | undefined} |
+  {type: 'setPlayer', value: Player | null}
   // {type: 'assignActions', value: Player} | 
-  undefined;
+  | undefined;
 export type Dispatch = (action: Action) => void;
 
 type PlayerProviderProps = {children: React.ReactNode}
@@ -52,11 +52,13 @@ export const PlayerFactory = (playerName: string, playersInLobby: number) => {
 
 const playerInitialState: Player = {} as Player;
 
-const PlayerStateContext = createContext<Player | undefined>(undefined);
+const PlayerStateContext = createContext<Player | null | undefined>(undefined);
 const PlayerDispatchContext = createContext<Dispatch | undefined>(undefined);
 
-const playerReducer = (playerState: Player, action: any) => {
-  let newState = {...playerState};
+type PlayerState = Player | null;
+
+const playerReducer = (playerState: PlayerState, action: any) => {
+  let newState = {...playerState} as PlayerState;
 
   switch (action.type) {
     // case 'playerHeld': {

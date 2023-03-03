@@ -98,7 +98,7 @@ export interface Room {
 
 export interface DBPlayer extends Player {
   name: string,
-  number: number,
+  number: playerNumber,
   // pinged: boolean,
   playerDirections: direction[],
   playerAbilities: basicAbility[],

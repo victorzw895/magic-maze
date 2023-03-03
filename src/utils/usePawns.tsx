@@ -11,7 +11,7 @@ const initPlayerHeldPawn = {
 }
 
 const usePawns = (room: Room, roomId: string): any => {
-  const player = usePlayerState();
+  const playerState = usePlayerState();
   const [playerHeldPawn, setPlayerHeldPawn] = useState<PlayerHeldPawn>(initPlayerHeldPawn);
   const [green, setGreen] = useState<DBHeroPawn>({} as DBHeroPawn);
   const [yellow, setYellow] = useState<DBHeroPawn>({} as DBHeroPawn);
@@ -22,7 +22,9 @@ const usePawns = (room: Room, roomId: string): any => {
   const { green: greenPawn, yellow: yellowPawn, orange: orangePawn, purple: purplePawn } = pawns;
 
   useEffect(() => {
-    const currentHeldPawn = Object.values(pawns).find(pawn => pawn.playerHeld === player.number);
+    const currentPlayer = room.players.find(player => player.id === playerState?.id)
+    if (!currentPlayer) return;
+    const currentHeldPawn = Object.values(pawns).find(pawn => pawn.playerHeld === currentPlayer.number);
     if (!currentHeldPawn) return;
     setPlayerHeldPawn(() => currentHeldPawn || initPlayerHeldPawn);
 

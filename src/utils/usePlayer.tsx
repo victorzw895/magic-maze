@@ -18,7 +18,7 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer, Dispatch<SetStateAction<D
   }, [room.players])
 
   useEffect(() => {
-    const currentPlayer = players.find(dbPlayer => dbPlayer.id === playerState.id)
+    const currentPlayer = players.find(dbPlayer => dbPlayer.id === playerState?.id)
     if (!currentPlayer) return;
     setPlayer(currentPlayer)
   }, [players])
