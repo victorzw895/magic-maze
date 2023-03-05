@@ -42,8 +42,6 @@ const Lobby = () => {
     // create new player
     const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, 0)
 
-    console.log("dbPlayer", dbPlayer);
-    console.log("player", player.number)
     setPlayer(dbPlayer)
     playerDispatch({type: "setPlayer", value: player});
 

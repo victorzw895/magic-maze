@@ -56,7 +56,7 @@ export const getDefaultBlockedPositions = (): BlockedPositions => {
 export const pawnDefaultValues = {
   playerHeld: null,
   position: [],
-  gridPosition: [],
+  gridPosition: [8, 8],
   ability: '',
   canUseAbility: false,
   blockedPositions: getDefaultBlockedPositions(),

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, Dispatch, SetStateAction, useState, useMemo } from 'react';
-import { DBPlayer, DBHeroPawn } from '../types';
+import { DBPlayer, DBHeroPawn, PlayerHeldPawn } from '../types';
 import { useGame } from '../Contexts/GameContext';
 import { useDocData } from '../utils/useFirestore';
 import useGamePaused from '../utils/useGamePaused';
@@ -20,11 +20,11 @@ const GameOverDocContext = createContext<any>(false);
 const GameWonDocContext = createContext<any>(false);
 const WeaponsStolenDocContext = createContext<any>(undefined);
 const HeroesEscapedDocContext = createContext<any>(undefined);
-const PlayerHeldPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
-const GreenPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
-const YellowPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
-const PurplePawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
-const OrangePawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
+const PlayerHeldPawnDocContext = createContext<PlayerHeldPawn>({} as PlayerHeldPawn);
+const GreenPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
+const YellowPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
+const PurplePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
+const OrangePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const TilesDocContext = createContext<any>(undefined);
 const RoomHostDocContext = createContext<any>(undefined);
 const PlayerDocContext = createContext<{ 

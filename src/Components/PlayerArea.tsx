@@ -3,7 +3,7 @@ import { useGame } from '../Contexts/GameContext';
 import isEqual from 'lodash/isEqual';
 import PlayerAreaDisabled from './PlayerAreaDisabled';
 import Pinged from './Pinged';
-import { useGamePausedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
+import { useGamePausedDocState, usePlayerDocState, useWeaponsStolenDocState } from '../Contexts/FirestoreContext';
 interface PlayerAreaProps {
   highlightNewTileArea: () => void,
   children: ReactNode
@@ -17,6 +17,7 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
   const { gameState } = useGame();
   const { player } = usePlayerDocState();
   const gamePaused = useGamePausedDocState();
+  const weaponsStolen = useWeaponsStolenDocState();
 
   return (
     <div className="player-area">
@@ -46,8 +47,8 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
                 // return <button key={ability} onClick={() => highlightNewTileArea()}>Add Tile</button>
                 return (
                   <img 
-                    draggable={false}
                     key={ability}
+                    draggable={false}
                     onClick={gamePaused ? () => {} : highlightNewTileArea} // TODO: disable if game paused
                     src={`/${ability}.png`} 
                     alt={ability} 

@@ -23,7 +23,6 @@ export interface Game {
   minutesLeft: number,
   secondsLeft: number,
   gameOver: boolean,
-  docRef: DocumentReference<any> | null,
   // weaponsStolen: heroColor[],
   // heroesEscaped: heroColor[]
   // players: Player[],

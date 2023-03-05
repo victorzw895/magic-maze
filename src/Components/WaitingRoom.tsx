@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
-import { pawnDBInitialState } from '../Contexts/PawnContext';
+// import { pawnDBInitialState } from '../Contexts/PawnContext';
 import { Paper, Stack, Button, List, ListItem, Alert, Box, Modal, Typography } from '@mui/material';
 import { DBPlayer, playerNumber } from '../types';
-import { setDoc, useDocData } from "../utils/useFirestore"; 
-import { allTiles } from '../Data/all-tiles-data';
-import { doc } from '../utils/useFirestore'
+import { setDoc, useDocData, doc } from "../utils/useFirestore"; 
 import { deleteDoc } from "firebase/firestore";
 import CloseIcon from '@mui/icons-material/Close';
 import { useRoomHostDocState } from '../Contexts/FirestoreContext';
@@ -30,22 +28,7 @@ const WaitingRoom = () => {
   // set pawn positions ->
   // save players, gameStarted, tiles, pawns (DB)
   // update player with actions (local)
-  const startGame = async () => {
-    // set player actions
-    const dbPlayers: DBPlayer[] = assignRandomActions(players)
-    const firstTile = allTiles.find(tile => tile.id === "1a");
-    const initTile = {
-      ...firstTile,
-      gridPosition: [8, 8]
-    }
-    await setDoc(gameState.roomId, 
-      { 
-        players: dbPlayers, 
-        gameStarted: true,
-        tiles: [initTile],
-        pawns: pawnDBInitialState
-      }
-    )
+  const startGame = () => {
     gameDispatch({type: "startGame"})
   }
 

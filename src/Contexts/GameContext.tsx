@@ -16,7 +16,6 @@ type GameProviderProps = {children: React.ReactNode}
 const gameInitialState: Game = {
   // roomId: "PKHRP",
   roomId: "",
-  docRef: null,
   gameStarted: false, // TODO remove, can use values straight from DB
   gamePaused: false, // TODO remove, can use values straight from DB
   timerRunning: false, // TODO maybe not necessary
@@ -39,7 +38,7 @@ const randomize = (array: any[]) => {
   })
 }
 
-export const assignRandomActions = (players: DBPlayer[]) => {
+export const assignRandomActions = (players: DBPlayer[]): DBPlayer[] => {
   const randomPlayerOrder = randomize(players);
   
   return randomPlayerOrder.map(player => {
@@ -133,9 +132,14 @@ const gameReducer = (gameState: Game, action: any) => {
       // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
       return newState;
     }
+    case 'play': {
+      newState.timerRunning = true;
+      // newState.docRef = doc(gamesRef, action.value);
+      // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
+      return newState;
+    }
     case 'startGame': {
       // newState.players = assignRandomActions(newState.players);
-      newState.timerRunning = true;
       newState.gameStarted = true;
       return newState;
     }

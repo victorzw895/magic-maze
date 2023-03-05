@@ -44,7 +44,7 @@ const Tile = ({tileIndex, tileData}: tileProps) => {
             return (
               <div className="row" key={`row${rowIndex}`}>
                 {row.map((space, colIndex) => {
-                  const highlightSpace = shouldHighlightSpace(playerHeldPawn, player, tileData, colIndex, rowIndex);
+                  const highlightSpace = playerHeldPawn && shouldHighlightSpace(playerHeldPawn, player, tileData, colIndex, rowIndex);
                   const {type, details} = space;
                   const playerHeldPawnColor = playerHeldPawn?.color;
                   const disableTeleporter = weaponsStolen.length === 4
