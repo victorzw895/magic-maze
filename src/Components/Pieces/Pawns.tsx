@@ -8,6 +8,7 @@ import {
   useYellowDocState,
   useOrangeDocState,
   usePurpleDocState,
+  useHeroesEscapedDocState,
 } from '../../Contexts/FirestoreContext';
 import { useGame } from '../../Contexts/GameContext';
 import { getPlayerPawnActions } from '../../Helpers/PawnMethods';
@@ -17,6 +18,7 @@ const Pawns = () => {
   const { gameState } = useGame();
   const { currentPlayer } = usePlayerDocState();
   const tiles: DBTile[] = useTilesDocState();
+  const heroesEscaped = useHeroesEscapedDocState();
 
   useEffect(() => {
     (async () => {
@@ -51,10 +53,10 @@ const Pawns = () => {
 
   return (
     <>
-      <GreenPawn />
-      <YellowPawn />
-      <OrangePawn />
-      <PurplePawn />
+      {!heroesEscaped.includes('green') ? <GreenPawn /> : <></>}
+      {!heroesEscaped.includes('yellow') ? <YellowPawn /> : <></>}
+      {!heroesEscaped.includes('orange') ? <OrangePawn /> : <></>}
+      {!heroesEscaped.includes('purple') ? <PurplePawn /> : <></>}
     </>
   )
 }
