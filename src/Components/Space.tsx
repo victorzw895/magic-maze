@@ -205,7 +205,7 @@ const Space = memo(({
           newRoomValue.weaponsStolen = [...newRoomValue.weaponsStolen, colorSelected]
         }
         else if (isExit && spaceColor === colorSelected) {
-          if (newRoomValue.weaponsStolen.length === 4) {
+          if (newRoomValue.weaponsStolen.length === 4 && !newRoomValue.heroesEscaped.includes(colorSelected)) {
             newRoomValue.heroesEscaped = [...newRoomValue.heroesEscaped, colorSelected]
             playExit();
             // if last exit, celebration soundtrack
