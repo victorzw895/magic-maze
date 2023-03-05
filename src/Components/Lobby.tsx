@@ -7,7 +7,6 @@ import { playerNumber, Room } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import WaitingRoom from './WaitingRoom';
 import { roomDefaultValues } from '../constants';
-import { usePlayerDocState } from '../Contexts/FirestoreContext';
 
 const Lobby = () => {
   console.log('re-render Lobby');
@@ -19,8 +18,6 @@ const Lobby = () => {
   const [promptCode, setPromptCode] = useState(false);
   const [existingRoomCode, setExistingRoomCode] = useState("");
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState<string>("");
-  const [currentPlayer, setCurrentPlayer] = useState({})
-  const { players, setPlayers, player, setPlayer } = usePlayerDocState()
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -36,36 +33,25 @@ const Lobby = () => {
   // create new Document, save player (DB)
   const createNewGame = async () => {
     const newGameCode = cryptoRandomString({length: 5, type: 'distinguishable'});
-    // setIsHost(true);
+
     // save Room Code
     gameDispatch({type: "joinRoom", value: newGameCode});
+
     // create new player
     const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, 0)
 
-    console.log("dbPlayer", dbPlayer);
-    console.log("player", player.number)
-    setPlayer(dbPlayer)
+    // save player id Locally
     playerDispatch({type: "setPlayer", value: player});
 
     await setDoc(newGameCode, {
       ...roomDefaultValues,
       players: [dbPlayer],
-      // host: player.number
     })
   }
 
-  // check room code typed
-  // if document with room code exists
-  // save to local room state (live)
-  // if room found & not started & players < 8
-  // create factory new player
-  // save room code (local)
-  // save player number/name (local)
-  // save players + newPlayer (DB)
   const joinRoom = async () => {
     if (!existingRoomCode) return
     const docSnap = await getDoc(existingRoomCode);
-
 
     if (!docSnap.exists()) {
       setFailJoinRoomMessage("Room code not found");
@@ -75,25 +61,27 @@ const Lobby = () => {
     const roomFound = docSnap.data() as Room;
 
     // if found
-    if (roomFound && !roomFound.gameStarted && roomFound.players.length <= 8) {
-      // add player Number
-      let newPlayerNo = Math.max(...roomFound.players.map( obj => obj.number));
-      const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, newPlayerNo);
+    if (roomFound && !roomFound.gameStarted && roomFound.players.length < 8) {
+      // get current number of players in Lobby
+      const playersCount = roomFound.players.length
+
+      const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, playersCount);
+
       const playersInRoom = [
         ...roomFound.players, 
         dbPlayer
       ];
+
       gameDispatch({type: "joinRoom", value: existingRoomCode});
+      // save player id locally
       playerDispatch({type: "setPlayer", value: player});
+
       await setDoc(existingRoomCode, 
         {
           ...roomFound,
           players: playersInRoom
         },
       )
-      console.log("setting current player in join room", dbPlayer)
-      setPlayer(dbPlayer)
-
     }
     else if (!roomFound) {
       setFailJoinRoomMessage("Room code not found");
@@ -101,7 +89,7 @@ const Lobby = () => {
     else if (roomFound.gameStarted) {
       setFailJoinRoomMessage("Game has already started");
     }
-    else if (roomFound.players.length > 8) {
+    else if (roomFound.players.length >= 8) {
       setFailJoinRoomMessage("Game Lobby full");
     }
   }

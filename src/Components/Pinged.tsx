@@ -23,7 +23,7 @@ const playAlert = () => {
 const Pinged = () => {
   const { gameState } = useGame();
   const gamePaused = useGamePausedDocState();
-  const { player, players } = usePlayerDocState();
+  const { currentPlayer, players } = usePlayerDocState();
   const pinged = usePingedDocState();
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const Pinged = () => {
         await setDoc(
           gameState.roomId, 
           {
-            pings: room.pings.filter(ping => ping !== player.number)
+            pings: room.pings.filter(ping => ping !== currentPlayer.number)
           },
         )
       }, 6000);
@@ -112,7 +112,7 @@ const Pinged = () => {
                   <List dense={true}>
                     {
                       players.map((dbPlayer) => {
-                        if (dbPlayer.number !== player.number) {
+                        if (dbPlayer.number !== currentPlayer.number) {
                           return (
                             <ListItemButton onClick={() => {
                                 popupState.close()
