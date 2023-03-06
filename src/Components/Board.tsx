@@ -64,6 +64,7 @@ const Board = () => {
 
   useEffect(() => {
     (async () => {
+      console.log('running load assets useEffect')
     // load stuff
     // once loaded add undisable start game button
     // countdown to start or just start
