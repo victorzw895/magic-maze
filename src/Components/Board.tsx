@@ -10,10 +10,6 @@ import useHighlightArea from '../utils/useHighlightArea';
 import Timer from './Timer';
 import Pinged from './Pinged';
 import { useGameStartedDocState } from '../Contexts/FirestoreContext';
-import { usePlayerState } from '../Contexts/PlayerContext';
-import { usePlayerDocState } from '../Contexts/FirestoreContext';
-import { getDoc } from '../utils/useFirestore';
-import { Room } from '../types';
 import Objectives from './Objectives';
 import GameOver from './GameOver';
 
@@ -24,28 +20,10 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
   const gameStarted = useGameStartedDocState();
   const [availableArea, highlightNewTileArea, clearHighlightAreas] = useHighlightArea(gameState.roomId);
 
-  const playerState = usePlayerState();
-  const {setPlayer, setPlayers} = usePlayerDocState();
-
-  useEffect(() => {
-    (async () => {
-      if (!gameStarted) return;
-
-      const docSnap = await getDoc(gameState.roomId);
-      if (!docSnap.exists()) return;
-      const roomFound = docSnap.data() as Room;
-
-      setPlayers(roomFound.players);
-      const currentPlayer = roomFound.players.find((player) => player.number === playerState.number);
-      if (!currentPlayer) return;
-      setPlayer(currentPlayer);
-    })()
-  }, [gameStarted])
-
   return (
     <>
-      {gameStarted ? timer : <></>}
       <Objectives /> {/* minimize when playing, can click to expand */}
+      {gameStarted ? timer : <></>}
       <Draggable
         nodeRef={draggableNodeRef}
         defaultPosition={{x: 0, y: 0}}

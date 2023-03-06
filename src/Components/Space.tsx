@@ -110,7 +110,7 @@ const Space = memo(({
     (async () => {
       if (!isTeleporter) return;
       if (disableTeleporter) {
-        setShowEscalator(false);
+        setShowTeleport(false);
         return;
       }
       if (highlightTeleporter === teleporterColor) {
@@ -183,7 +183,6 @@ const Space = memo(({
         newRoomValue.pawns[colorSelected].showEscalatorSpaces = [];
         newRoomValue.pawns[colorSelected].showMovableDirections = [];
         newRoomValue.pawns[colorSelected].showTeleportSpaces = null;
-        newRoomValue.pawns[colorSelected].playerHeld = null;
         newRoomValue.pawns[colorSelected].blockedPositions = {
           up: {position: null, gridPosition: null},
           down: {position: null, gridPosition: null},
@@ -206,7 +205,7 @@ const Space = memo(({
           newRoomValue.weaponsStolen = [...newRoomValue.weaponsStolen, colorSelected]
         }
         else if (isExit && spaceColor === colorSelected) {
-          if (newRoomValue.weaponsStolen.length === 4) {
+          if (newRoomValue.weaponsStolen.length === 4 && !newRoomValue.heroesEscaped.includes(colorSelected)) {
             newRoomValue.heroesEscaped = [...newRoomValue.heroesEscaped, colorSelected]
             playExit();
             // if last exit, celebration soundtrack
@@ -240,7 +239,7 @@ const Space = memo(({
 
   return (
     <div 
-      className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}${disableTeleporter ? " disabled-teleporter" : ""}`}
+      className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}${showEscalator ? " escalator" : ""}${disableTeleporter ? " disabled-teleporter" : ""}`}
       onClick={showMovableArea || showTeleport || showEscalator ? movePawn : () => {}}
        // TODO: disable if game paused
     >
