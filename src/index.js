@@ -18,6 +18,7 @@ ReactDOM.render(
       <PlayerProvider>
         <FirestoreProvider>
           <TilesProvider>
+            {/* TODO KRIS: Add Game Audio Provider here */}
             <App />
             {/* <Test /> */}
           </TilesProvider>
