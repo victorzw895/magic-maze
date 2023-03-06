@@ -13,7 +13,7 @@ const Test = () => {
       await downloadAssets();
     })()
   }, [])
-  // const { player } = usePlayerDocState();
+  // const { currentPlayer } = usePlayerDocState();
   
   // const pawnState = usePawn(); // 2x extra re render
   

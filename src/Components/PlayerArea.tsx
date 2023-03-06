@@ -15,17 +15,17 @@ const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
 
 const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
   const { gameState } = useGame();
-  const { player } = usePlayerDocState();
+  const { currentPlayer } = usePlayerDocState();
   const gamePaused = useGamePausedDocState();
   const weaponsStolen = useWeaponsStolenDocState();
 
   return (
     <div className="player-area">
       {
-        player.number &&
+        currentPlayer.number &&
         <>
           {
-            player.playerDirections.map(direction => {
+            currentPlayer.playerDirections.map(direction => {
               return (
                 <img 
                   key={direction}
@@ -41,7 +41,7 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
             })
           }
           {
-            player.playerAbilities.map(ability => {
+            currentPlayer.playerAbilities.map(ability => {
               if (ability === "explore") {
                 // DECISION: use button, or image?
                 // return <button key={ability} onClick={() => highlightNewTileArea()}>Add Tile</button>

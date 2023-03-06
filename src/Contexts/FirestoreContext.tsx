@@ -15,9 +15,9 @@ type DBProviderProps = {children: React.ReactNode}
 
 
 const GameStartedDocContext = createContext<any>(undefined);
-const GamePausedDocContext = createContext<any>(undefined);
-const GameOverDocContext = createContext<any>(false);
-const GameWonDocContext = createContext<any>(false);
+const GamePausedDocContext = createContext<boolean>(false);
+const GameOverDocContext = createContext<boolean>(false);
+const GameWonDocContext = createContext<boolean>(false);
 const WeaponsStolenDocContext = createContext<any>(undefined);
 const HeroesEscapedDocContext = createContext<any>(undefined);
 const PlayerHeldPawnDocContext = createContext<PlayerHeldPawn>({} as PlayerHeldPawn);
@@ -28,8 +28,8 @@ const OrangePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const TilesDocContext = createContext<any>(undefined);
 const RoomHostDocContext = createContext<any>(undefined);
 const PlayerDocContext = createContext<{ 
-  players: DBPlayer[], setPlayers: Dispatch<SetStateAction<DBPlayer[]>>,
-  player: DBPlayer, setPlayer: Dispatch<SetStateAction<DBPlayer>> 
+  players: DBPlayer[],
+  currentPlayer: DBPlayer
 } | undefined>(undefined);
 const PingedDocContext = createContext<boolean>(false);
 
@@ -44,14 +44,14 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [gamePaused, gameOver, gameWon] = useGamePaused(room);
   const [roomHost] = useRoomHost(room);
   const [tiles] = useTiles(room);
-  const [players, setPlayers, player, setPlayer] = usePlayer();
+  const [players, currentPlayer] = usePlayer(room);
   const pawns = usePawns(room, gameState.roomId);
   const {green, yellow, purple, orange, playerHeldPawn} = pawns;
 
   const [pinged, setPinged] = useState(false);
 
   useEffect(() => {
-    if (room.pings.length && room.pings.includes(player.number)) {
+    if (room.pings.length && room.pings.includes(currentPlayer.number)) {
       setPinged(true);
     }
     else {
@@ -72,8 +72,8 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   }, [room.gameStarted]);
 
   const playerProviderValue = useMemo(() => { // TODO figure out why need useMemo???
-    return {players, setPlayers, player, setPlayer}
-  }, [player, players]);
+    return {players, currentPlayer}
+  }, [currentPlayer, players]);
 
   return (
     <GameStartedDocContext.Provider value={gameStarted}>

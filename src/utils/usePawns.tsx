@@ -10,8 +10,8 @@ const initPlayerHeldPawn = {
   gridPosition: [8, 8],
 }
 
-const usePawns = (room: Room, roomId: string) => {
-  const player = usePlayerState();
+const usePawns = (room: Room, roomId: string): any => {
+  const playerState = usePlayerState();
   const [playerHeldPawn, setPlayerHeldPawn] = useState<PlayerHeldPawn>(initPlayerHeldPawn);
   const [green, setGreen] = useState<DBHeroPawn | undefined>(undefined);
   const [yellow, setYellow] = useState<DBHeroPawn | undefined>(undefined);
@@ -22,7 +22,11 @@ const usePawns = (room: Room, roomId: string) => {
   const { green: greenPawn, yellow: yellowPawn, orange: orangePawn, purple: purplePawn } = pawns;
 
   useEffect(() => {
-    const currentHeldPawn = Object.values(pawns).find(pawn => pawn.playerHeld === player.number);
+    setPlayerHeldPawn(() => initPlayerHeldPawn);
+    const currentPlayer = room.players.find(player => player.id === playerState?.id)
+    if (!currentPlayer) return;
+    const currentHeldPawn = Object.values(pawns).find(pawn => pawn.playerHeld === currentPlayer.number);
+    if (!currentHeldPawn) return;
     setPlayerHeldPawn(() => currentHeldPawn || initPlayerHeldPawn);
 
     if (!currentHeldPawn) return;

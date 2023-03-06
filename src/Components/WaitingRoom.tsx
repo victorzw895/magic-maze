@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useGame, assignRandomActions } from '../Contexts/GameContext';
-// import { pawnDBInitialState } from '../Contexts/PawnContext';
+import { useState } from 'react';
+import { useGame } from '../Contexts/GameContext';
 import { Paper, Stack, Button, List, ListItem, Alert, Box, Modal, Typography } from '@mui/material';
-import { DBPlayer, playerNumber } from '../types';
 import { setDoc, useDocData, doc } from "../utils/useFirestore"; 
-import { deleteDoc } from "firebase/firestore";
 import CloseIcon from '@mui/icons-material/Close';
-import { useRoomHostDocState } from '../Contexts/FirestoreContext';
 import { usePlayerDocState } from '../Contexts/FirestoreContext';
+import { deleteDoc } from "firebase/firestore";
+import { usePlayerDispatch } from '../Contexts/PlayerContext';
 
 const WaitingRoom = () => {
   const { gameState, gameDispatch } = useGame();
@@ -16,12 +14,8 @@ const WaitingRoom = () => {
   const handleClose = () => setOpen(false);
   const [room] = useDocData(gameState.roomId);
   const { players } = room;
-  const host = useRoomHostDocState()
-  const { player: currentPlayer } = usePlayerDocState()
-
-  useEffect(() => {
-   
-  }, [host, players])
+  const playerDispatch = usePlayerDispatch();
+  const { currentPlayer } = usePlayerDocState()
   
   // Assign actions to existing players ->
   // set initial tile ->
@@ -50,19 +44,16 @@ const WaitingRoom = () => {
     } else {
       // ! Feel like there could be async issues below but need revision
       // * remove current player from player list 
-      const updatePlayers = players.filter((dbPlayer: any) => dbPlayer.number !== currentPlayer.number)
+      const updatedPlayers = players.filter((dbPlayer: any) => dbPlayer.id !== currentPlayer.id)
+      // re-assign player numbers
+      updatedPlayers.map((player: any, playerNumber: number) => player.number = playerNumber + 1)
       
-      // changing host number
-      if (currentPlayer.number === host) {
-        await setDoc(gameState.roomId, {
-          host: updatePlayers[0].number,
-          players: updatePlayers
-        })
-      } else {
-        await setDoc(gameState.roomId, {
-          players: updatePlayers
-        })
-      }
+      // Update players and numbers
+      await setDoc(gameState.roomId, {
+        players: updatedPlayers
+      })
+      // remove player id locally
+      playerDispatch({type: "setPlayer", value: null});  // TODO most likely needs id / or same change
       gameDispatch({ type: "exitRoom" })
     }
   }
@@ -97,7 +88,7 @@ const WaitingRoom = () => {
                 </Typography>
                 <Button aria-label="close" onClick={handleClose} sx={{padding: "0px"}}><CloseIcon /></Button>
               </Box>
-              { (host === currentPlayer.number) &&
+              { (currentPlayer.number === 1) &&
                 <Stack>
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                   You are about to exit the room. You must reassign the host or end game for all.
@@ -117,7 +108,7 @@ const WaitingRoom = () => {
                   }
                 </Stack>
               }
-              { (host !== currentPlayer.number) &&
+              { (currentPlayer.number !== 1) &&
                 <Stack>
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                   You are about to exit the room. Confirm?
@@ -129,19 +120,19 @@ const WaitingRoom = () => {
             </Box>
           </Modal>    
           }
-          {(host === currentPlayer.number) && 
+          {(currentPlayer.number === 1) && 
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
               <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
               <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Exit Room</Button>          
               <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room</Button>
             </Stack>
           }
-          {(host !== currentPlayer.number) && players.length === 0 && 
+          {(currentPlayer.number !== 1) && players.length === 0 && 
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
               <Alert severity="info" style={{margin: "20px"}}>This game has been deleted. Please click "back" to return to the Lobby area</Alert>
             </Stack>
           }
-          {(host !== currentPlayer.number) &&
+          {(currentPlayer.number !== 1) &&
             <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
               <Box textAlign='center'>
                 <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Back</Button>

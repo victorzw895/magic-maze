@@ -34,7 +34,6 @@ const style = {
 
 const GameOver = () => {
   const playerDispatch = usePlayerDispatch();
-  const {setPlayer, setPlayers} = usePlayerDocState();
   const {gameDispatch} = useGame();
   const gameOver = useGameOverDocState();
   const gameWon = useGameWonDocState();
@@ -45,10 +44,9 @@ const GameOver = () => {
   }, [gameOver, gameWon])
 
   const handleClick = async () => {
-    playerDispatch({type: 'setPlayer', value: {} as Player});
+    playerDispatch({type: 'setPlayer', value: null});
     gameDispatch({type: "exitRoom"});
-    setPlayer({} as DBPlayer);
-    setPlayers([]);
+    // delete doc or reset doc
   }
 
   return (

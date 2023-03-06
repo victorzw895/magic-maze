@@ -21,7 +21,7 @@ const Pawn = ({pawnData}: pawnProps) => {
   const { gameState } = useGame();
   const gamePaused = useGamePausedDocState();
 
-  const { player } = usePlayerDocState();
+  const { currentPlayer } = usePlayerDocState();
   const tiles: DBTile[] = useTilesDocState();
 
   const toggleMovableSpaces = async () => {
@@ -32,7 +32,7 @@ const Pawn = ({pawnData}: pawnProps) => {
 
     const disableTeleport = weaponsStolen.length === 4;
 
-    await showMovableSpaces(gameState.roomId, pawns, player, pawnData, tiles, disableTeleport)
+    await showMovableSpaces(gameState.roomId, pawns, currentPlayer, pawnData, tiles, disableTeleport)
   }
 
   return (
@@ -68,7 +68,7 @@ const Pawn = ({pawnData}: pawnProps) => {
               style={{
                 border: 
                   `${pawnData?.playerHeld ? 
-                    (pawnData?.playerHeld === player.number ?
+                    (pawnData?.playerHeld === currentPlayer.number ?
                       "2px solid blue"
                         : 
                       "2px solid grey")
