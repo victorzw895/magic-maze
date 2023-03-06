@@ -2,15 +2,13 @@ import { useEffect, useState } from 'react';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
 import { Paper, Stack, Button, List, ListItem, Alert, Box, Modal, Typography } from '@mui/material';
-import { DBPlayer, playerNumber, Player } from '../types';
-import { setDoc, useDocData } from "../utils/useFirestore"; 
+import { DBPlayer } from '../types';
+import { setDoc, useDocData, doc } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
-import { doc } from '../utils/useFirestore'
-import { deleteDoc } from "firebase/firestore";
 import CloseIcon from '@mui/icons-material/Close';
-import { useRoomHostDocState } from '../Contexts/FirestoreContext';
-import { usePlayerDocState } from '../Contexts/FirestoreContext';
-import { usePlayerDispatch, PlayerFactory, PlayerFactoryType } from '../Contexts/PlayerContext';
+import { useRoomHostDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
+import { deleteDoc } from "firebase/firestore";
+import { usePlayerDispatch } from '../Contexts/PlayerContext';
 
 const WaitingRoom = () => {
   const { gameState, gameDispatch } = useGame();

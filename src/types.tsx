@@ -10,6 +10,7 @@ export type direction = "up" | "right" | "down" | "left"
 export type basicAbility = "explore" | "teleport" | "escalator"
 
 
+
 export interface SandTimer {
   timeLimit: number,
   pause: boolean,
@@ -92,7 +93,9 @@ export interface Room {
   host: playerNumber,
   tiles: DBTile[],
   pawns: DBPawns,
-  pings: playerNumber[] // ?? add debouncer or throttle, or batch update/consume from firestore
+  pings: playerNumber[], // ?? add debouncer or throttle, or batch update/consume from firestore
+  createdDate: Date,
+  createdDateInSeconds: number
 }
 
 
