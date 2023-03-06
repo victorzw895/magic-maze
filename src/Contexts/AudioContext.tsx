@@ -1,4 +1,4 @@
-import {createContext, useContext, ReactNode} from 'react';
+import {createContext, useContext, ReactNode, useReducer} from 'react';
 import useSounds from '../utils/useSounds';
 
 // TODO KRIS: Create Context -> takes a initial value
@@ -7,6 +7,8 @@ const AudioContext = createContext<any>(undefined);
 
 // TODO KRIS: Context Provider -> like a component with all states, useEffects and returns provider wrapping children
 const AudioProvider = ({children}: {children: ReactNode}) => {
+
+  // const [useSounds] = useReducer()
   return (
     <AudioContext.Provider value={useSounds}>
       {children}
@@ -19,12 +21,12 @@ const AudioProvider = ({children}: {children: ReactNode}) => {
 const useAudio = () => {
   const context = useContext(AudioContext);
   if (context === undefined) {
-    throw new Error('usePingedDocState must be used within a PingedDocContext');
+    throw new Error('useAudio must be used within a AudioProvider');
   }
   return context
 }
 
 
 export {
-  AudioProvider,
+  AudioProvider, useAudio
 }

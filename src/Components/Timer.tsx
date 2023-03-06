@@ -8,6 +8,7 @@ import warningSound from '../assets/warning.wav'; // download file from firestor
 import { setDoc } from '../utils/useFirestore';
 import { IconButton } from '@mui/material';
 import { VolumeUp, VolumeMute } from '@mui/icons-material';
+import { useAudio } from '../Contexts/AudioContext';
 
 const playWarning = () => {
   const audio = new Audio(warningSound);
@@ -35,6 +36,7 @@ const Timer = () => {
   const weaponsStolen = useWeaponsStolenDocState();
   const time = new Date();
   const [soundOn, setSoundOn] = useState<boolean>(true)
+  const { useSounds } = useAudio();
 
   useEffect(() => {
     if (weaponsStolen.length === 4) {

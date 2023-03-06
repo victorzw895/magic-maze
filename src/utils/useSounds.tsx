@@ -14,11 +14,8 @@ const achievementAudio = new Audio(achievementSound);
 const teleporterAudio = new Audio(teleporterSound);
 const exitAudio = new Audio(exitSound);
 const winAudio = new Audio(winSound)
-  // TODO KRIS: add the rest;
 
-
-
-
+// ? Do we want to include Ping here?
 
 const useSounds = () => {
   const [musicOn, setMusicOn] = useState<boolean>(true)
@@ -44,14 +41,36 @@ const useSounds = () => {
     setGameAudio(escapeSoundtrack)
   }
 
-
   // Sounds methods
   const playWarningSound = () => {
     if (soundOn) warningAudio.play()
     else warningAudio.pause()
   }
 
+  const playSelectSound = () => {
+    if (soundOn) selectAudio.play()
+    else selectAudio.pause()
+  }
 
+  const playAchievementSound = () => {
+    if (soundOn) achievementAudio.play()
+    else achievementAudio.pause()
+  }
+
+  const playTeleporterSound = () => {
+    if (soundOn) teleporterAudio.play()
+    else teleporterAudio.pause()
+  }
+
+  const playExitSound = () => {
+    if (soundOn) exitAudio.play()
+    else exitAudio.pause()
+  }
+
+  const playWinSound = () => {
+    if (soundOn) winAudio.play()
+    else winAudio.pause()
+  }
 
   return {
     musicOn, // Might not be necessary to export
@@ -61,6 +80,11 @@ const useSounds = () => {
     gameAudio,
     loadAndPlayEscapeSoundtrack,
     playWarningSound,
+    playSelectSound,
+    playAchievementSound,
+    playTeleporterSound,
+    playExitSound,
+    playWinSound
   }
 } 
 
