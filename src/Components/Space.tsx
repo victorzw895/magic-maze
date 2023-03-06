@@ -110,7 +110,7 @@ const Space = memo(({
     (async () => {
       if (!isTeleporter) return;
       if (disableTeleporter) {
-        setShowEscalator(false);
+        setShowTeleport(false);
         return;
       }
       if (highlightTeleporter === teleporterColor) {
@@ -239,7 +239,7 @@ const Space = memo(({
 
   return (
     <div 
-      className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}${disableTeleporter ? " disabled-teleporter" : ""}`}
+      className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}${showEscalator ? " escalator" : ""}${disableTeleporter ? " disabled-teleporter" : ""}`}
       onClick={showMovableArea || showTeleport || showEscalator ? movePawn : () => {}}
        // TODO: disable if game paused
     >
