@@ -60,10 +60,10 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
 const Board = () => {
   const { gameState, gameDispatch } = useGame();
   const [loading, setLoading] = useState(true);
+  const gameStarted = useGameStartedDocState();
 
   useEffect(() => {
     (async () => {
-
     // load stuff
     // once loaded add undisable start game button
     // countdown to start or just start
@@ -103,10 +103,11 @@ const Board = () => {
       {/* Loading board components use MUI Backdrop + Progress */}
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}
+        open={!gameStarted}
       >
-        <CircularProgress color="inherit" />
-        {loading ? 'Loading Assets' : 
+        {loading ? 
+          <CircularProgress color="inherit" />
+            : 
           <Button variant='contained' onClick={startGame}>Start</Button>
         }
       </Backdrop>
@@ -122,8 +123,5 @@ const Board = () => {
     </div>
   );
 };
-
-// Board.whyDidYouRender = true
-// BoardComponent.whyDidYouRender = true;
 
 export default Board;
