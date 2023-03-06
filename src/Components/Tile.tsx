@@ -21,7 +21,7 @@ const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
 
 // memo could be good
 const Tile = ({tileIndex, tileData}: tileProps) => {
-  const { player } = usePlayerDocState();
+  const { currentPlayer } = usePlayerDocState();
   const playerHeldPawn = usePlayerHeldPawnDocState()
   const weaponsStolen = useWeaponsStolenDocState();
   
@@ -44,7 +44,7 @@ const Tile = ({tileIndex, tileData}: tileProps) => {
             return (
               <div className="row" key={`row${rowIndex}`}>
                 {row.map((space, colIndex) => {
-                  const highlightSpace = shouldHighlightSpace(playerHeldPawn, player, tileData, colIndex, rowIndex);
+                  const highlightSpace = shouldHighlightSpace(playerHeldPawn, currentPlayer, tileData, colIndex, rowIndex);
                   const {type, details} = space;
                   const playerHeldPawnColor = playerHeldPawn?.color;
                   const disableTeleporter = weaponsStolen.length === 4
