@@ -6,7 +6,7 @@ import { DBPlayer } from '../types';
 import { setDoc, useDocData, doc } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
 import CloseIcon from '@mui/icons-material/Close';
-import { useRoomHostDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
+import { usePlayerDocState } from '../Contexts/FirestoreContext';
 import { deleteDoc } from "firebase/firestore";
 import { usePlayerDispatch } from '../Contexts/PlayerContext';
 
