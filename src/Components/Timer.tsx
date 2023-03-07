@@ -22,7 +22,7 @@ const Timer = () => {
 
       const warningTimer = setTimeout(async () => {
         loadAndPlayEscapeSoundtrack()
-        gameAudio.play();
+        // gameAudio.play();
       }, 5100);
 
       return () => clearTimeout(warningTimer);
