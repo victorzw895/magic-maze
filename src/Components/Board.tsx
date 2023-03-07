@@ -12,6 +12,7 @@ import Pinged from './Pinged';
 import { useGameStartedDocState } from '../Contexts/FirestoreContext';
 import Objectives from './Objectives';
 import GameOver from './GameOver';
+import AudioControls from './AudioControls';
 
 const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: ReactNode, children: ReactNode}) => {
   console.log('*** Board Component re render')
@@ -23,6 +24,7 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
   return (
     <>
       <Objectives /> {/* minimize when playing, can click to expand */}
+      <AudioControls />
       {gameStarted ? timer : <></>}
       <Draggable
         nodeRef={draggableNodeRef}

@@ -3,6 +3,7 @@ import { useGame } from '../Contexts/GameContext';
 import { heroColor, Escalator, SpaceTypeName } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
+import { useAudio } from '../Contexts/AudioContext';
 
 import achievementSound from '../assets/achievement.mp3'; // download file from firestore storage instead
 import teleporterSound from '../assets/teleporter.mp3'; // download file from firestore storage instead
@@ -104,6 +105,7 @@ const Space = memo(({
 
   const [showTeleport, setShowTeleport] = useState(false)
   const [showEscalator, setShowEscalator] = useState(false);
+  const { playSelectSound, playAchievementSound, playTeleporterSound, playExitSound, playWinSound } = useAudio();
 
   // BUG: NEED TO FINE TUNE teleport and escalator
   useEffect(() => {
