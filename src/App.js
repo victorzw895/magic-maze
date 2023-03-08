@@ -20,6 +20,6 @@ function App() {
   );
 }
 
-App.whyDidYouRender = true;
+// App.whyDidYouRender = true;
 
 export default App;

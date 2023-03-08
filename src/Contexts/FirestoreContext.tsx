@@ -76,7 +76,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
 
   const playerProviderValue = useMemo(() => { // TODO figure out why need useMemo???
     return {players, currentPlayer, allPlayersReady}
-  }, [currentPlayer, players]);
+  }, [players, currentPlayer, allPlayersReady]);
 
   return (
     <GameStartedDocContext.Provider value={{gameStarted, loadBoard}}>

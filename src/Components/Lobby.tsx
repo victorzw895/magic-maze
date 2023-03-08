@@ -12,8 +12,6 @@ import { gamesRef } from '../Firestore';
 import { usePlayerDocState } from '../Contexts/FirestoreContext';
 
 const Lobby = () => {
-  console.log('re-render Lobby');
-
   const { gameState, gameDispatch } = useGame();
   const playerDispatch = usePlayerDispatch();
 
@@ -32,6 +30,8 @@ const Lobby = () => {
   const _handleNameInput = (e: ChangeEvent<HTMLInputElement>) => {
     setPlayerName(e.target.value)
   }
+
+  console.log('re-render Lobby', currentPlayer, gameState);
 
   // Generate code ->
   // save room code (local) -> 
@@ -133,7 +133,7 @@ const Lobby = () => {
       {gameState.roomId && currentPlayer.number ?
         <WaitingRoom />
           :
-        <Paper className="lobby-actions" sx={{ width: '100%', maxWidth: 360, bgcolor: '#63B0CD' }}>
+        <Paper className="lobby-actions" sx={{ display: 'grid', gridTemplateRows: 'repeat(2, minmax(50px, 1fr))', width: '100%', maxWidth: 360, bgcolor: '#63B0CD' }}>
           {
             promptCode ? 
               <>

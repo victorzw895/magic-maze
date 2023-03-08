@@ -15,10 +15,8 @@ const WaitingRoom = () => {
   const [open, setOpen] = useState<boolean>(false)
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [room] = useDocData(gameState.roomId);
-  const { players, playersReady } = room;
   const playerDispatch = usePlayerDispatch();
-  const { currentPlayer } = usePlayerDocState()
+  const { currentPlayer, players } = usePlayerDocState()
   
   // Assign actions to existing players ->
   // set initial tile ->
@@ -87,7 +85,7 @@ const WaitingRoom = () => {
   return (
     <>
       <h4 className="lobby-code">CODE: {gameState.roomId}</h4>
-      <Paper sx={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '100%', minHeight: '135px', maxWidth: '360px', bgcolor: '#63B0CD' }}>
+      <Paper sx={{display: 'grid', gridTemplateRows: 'repeat(2, minmax(50px, 1fr))', width: '100%', minHeight: '135px', maxWidth: '360px', bgcolor: '#63B0CD' }}>
         <List>
           {
             players && players.map((player: any) => 
@@ -140,26 +138,21 @@ const WaitingRoom = () => {
             </Box>
           </Modal>    
           }
-          {(currentPlayer.number === 1) && 
-            <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
-              <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
-              <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Exit Room</Button>          
-              <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room</Button>
-            </Stack>
-          }
-          {(currentPlayer.number !== 1) && players.length === 0 && 
-            <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
-              <Alert severity="info" style={{margin: "20px"}}>This game has been deleted. Please click "back" to return to the Lobby area</Alert>
-            </Stack>
-          }
-          {(currentPlayer.number !== 1) &&
-            <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
-              <Box textAlign='center'>
-                <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Back</Button>
-              </Box>
-            </Stack>
-          }
         </List>
+        {(currentPlayer.number === 1) && 
+          <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 10px"}}>
+            <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
+            <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Exit Room</Button>          
+            <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room</Button>
+          </Stack>
+        }
+        {(currentPlayer.number !== 1) &&
+          <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 10px", display: "block"}}>
+            <Box textAlign='center'>
+              <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Back</Button>
+            </Box>
+          </Stack>
+        }
  
       </Paper>
     </>

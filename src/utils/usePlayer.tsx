@@ -18,14 +18,26 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer, boolean] => {
 
   useEffect(() => {
     setPlayers(room.players);
+  }, [room.players.length])
 
+  useEffect(() => {
     const player = room.players.find(dbPlayer => dbPlayer.id === playerState?.id)
     
     if (!currentPlayer.number && !player) {
         return;
     }
+    console.log('useEffect usePlayer', {
+      roomPlayers: room.players,
+      players: players,
+      player,
+      currentPlayer
+    })
   
     setCurrentPlayer(player || {} as DBPlayer)
+  }, [room.players])
+
+  useEffect(() => {
+    console.log('room Players', room.players)
   }, [room.players])
 
   return [players, currentPlayer, allPlayersReady];
