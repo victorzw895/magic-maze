@@ -9,6 +9,7 @@ import {
   useWeaponsStolenDocState,
 } from '../Contexts/FirestoreContext';
 import { getDisplacementValue, shouldHighlightSpace } from '../Helpers/TileMethods';
+import { useAssets } from '../Contexts/AssetsContext';
 
 interface tileProps {
   tileData: DBTile,
@@ -21,6 +22,7 @@ const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
 
 // memo could be good
 const Tile = ({tileIndex, tileData}: tileProps) => {
+  const { assets } = useAssets();
   const { currentPlayer } = usePlayerDocState();
   const playerHeldPawn = usePlayerHeldPawnDocState()
   const weaponsStolen = useWeaponsStolenDocState();
@@ -84,7 +86,8 @@ const Tile = ({tileIndex, tileData}: tileProps) => {
           <img 
             key={tileData.id}
             draggable={false}
-            src={`/${tileData.id}.jpg`} alt={`tile-${tileData.id}`}
+            src={assets[`${tileData.id}.jpg`]}
+            alt={`tile-${tileData.id}`}
             style={{
               transform: `rotate(${tileData.rotation}deg)`,
             }}>

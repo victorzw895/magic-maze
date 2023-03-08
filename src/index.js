@@ -11,6 +11,7 @@ import { FirestoreProvider } from './Contexts/FirestoreContext';
 import { PlayerProvider } from './Contexts/PlayerContext';
 import Test from './Components/Test';
 import { TilesProvider } from './Contexts/TilesContext';
+import { AssetsProvider } from './Contexts/AssetsContext';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -18,8 +19,10 @@ ReactDOM.render(
       <PlayerProvider>
         <FirestoreProvider>
           <TilesProvider>
-            <App />
+            <AssetsProvider>
+              <App />
             {/* <Test /> */}
+            </AssetsProvider>
           </TilesProvider>
         </FirestoreProvider>
       </PlayerProvider>

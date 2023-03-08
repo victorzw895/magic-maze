@@ -10,6 +10,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import { useAssets } from '../Contexts/AssetsContext';
 
 import alertSound from '../assets/alert.wav'; // download file from firestore storage instead
 
@@ -21,6 +22,7 @@ const playAlert = () => {
 }
 
 const Pinged = () => {
+  const { assets } = useAssets();
   const { gameState } = useGame();
   const gamePaused = useGamePausedDocState();
   const { currentPlayer, players } = usePlayerDocState();
@@ -78,7 +80,7 @@ const Pinged = () => {
                       {...bindTrigger(popupState)}
                       key={'bell-shake'}
                       draggable={false}
-                      src={'/bell-shake.png'} 
+                      src={assets['bell-shake.png']} 
                       alt={'bell-shake'} 
                       style={{
                         width: '80px',
@@ -90,7 +92,7 @@ const Pinged = () => {
                       key={'bell'}
                       {...bindTrigger(popupState)}
                       draggable={false}
-                      src={`/bell.png`} 
+                      src={assets['bell.png']}
                       alt={'bell'} 
                       style={{
                         width: '80px',
@@ -99,6 +101,7 @@ const Pinged = () => {
                         />
                   }
                 <Popover
+                  key={`popover-${popupState.popupId}`}
                   {...bindPopover(popupState)}
                   anchorOrigin={{
                     vertical: 'top',
@@ -109,28 +112,23 @@ const Pinged = () => {
                     horizontal: 'center',
                   }}
                 >
-                  <List dense={true}>
-                    {
-                      players.map((dbPlayer) => {
-                        if (dbPlayer.number !== currentPlayer.number) {
-                          return (
-                            <ListItemButton onClick={() => {
-                                popupState.close()
-                                if (!gamePaused) handleClick(dbPlayer.number)
-                              }} >
-                              <ListItemIcon>
-                                <NotificationsIcon />
-                              </ListItemIcon>
-                              <ListItemText
-                                primary={dbPlayer.name}
-                                secondary={`${dbPlayer.playerDirections.join(', ')}, ${dbPlayer.playerAbilities.join(', ')}`}
-                              />
-                            </ListItemButton>
-                          )
-                        }
-                        return <></>
-                      })
-                    }
+                  <List 
+                    key={`list-${popupState.popupId}`}
+                    dense={true}>
+                    <ListItemButton 
+                      key={`ListItemButton-${popupState.popupId}`}
+                      onClick={() => {
+                        popupState.close()
+                        if (!gamePaused) handleClick(currentPlayer.number)
+                      }}>
+                      <ListItemIcon>
+                        <NotificationsIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={currentPlayer.name}
+                        secondary={`${currentPlayer.playerDirections.join(', ')}, ${currentPlayer.playerAbilities.join(', ')}`}
+                      />
+                    </ListItemButton>
                   </List>
                 </Popover>
               </>

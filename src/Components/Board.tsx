@@ -9,13 +9,15 @@ import Draggable from 'react-draggable';
 import useHighlightArea from '../utils/useHighlightArea';
 import Timer from './Timer';
 import Pinged from './Pinged';
-import { useGameStartedDocState } from '../Contexts/FirestoreContext';
+import { useGameStartedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
 import { getDoc, setDoc } from '../utils/useFirestore';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
+import { useAssets } from '../Contexts/AssetsContext';
 import { allTiles } from '../Data/all-tiles-data';
 import { Room, DBPlayer } from '../types';
 import Objectives from './Objectives';
 import GameOver from './GameOver';
+import { downloadAssets } from '../utils/useFirestore';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -25,7 +27,7 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
   console.log('*** Board Component re render')
   const draggableNodeRef = useRef(null);
   const { gameState } = useGame();
-  const gameStarted = useGameStartedDocState();
+  const { gameStarted } = useGameStartedDocState();
   const [availableArea, highlightNewTileArea, clearHighlightAreas] = useHighlightArea(gameState.roomId);
 
   return (
@@ -58,38 +60,30 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
 
 
 const Board = () => {
-  const { gameState, gameDispatch } = useGame();
+  console.log('rendering the board')
+  const { gameState } = useGame();
   const [loading, setLoading] = useState(true);
-  const gameStarted = useGameStartedDocState();
+  const { gameStarted, loadBoard } = useGameStartedDocState();
+  const { currentPlayer, allPlayersReady } = usePlayerDocState();
+  const { setAssets } = useAssets();
 
   useEffect(() => {
     (async () => {
-      console.log('running load assets useEffect')
-    // load stuff
-    // once loaded add undisable start game button
-    // countdown to start or just start
-    const docSnap = await getDoc(gameState.roomId);
-    if (!docSnap.exists()) return;
-    const roomFound = docSnap.data() as Room;
-    
-    // set player actions
-    const dbPlayers = assignRandomActions(roomFound.players)
-    const firstTile = allTiles.find(tile => tile.id === "1a");
-    const initTile = {
-      ...firstTile,
-      gridPosition: [8, 8]
-    }
+      const assets = await downloadAssets();
+      setAssets(assets);
+      const docSnap = await getDoc(gameState.roomId);
 
-    await setDoc(gameState.roomId, 
-      { 
-        players: dbPlayers, 
-        tiles: [initTile],
-        pawns: pawnDBInitialState
+      if (docSnap.exists()) {
+        const room = docSnap.data() as Room;
+        await setDoc(gameState.roomId, 
+          { 
+            playersReady: [...room.playersReady, currentPlayer.number],
+          }
+        )
       }
-    )
-    setLoading(false);
+      setLoading(false)
     })()
-  }, [gameState.gameStarted])
+  }, [loadBoard])
 
   const startGame = async () => {
     await setDoc(gameState.roomId, 
@@ -109,18 +103,30 @@ const Board = () => {
         {loading ? 
           <CircularProgress color="inherit" />
             : 
-          <Button variant='contained' onClick={startGame}>Start</Button>
+          <Button 
+            variant='contained' 
+            onClick={startGame}
+            disabled={!allPlayersReady}
+          >
+            {!allPlayersReady ? 'Waiting for other players...' : 'Start'}
+          </Button>
         }
       </Backdrop>
-      <BoardComponent
-        timer={<Timer />}
-        pinged={<Pinged />}
-      >
-        <Tiles />
-        {!loading && <Pawns />}
-      </BoardComponent>
-      {/* IF WON Component use MUI Backdrop and Win message or modal*/}
-      <GameOver />
+      {
+        !loading && 
+          <>
+            <BoardComponent
+              timer={<Timer />}
+              pinged={<Pinged />}
+            >
+              <Tiles />
+              <Pawns />
+              {/* {!loading && <Pawns />} */}
+            </BoardComponent>
+            {/* IF WON Component use MUI Backdrop and Win message or modal*/}
+            <GameOver />
+          </>
+      }
     </div>
   );
 };

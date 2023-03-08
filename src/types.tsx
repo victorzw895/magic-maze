@@ -81,14 +81,16 @@ export interface DBPawns {
 export interface Room {
   // timerRunning: boolean
   // minutesLeft: number,
+  loadBoard: boolean,
+  gameStarted: boolean,
+  gamePaused: boolean,
   gameOver: boolean,
   gameWon: boolean,
-  gamePaused: boolean,
-  gameStarted: boolean,
   timeLeft: number,
   weaponsStolen: heroColor[],
   heroesEscaped: heroColor[],
   players: DBPlayer[],
+  playersReady: playerNumber[],
   host: playerNumber,
   tiles: DBTile[],
   pawns: DBPawns,

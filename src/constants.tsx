@@ -1,7 +1,6 @@
 import { BlockedPositions, heroColor, Room } from './types';
 import { Timestamp } from 'firebase/firestore';
 
-export const jpgAssets = ['objective_a', 'objective_b'];
 export const pngAssets = [
   'down',
   'up',
@@ -13,6 +12,16 @@ export const pngAssets = [
   'hour-glass',
   'teleport-disabled',
   'teleport',
+  'bell',
+  'bell-shake',
+  'exit-green',
+  'exit-yellow',
+  'exit-purple',
+  'exit-orange',
+  'objective-green',
+  'objective-yellow',
+  'objective-purple',
+  'objective-orange',
 ]
 
 export const svgAssets = [
@@ -67,9 +76,11 @@ export const pawnDefaultValues = {
 }
 
 export const roomDefaultValues: Room = {
+  playersReady: [],
   players: [],
   host: 1,
   pings: [],
+  loadBoard: false,
   gameStarted: false,
   gamePaused: false,
   gameOver: false,

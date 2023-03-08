@@ -27,7 +27,8 @@ const OrangePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const TilesDocContext = createContext<any>(undefined);
 const PlayerDocContext = createContext<{ 
   players: DBPlayer[],
-  currentPlayer: DBPlayer
+  currentPlayer: DBPlayer,
+  allPlayersReady: boolean,
 } | undefined>(undefined);
 const PingedDocContext = createContext<boolean>(false);
 
@@ -36,12 +37,13 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [room] = useDocData(gameState.roomId);
 
   const [gameStarted, setGameStarted] = useState(false);
+  const [loadBoard, setLoadBoard] = useState(false);
   const [heroesEscaped, setHeroesEscaped] = useState([]);
   const [weaponsStolen, setWeaponsStolen] = useState([]);
   
   const [gamePaused, gameOver, gameWon] = useGamePaused(room);
   const [tiles] = useTiles(room);
-  const [players, currentPlayer] = usePlayer(room);
+  const [players, currentPlayer, allPlayersReady] = usePlayer(room);
   const pawns = usePawns(room, gameState.roomId);
   const {green, yellow, purple, orange, playerHeldPawn} = pawns;
 
@@ -68,12 +70,16 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
     setGameStarted(room.gameStarted)
   }, [room.gameStarted]);
 
+  useEffect(() => {
+    setLoadBoard(room.loadBoard)
+  }, [room.loadBoard]);
+
   const playerProviderValue = useMemo(() => { // TODO figure out why need useMemo???
-    return {players, currentPlayer}
+    return {players, currentPlayer, allPlayersReady}
   }, [currentPlayer, players]);
 
   return (
-    <GameStartedDocContext.Provider value={gameStarted}>
+    <GameStartedDocContext.Provider value={{gameStarted, loadBoard}}>
       <GamePausedDocContext.Provider value={gamePaused}>
       <GameOverDocContext.Provider value={gameOver}>
       <GameWonDocContext.Provider value={gameWon}>

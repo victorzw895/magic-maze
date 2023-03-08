@@ -10,12 +10,14 @@ import {
   useGamePausedDocState,
 } from '../../Contexts/FirestoreContext';
 import { getDisplacementValue } from '../../Helpers/TileMethods';
+import { useAssets } from '../../Contexts/AssetsContext';
 
 interface pawnProps {
   pawnData: DBHeroPawn,
 }
 
 const Pawn = ({pawnData}: pawnProps) => {
+  const { assets } = useAssets();
   const { color } = pawnData;
 
   const { gameState } = useGame();
@@ -63,7 +65,7 @@ const Pawn = ({pawnData}: pawnProps) => {
             <img 
               key={`${color}-pawn`}
               draggable={false}
-              src={`/${color}-pawn.svg`} 
+              src={assets[`${color}-pawn.svg`]} 
               alt={`${color}-piece`} 
               style={{
                 border: 
