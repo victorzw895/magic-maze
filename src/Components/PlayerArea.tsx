@@ -31,6 +31,7 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
                   draggable={false}
                   src={`/${direction}.png`} 
                   alt={direction} 
+                  title={direction}
                   style={{
                     width: '80px',
                     margin: '0 30px'
@@ -51,6 +52,7 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
                     onClick={gamePaused ? () => {} : highlightNewTileArea} // TODO: disable if game paused
                     src={`/${ability}.png`} 
                     alt={ability} 
+                    title={ability}
                     style={{
                       width: '80px',
                       margin: '0 30px'
@@ -65,6 +67,7 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
                     draggable={false}
                     src={`/${ability}.png`} 
                     alt={ability} 
+                    title={ability}
                     style={{
                       width: '80px',
                       margin: '0 30px'
