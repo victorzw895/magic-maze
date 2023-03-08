@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTimer } from 'react-timer-hook';
 import { useGame } from '../Contexts/GameContext';
 import { useGamePausedDocState, useGameOverDocState, useWeaponsStolenDocState } from '../Contexts/FirestoreContext';
@@ -13,21 +13,31 @@ const Timer = () => {
   const gamePaused = useGamePausedDocState();
   const weaponsStolen = useWeaponsStolenDocState();
   const time = new Date();
-  const { gameAudio, loadAndPlayEscapeSoundtrack, playWarningSound } = useAudio();
+  const { gameAudio, loadAndPlayEscapeSoundtrack, playWarningSound, musicOn, soundOn, warningOn, setWarningOn } = useAudio();
 
   useEffect(() => {
-    if (weaponsStolen.length === 4) {
+
+    if (weaponsStolen.length === 4 && warningOn) {
       gameAudio.pause();
-      playWarningSound();
 
-      const warningTimer = setTimeout(async () => {
-        loadAndPlayEscapeSoundtrack()
-        // gameAudio.play();
-      }, 5100);
+      if (musicOn) { // i only want this to run once 
+        playWarningSound() && setWarningOn(false); // need to play this only in the first few seconds.
+      
+        const warningTimer = setTimeout(async () => {
+          loadAndPlayEscapeSoundtrack()
+          // gameAudio.play();
+        }, 5100);
+        return () => clearTimeout(warningTimer);
+      }
 
-      return () => clearTimeout(warningTimer);
+    } else if (weaponsStolen.length === 4 && !warningOn) {
+      if (musicOn) {
+        gameAudio.play();
+      }
     }
-  }, [weaponsStolen])
+
+
+  }, [weaponsStolen, musicOn, warningOn])
 
   useEffect(() => {
     // IDEALLY on game start
