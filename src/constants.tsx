@@ -9,6 +9,7 @@ export const pngAssets = [
   'emergency-exit',
   'escalator',
   'explore',
+  'explore-disabled',
   'hour-glass',
   'teleport-disabled',
   'teleport',

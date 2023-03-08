@@ -1,17 +1,15 @@
-import { ReactNode } from 'react';
 import { useGame } from '../Contexts/GameContext';
-import isEqual from 'lodash/isEqual';
 import PlayerAreaDisabled from './PlayerAreaDisabled';
 import Pinged from './Pinged';
 import { useGamePausedDocState, usePlayerDocState, useWeaponsStolenDocState } from '../Contexts/FirestoreContext';
 import { useAssets } from '../Contexts/AssetsContext';
+import { availableTiles } from '../Contexts/TilesContext';
 
 interface PlayerAreaProps {
-  highlightNewTileArea: () => void,
-  children: ReactNode
+  highlightNewTileArea: () => void
 }
 
-const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
+const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
   const { assets } = useAssets();
   const { gameState } = useGame();
   const { currentPlayer } = usePlayerDocState();
@@ -48,8 +46,8 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
                   <img 
                     key={ability}
                     draggable={false}
-                    onClick={gamePaused ? () => {} : highlightNewTileArea} // TODO: disable if game paused
-                    src={assets[`${ability}.png`]}
+                    onClick={gamePaused || availableTiles.length === 0 ? () => {} : highlightNewTileArea} // TODO: disable if game paused
+                    src={availableTiles.length === 0 ? assets[`${ability}-disabled.png`] : assets[`${ability}.png`]}
                     alt={ability} 
                     style={{
                       width: '80px',
@@ -63,11 +61,11 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
                   <img 
                     key={ability}
                     draggable={false}
-                    src={assets[`${ability}.png`]}
+                    src={ability === 'teleport' && weaponsStolen.length === 4 ? assets[`${ability}-disabled.png`] : assets[`${ability}.png`]}
                     alt={ability} 
                     style={{
                       width: '80px',
-                      margin: '0 30px'
+                      margin: '0 30px',
                     }}
                       />
                 )

@@ -27,7 +27,7 @@ const directionValue: directionValuesType = {
   left: 270
 }
 
-const availableTiles = [2,3,4,5,6,7,8,9,10,11,12];
+export const availableTiles = [2,3,4,5,6,7,8,9,10,11,12];
 
 availableTiles.sort(() => 0.5 - Math.random());
 

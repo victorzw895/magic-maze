@@ -8,7 +8,6 @@ import { useGame } from '../Contexts/GameContext';
 import Draggable from 'react-draggable';
 import useHighlightArea from '../utils/useHighlightArea';
 import Timer from './Timer';
-import Pinged from './Pinged';
 import { useLoadingDocState, useGameStartedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
 import { getDoc, setDoc } from '../utils/useFirestore';
 import { useAssets } from '../Contexts/AssetsContext';
@@ -21,7 +20,7 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
 
-const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: ReactNode, children: ReactNode}) => {
+const BoardComponent = ({timer, children}: {timer: ReactNode, children: ReactNode}) => {
   const draggableNodeRef = useRef(null);
   const { gameState } = useGame();
   const gameStarted = useGameStartedDocState();
@@ -48,15 +47,16 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
           {children}
         </div>
       </Draggable>
-      <PlayerArea highlightNewTileArea={highlightNewTileArea}>
-        {pinged}
-      </PlayerArea>
+      <PlayerArea highlightNewTileArea={highlightNewTileArea} />
     </>
   );
 };
 
 
+// TODO Need to fix, unnecessary re-rendering
 const Board = () => {
+  console.log('re rendering Board')
+
   const { gameState } = useGame();
   const [loading, setLoading] = useState(true);
   const gameStarted = useGameStartedDocState();
@@ -113,7 +113,6 @@ const Board = () => {
           <>
             <BoardComponent
               timer={<Timer />}
-              pinged={<Pinged />}
             >
               <Tiles />
               <Pawns />
