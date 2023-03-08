@@ -9,6 +9,7 @@ import WaitingRoom from './WaitingRoom';
 import { roomDefaultValues } from '../constants';
 import { query, where, getDocs, deleteDoc } from "firebase/firestore";
 import { gamesRef } from '../Firestore';
+import { usePlayerDocState } from '../Contexts/FirestoreContext';
 
 const Lobby = () => {
   console.log('re-render Lobby');
@@ -22,6 +23,7 @@ const Lobby = () => {
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState<string>("");
   const [count, setCount] = useState<number>(0)
   const [show, setShow] = useState<boolean>(false)
+  const { currentPlayer } = usePlayerDocState()
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -128,7 +130,7 @@ const Lobby = () => {
         Welcome to <span onClick={() => setCount(count +1)}> Magic Maze. </span>
       </h3>
       { show ? <Button variant='contained' size='small' color='error' disableElevation style={{marginBottom: "20px"}} onClick={expiredDocs}>Delete Expired Documents</Button> : ""}
-      {gameState.roomId ?
+      {gameState.roomId && currentPlayer.number ?
         <WaitingRoom />
           :
         <Paper className="lobby-actions" sx={{ width: '100%', maxWidth: 360, bgcolor: '#63B0CD' }}>
