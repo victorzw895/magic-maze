@@ -1,17 +1,14 @@
 
 // import { usePawn } from '../Contexts/PawnContext';
 import { useEffect } from 'react';
-import { 
-  usePlayerHeldPawnDocState 
-} from '../Contexts/FirestoreContext';
-import { downloadAssets } from '../utils/useFirestore';
+// import { downloadAssets } from '../utils/useFirestore';
 
 const Test = () => {
 
   useEffect(() => {
-    (async () => {
-      await downloadAssets();
-    })()
+    // (async () => {
+    //   await downloadAssets();
+    // })()
   }, [])
   // const { currentPlayer } = usePlayerDocState();
   

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { heroColor, Player, playerNumber, direction, Escalator, DBPlayer } from '../types';
+import { Player, playerNumber, DBPlayer } from '../types';
 import cryptoRandomString from 'crypto-random-string';
 
 export type Action = 

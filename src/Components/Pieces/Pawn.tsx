@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Room, DBHeroPawn, DBTile } from '../../types';
 import { tileWallSize } from '../../constants';
 import { useGame } from '../../Contexts/GameContext';

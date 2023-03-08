@@ -1,5 +1,5 @@
-import { useMemo, Dispatch, useEffect, SetStateAction, useState } from 'react';
-import { usePlayerState, usePlayerDispatch } from '../Contexts/PlayerContext';
+import { useEffect, useState } from 'react';
+import { usePlayerState } from '../Contexts/PlayerContext';
 import { DBPlayer, Room } from '../types';
 
 const usePlayer = (room: Room): [DBPlayer[], DBPlayer, boolean] => {
@@ -36,9 +36,6 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer, boolean] => {
     setCurrentPlayer(player || {} as DBPlayer)
   }, [room.players])
 
-  useEffect(() => {
-    console.log('room Players', room.players)
-  }, [room.players])
 
   return [players, currentPlayer, allPlayersReady];
 };

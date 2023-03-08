@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { Game, direction, basicAbility, DBPlayer } from '../types';
-import { gamesRef } from "../Firestore";
-import { doc } from "firebase/firestore"; 
 
 type Action = {type: 'joinRoom', value: String} | // USED
               {type: 'toggleTimer', value: boolean} | 
@@ -122,43 +120,31 @@ const gameReducer = (gameState: Game, action: any) => {
       // ]
       // newState.players = players;
       newState.roomId = action.value;
-      // newState.docRef = doc(gamesRef, action.value);
-      // newState.players.push(PlayerFactory(0, action.playerName))
       return newState;
     }
     case 'joinRoom': {
       newState.roomId = action.value;
-      // newState.docRef = doc(gamesRef, action.value);
-      // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
       return newState;
     }
     case 'play': {
       newState.timerRunning = true;
-      // newState.docRef = doc(gamesRef, action.value);
-      // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
       return newState;
     }
     case 'startGame': {
-      // newState.players = assignRandomActions(newState.players);
       newState.gameStarted = true;
       return newState;
     }
     case 'timeLeft': {
-      // console.log("update time left")
       newState.minutesLeft = action.minutes;
       newState.secondsLeft = action.seconds;
-      // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
       return newState;
     }
     case 'toggleTimer': {
       newState.timerRunning = action.value;
       newState.gamePaused = !newState.gamePaused;
-      // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
       return newState;
     }
     case 'gameOver': {
-      // newState.players = assignRandomActions(newState.players);
-      // newState.timerRunning = false;
       newState.minutesLeft = 0;
       newState.secondsLeft = 0;
       newState.gameOver = true;

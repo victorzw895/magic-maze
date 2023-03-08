@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import Space from './Space';
 import { DBTile, TeleporterSpace, ExplorationSpace, WeaponSpace, ExitSpace, TimerSpace } from '../types';
 import { tileWallSize } from '../constants';
@@ -16,11 +15,6 @@ interface tileProps {
   tileIndex: number,
 }
 
-const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
-  return isEqual(prevProps, nextProps);
-}
-
-// memo could be good
 const Tile = ({tileIndex, tileData}: tileProps) => {
   const { assets } = useAssets();
   const { currentPlayer } = usePlayerDocState();

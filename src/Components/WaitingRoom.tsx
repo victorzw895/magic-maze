@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
-import { Paper, Stack, Button, List, ListItem, Alert, Box, Modal, Typography } from '@mui/material';
-import { getDoc, setDoc, useDocData, doc } from "../utils/useFirestore"; 
+import { Paper, Stack, Button, List, ListItem, Box, Modal, Typography } from '@mui/material';
+import { setDoc, doc } from "../utils/useFirestore"; 
 import CloseIcon from '@mui/icons-material/Close';
 import { usePlayerDocState } from '../Contexts/FirestoreContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
 import { allTiles } from '../Data/all-tiles-data';
-import { Room, DBPlayer } from '../types';
 import { deleteDoc } from "firebase/firestore";
 import { usePlayerDispatch } from '../Contexts/PlayerContext';
 

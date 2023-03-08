@@ -1,5 +1,5 @@
-import { memo, ReactNode, useEffect, useState } from 'react';
-import { DBPlayer, Room, playerNumber } from '../types';
+import { useEffect } from 'react';
+import { Room } from '../types';
 import { useGamePausedDocState, usePlayerDocState, usePingedDocState } from '../Contexts/FirestoreContext';
 import { useGame } from '../Contexts/GameContext';
 import { setDoc, getDoc } from '../utils/useFirestore';

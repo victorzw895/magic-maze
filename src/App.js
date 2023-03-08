@@ -5,7 +5,6 @@ import Lobby from './Components/Lobby';
 import { useLoadingDocState } from './Contexts/FirestoreContext';
 
 function App() {
-  console.log('re rendering app')
   const { gameState } = useGame();
   const { loadBoard } = useLoadingDocState();
 

@@ -1,4 +1,4 @@
-import { memo, ReactNode, useEffect } from 'react';
+import { ReactNode } from 'react';
 import { useGame } from '../Contexts/GameContext';
 import isEqual from 'lodash/isEqual';
 import PlayerAreaDisabled from './PlayerAreaDisabled';
@@ -9,10 +9,6 @@ import { useAssets } from '../Contexts/AssetsContext';
 interface PlayerAreaProps {
   highlightNewTileArea: () => void,
   children: ReactNode
-}
-
-const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
-  return isEqual(prevProps, nextProps);
 }
 
 const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
@@ -92,7 +88,5 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
     </div>
   )
 }
-
-// PlayerArea.whyDidYouRender = true
 
 export default PlayerArea;

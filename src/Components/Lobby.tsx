@@ -31,8 +31,6 @@ const Lobby = () => {
     setPlayerName(e.target.value)
   }
 
-  console.log('re-render Lobby', currentPlayer, gameState);
-
   // Generate code ->
   // save room code (local) -> 
   // save player number/name (local) -> 
