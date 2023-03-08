@@ -13,15 +13,17 @@ const Timer = () => {
   const gamePaused = useGamePausedDocState();
   const weaponsStolen = useWeaponsStolenDocState();
   const time = new Date();
-  const { gameAudio, loadAndPlayEscapeSoundtrack, playWarningSound, musicOn, soundOn, warningOn, setWarningOn } = useAudio();
+  const { gameAudio, loadAndPlayEscapeSoundtrack, playWarningSound, musicOn, soundOn } = useAudio();
 
   useEffect(() => {
 
-    if (weaponsStolen.length === 4 && warningOn) {
+    if (weaponsStolen.length === 4) {
       gameAudio.pause();
 
-      if (musicOn) { // i only want this to run once 
-        playWarningSound() && setWarningOn(false); // need to play this only in the first few seconds.
+      if (!musicOn) { 
+        loadAndPlayEscapeSoundtrack(); // load but don't play
+      } else {
+        playWarningSound(); 
       
         const warningTimer = setTimeout(async () => {
           loadAndPlayEscapeSoundtrack()
@@ -30,14 +32,9 @@ const Timer = () => {
         return () => clearTimeout(warningTimer);
       }
 
-    } else if (weaponsStolen.length === 4 && !warningOn) {
-      if (musicOn) {
-        gameAudio.play();
-      }
-    }
+    } 
 
-
-  }, [weaponsStolen, musicOn, warningOn])
+  }, [weaponsStolen])
 
   useEffect(() => {
     // IDEALLY on game start
@@ -46,6 +43,8 @@ const Timer = () => {
 
     time.setSeconds(time.getSeconds() + 200);
   }, [])
+
+
 
   const {
     seconds,

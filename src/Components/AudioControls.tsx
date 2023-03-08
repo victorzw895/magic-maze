@@ -16,7 +16,6 @@ const AudioControls = () => {
 
   return (
     <div className='controls'>
-      <h2>Audio Controls</h2>
       { musicOn ? 
         <IconButton color="primary" aria-label="turn off sound" component="label" onClick={() => setMusicOn(false)}><MusicNote /> </IconButton> 
         : 

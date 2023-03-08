@@ -26,7 +26,6 @@ const useSounds = () => {
   const [soundOn, setSoundOn] = useState<boolean>(true);
   // gameAudio can play, pause. SetGameAudio is to change tracks
   const [gameAudio, setGameAudio] = useState<HTMLAudioElement>(new Audio(gameSound));
-  const [warningOn, setWarningOn] = useState<boolean>(true); // will replay warning sound on again if musicOn is turn on and off
 
   // Game Music soundtrack useEffects
 
@@ -38,16 +37,12 @@ const useSounds = () => {
   const loadAndPlayEscapeSoundtrack = () => {
     const escapeSoundtrack = new Audio(escapeSound);
     escapeSoundtrack.loop = true;
-    
-    // if (musicOn) escapeSoundtrack.play();
-    // else escapeSoundtrack.pause();
-    
     setGameAudio(escapeSoundtrack);
   };
 
   // Sounds methods
   const playWarningSound = () => {
-    if (musicOn && warningOn) warningAudio.play();
+    if (musicOn) warningAudio.play();
     else warningAudio.pause();
   };
 
@@ -102,8 +97,6 @@ const useSounds = () => {
     playWinSound,
     playLoseSound,
     playCheeringSound, 
-    warningOn,
-    setWarningOn
   }
 } 
 
