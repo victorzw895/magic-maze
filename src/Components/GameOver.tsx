@@ -41,8 +41,11 @@ const GameOver = () => {
   const { setMusicOn, soundOn, playCheeringSound, playLoseSound } = useAudio();
 
   useEffect(() => {
-    if (gameOver && gameWon && soundOn) playCheeringSound() && setMusicOn(false) ;
-    else if (gameOver && !gameWon && soundOn) playLoseSound() && setMusicOn(false);
+    if (!soundOn) return;
+    if (!gameOver) return;
+
+    if (gameWon) playCheeringSound() && setMusicOn(false) ;
+    else playLoseSound() && setMusicOn(false);
   }, [gameOver, gameWon, soundOn])
 
   const handleClick = async () => {

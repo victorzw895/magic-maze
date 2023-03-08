@@ -25,16 +25,20 @@ const useSounds = () => {
   const [musicOn, setMusicOn] = useState<boolean>(true);
   const [soundOn, setSoundOn] = useState<boolean>(true);
   // gameAudio can play, pause. SetGameAudio is to change tracks
-  const [gameAudio, setGameAudio] = useState<HTMLAudioElement>(new Audio(gameSound));
+  const [gameAudio, setGameAudio] = useState<HTMLAudioElement>(() => {
+    const gameSoundtrack = new Audio(gameSound);
+    gameSoundtrack.loop = true;
+    return gameSoundtrack;
+  });
 
   // Game Music soundtrack useEffects
 
   useEffect(() => {
     if (musicOn) gameAudio.play();
     else gameAudio.pause();
-  }, [musicOn, gameAudio])
+  }, [musicOn])
 
-  const loadAndPlayEscapeSoundtrack = () => {
+  const loadEscapeSoundtrack = () => {
     const escapeSoundtrack = new Audio(escapeSound);
     escapeSoundtrack.loop = true;
     setGameAudio(escapeSoundtrack);
@@ -54,7 +58,6 @@ const useSounds = () => {
   const playAchievementSound = () => {
     if (soundOn) achievementAudio.play();
     else achievementAudio.pause();
-
   };
 
   const playTeleporterSound = () => {
@@ -88,7 +91,7 @@ const useSounds = () => {
     soundOn, // Might not be necessary to export
     setSoundOn, 
     gameAudio,
-    loadAndPlayEscapeSoundtrack,
+    loadEscapeSoundtrack,
     playWarningSound,
     playSelectSound,
     playAchievementSound,

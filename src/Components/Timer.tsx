@@ -13,25 +13,22 @@ const Timer = () => {
   const gamePaused = useGamePausedDocState();
   const weaponsStolen = useWeaponsStolenDocState();
   const time = new Date();
-  const { gameAudio, loadAndPlayEscapeSoundtrack, playWarningSound, musicOn, soundOn } = useAudio();
+  const { gameAudio, loadEscapeSoundtrack, playWarningSound, musicOn, soundOn } = useAudio();
 
   useEffect(() => {
 
     if (weaponsStolen.length === 4) {
       gameAudio.pause();
+      loadEscapeSoundtrack();
 
-      if (!musicOn) { 
-        loadAndPlayEscapeSoundtrack(); // load but don't play
-      } else {
+      if (musicOn) { 
         playWarningSound(); 
       
         const warningTimer = setTimeout(async () => {
-          loadAndPlayEscapeSoundtrack()
-          // gameAudio.play();
+          loadEscapeSoundtrack();
         }, 5100);
         return () => clearTimeout(warningTimer);
       }
-
     } 
 
   }, [weaponsStolen])
