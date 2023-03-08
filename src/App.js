@@ -2,11 +2,12 @@ import Board from './Components/Board';
 import './App.css';
 import { useGame } from './Contexts/GameContext';
 import Lobby from './Components/Lobby';
-import { useGameStartedDocState } from './Contexts/FirestoreContext';
+import { useLoadingDocState } from './Contexts/FirestoreContext';
 
 function App() {
+  console.log('re rendering app')
   const { gameState } = useGame();
-  const { loadBoard } = useGameStartedDocState();
+  const { loadBoard } = useLoadingDocState();
 
   return (
     <div className="MMApp">

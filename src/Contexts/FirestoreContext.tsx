@@ -13,6 +13,7 @@ import usePawns from '../utils/usePawns';
 type DBProviderProps = {children: React.ReactNode}
 
 
+const LoadingDocContext = createContext<any>(undefined);
 const GameStartedDocContext = createContext<any>(undefined);
 const GamePausedDocContext = createContext<boolean>(false);
 const GameOverDocContext = createContext<boolean>(false);
@@ -28,7 +29,6 @@ const TilesDocContext = createContext<any>(undefined);
 const PlayerDocContext = createContext<{ 
   players: DBPlayer[],
   currentPlayer: DBPlayer,
-  allPlayersReady: boolean,
 } | undefined>(undefined);
 const PingedDocContext = createContext<boolean>(false);
 
@@ -75,11 +75,16 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   }, [room.loadBoard]);
 
   const playerProviderValue = useMemo(() => { // TODO figure out why need useMemo???
-    return {players, currentPlayer, allPlayersReady}
-  }, [players, currentPlayer, allPlayersReady]);
+    return {players, currentPlayer}
+  }, [players, currentPlayer]);
+
+  const loadingProviderValue = useMemo(() => {
+    return {loadBoard, allPlayersReady}
+  }, [loadBoard, allPlayersReady])
 
   return (
-    <GameStartedDocContext.Provider value={{gameStarted, loadBoard}}>
+    <LoadingDocContext.Provider value={loadingProviderValue}>
+    <GameStartedDocContext.Provider value={gameStarted}>
       <GamePausedDocContext.Provider value={gamePaused}>
       <GameOverDocContext.Provider value={gameOver}>
       <GameWonDocContext.Provider value={gameWon}>
@@ -108,9 +113,18 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
       </GameOverDocContext.Provider>
       </GamePausedDocContext.Provider>
     </GameStartedDocContext.Provider>
+    </LoadingDocContext.Provider>
   )
 }
 
+
+const useLoadingDocState = () => {
+  const context = useContext(LoadingDocContext)
+  if (context === undefined) {
+    throw new Error('useLoadingDocState must be used within a LoadingDocContext');
+  }
+  return context;
+}
 
 const useGameStartedDocState = () => {
   const context = useContext(GameStartedDocContext)
@@ -226,6 +240,7 @@ const usePingedDocState = () => {
 
 export { 
   FirestoreProvider,
+  useLoadingDocState,
   useGameStartedDocState,
   useGamePausedDocState,
   useGreenDocState,

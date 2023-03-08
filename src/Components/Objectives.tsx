@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import { roomDefaultValues } from '../constants';
 import { useWeaponsStolenDocState, useHeroesEscapedDocState } from '../Contexts/FirestoreContext';
 import { useAssets } from '../Contexts/AssetsContext';

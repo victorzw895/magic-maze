@@ -9,7 +9,7 @@ import Draggable from 'react-draggable';
 import useHighlightArea from '../utils/useHighlightArea';
 import Timer from './Timer';
 import Pinged from './Pinged';
-import { useGameStartedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
+import { useLoadingDocState, useGameStartedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
 import { getDoc, setDoc } from '../utils/useFirestore';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
 import { useAssets } from '../Contexts/AssetsContext';
@@ -27,7 +27,7 @@ const BoardComponent = ({timer, pinged, children}: {timer: ReactNode, pinged: Re
   console.log('*** Board Component re render')
   const draggableNodeRef = useRef(null);
   const { gameState } = useGame();
-  const { gameStarted } = useGameStartedDocState();
+  const gameStarted = useGameStartedDocState();
   const [availableArea, highlightNewTileArea, clearHighlightAreas] = useHighlightArea(gameState.roomId);
 
   return (
@@ -63,8 +63,9 @@ const Board = () => {
   console.log('rendering the board')
   const { gameState } = useGame();
   const [loading, setLoading] = useState(true);
-  const { gameStarted, loadBoard } = useGameStartedDocState();
-  const { currentPlayer, allPlayersReady } = usePlayerDocState();
+  const gameStarted = useGameStartedDocState();
+  const { loadBoard, allPlayersReady } = useLoadingDocState();
+  const { currentPlayer } = usePlayerDocState();
   const { setAssets } = useAssets();
 
   useEffect(() => {
