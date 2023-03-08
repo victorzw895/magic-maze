@@ -6,7 +6,7 @@ import { DBPlayer } from '../types';
 import { setDoc, useDocData, doc } from "../utils/useFirestore"; 
 import { allTiles } from '../Data/all-tiles-data';
 import CloseIcon from '@mui/icons-material/Close';
-import { useRoomHostDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
+import { usePlayerDocState } from '../Contexts/FirestoreContext';
 import { deleteDoc } from "firebase/firestore";
 import { usePlayerDispatch } from '../Contexts/PlayerContext';
 
@@ -58,8 +58,10 @@ const WaitingRoom = () => {
 
   const exitRoom = async () => {
     if (players.length === 1) {
-      deleteRoom()
-    } else {
+      return deleteRoom()
+    } 
+     
+    if (players && players.length) {
       // ! Feel like there could be async issues below but need revision
       // * remove current player from player list 
       const updatedPlayers = players.filter((dbPlayer: any) => dbPlayer.id !== currentPlayer.id)
@@ -70,10 +72,10 @@ const WaitingRoom = () => {
       await setDoc(gameState.roomId, {
         players: updatedPlayers
       })
-      // remove player id locally
-      playerDispatch({type: "setPlayer", value: null});  // TODO most likely needs id / or same change
-      gameDispatch({ type: "exitRoom" })
-    }
+    } 
+    // remove player id locally
+    playerDispatch({type: "setPlayer", value: null});  // TODO most likely needs id / or same change
+    gameDispatch({ type: "exitRoom" })
   }
 
   const deleteRoom = () => {
