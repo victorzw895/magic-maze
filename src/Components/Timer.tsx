@@ -13,7 +13,7 @@ const Timer = () => {
   const gamePaused = useGamePausedDocState();
   const weaponsStolen = useWeaponsStolenDocState();
   const time = new Date();
-  const { gameAudio, loadEscapeSoundtrack, playWarningSound, musicOn, soundOn } = useAudio();
+  const { gameAudio, loadEscapeSoundtrack, playWarningSound, musicOn } = useAudio();
 
   useEffect(() => {
 
@@ -64,14 +64,12 @@ const Timer = () => {
   useEffect(() => {
     if (gameOver) {
       pause();
-      gameAudio.pause();
     }
   }, [gameOver])
 
   const toggleTimer = (pauseGame: boolean) => {
     if (pauseGame) {
       pause();
-      gameAudio.pause();
       // TODO: Notification Game Paused at 'minutes' 'seconds', Time remaining when resuming: restart time
       console.log("toggle timer here", seconds, minutes)
     }
