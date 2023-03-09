@@ -11,6 +11,7 @@ import { FirestoreProvider } from './Contexts/FirestoreContext';
 import { PlayerProvider } from './Contexts/PlayerContext';
 import Test from './Components/Test';
 import { TilesProvider } from './Contexts/TilesContext';
+import { AudioProvider } from './Contexts/AudioContext';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -18,8 +19,10 @@ ReactDOM.render(
       <PlayerProvider>
         <FirestoreProvider>
           <TilesProvider>
-            <App />
-            {/* <Test /> */}
+            <AudioProvider>
+              <App />
+              {/* <Test /> */}
+            </AudioProvider>
           </TilesProvider>
         </FirestoreProvider>
       </PlayerProvider>

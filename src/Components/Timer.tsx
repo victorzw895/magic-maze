@@ -1,31 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTimer } from 'react-timer-hook';
 import { useGame } from '../Contexts/GameContext';
 import { useGamePausedDocState, useGameOverDocState, useWeaponsStolenDocState } from '../Contexts/FirestoreContext';
-import gameSound from '../assets/game.mp3'; // download file from firestore storage instead
-import escapeSound from '../assets/escape.wav'; // download file from firestore storage instead
-import warningSound from '../assets/warning.wav'; // download file from firestore storage instead
 import { setDoc } from '../utils/useFirestore';
-import { IconButton } from '@mui/material';
-import { VolumeUp, VolumeMute } from '@mui/icons-material';
+import { useAudio } from '../Contexts/AudioContext';
 
-const playWarning = () => {
-  const audio = new Audio(warningSound);
-    audio.play();
-}
-const loadGameSoundtrack = () => {
-  const audio = new Audio(gameSound);
-  audio.loop = true;
-  return audio;
-}
-
-const loadEscapeSoundtrack = () => {
-  const audio = new Audio(escapeSound);
-  audio.loop = true;
-  return audio;
-}
-
-let gameAudio = loadGameSoundtrack()
 
 const Timer = () => {
   console.count('Render timer') // 28 times
@@ -34,28 +13,35 @@ const Timer = () => {
   const gamePaused = useGamePausedDocState();
   const weaponsStolen = useWeaponsStolenDocState();
   const time = new Date();
-  const [soundOn, setSoundOn] = useState<boolean>(true)
+  const { gameAudio, loadEscapeSoundtrack, playWarningSound, musicOn } = useAudio();
 
   useEffect(() => {
+
     if (weaponsStolen.length === 4) {
       gameAudio.pause();
-      playWarning()
+      loadEscapeSoundtrack();
 
-      const warningTimer = setTimeout(async () => {
-        gameAudio = loadEscapeSoundtrack()
-        gameAudio.play();
-      }, 5100);
+      if (musicOn) { 
+        playWarningSound(); 
+      
+        const warningTimer = setTimeout(async () => {
+          loadEscapeSoundtrack();
+        }, 5100);
+        return () => clearTimeout(warningTimer);
+      }
+    } 
 
-      return () => clearTimeout(warningTimer);
-    }
   }, [weaponsStolen])
 
   useEffect(() => {
     // IDEALLY on game start
     // maybe move timer to firestore ???
     console.log("start timer?")
+
     time.setSeconds(time.getSeconds() + 200);
-  }, [soundOn])
+  }, [])
+
+
 
   const {
     seconds,
@@ -67,7 +53,6 @@ const Timer = () => {
   // autoStart: false after attaching start() to waiting room start
   } = useTimer({ expiryTimestamp: time, autoStart: false, onExpire: async () => {
     gameDispatch({type: "gameOver"})
-    gameAudio.pause();
     await setDoc(gameState.roomId, {
       gameOver: true,
       gameWon: false,
@@ -78,9 +63,8 @@ const Timer = () => {
   useEffect(() => {
     if (gameOver) {
       pause();
-      gameAudio.pause();
     }
-  }, [gameOver, soundOn])
+  }, [gameOver])
 
   const toggleTimer = (pauseGame: boolean) => {
     if (pauseGame) {
@@ -111,12 +95,6 @@ const Timer = () => {
 
   return (
     <div className="timer">
-      { soundOn ? 
-        <IconButton color="primary" aria-label="turn off sound" component="label" onClick={() => {setSoundOn(false); gameAudio.pause()}}><VolumeUp /> </IconButton> 
-        : 
-        <IconButton color="primary" aria-label="turn off sound" component="label" onClick={() => {setSoundOn(true); gameAudio.play()}}><VolumeMute /> </IconButton> 
-      }
-
       <span>{minutes}</span>:
       <span>{seconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}</span>
     </div>
