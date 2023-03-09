@@ -7,7 +7,7 @@ import { useAudio } from '../Contexts/AudioContext';
 
 
 const Timer = () => {
-  console.count('Render timer') // 28 times
+  console.log('Render timer') // 28 times
   const { gameState, gameDispatch } = useGame();
   const gameOver = useGameOverDocState();
   const gamePaused = useGamePausedDocState();

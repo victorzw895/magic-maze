@@ -13,10 +13,10 @@ const initPlayerHeldPawn = {
 const usePawns = (room: Room, roomId: string): any => {
   const playerState = usePlayerState();
   const [playerHeldPawn, setPlayerHeldPawn] = useState<PlayerHeldPawn>(initPlayerHeldPawn);
-  const [green, setGreen] = useState<DBHeroPawn>({} as DBHeroPawn);
-  const [yellow, setYellow] = useState<DBHeroPawn>({} as DBHeroPawn);
-  const [purple, setPurple] = useState<DBHeroPawn>({} as DBHeroPawn);
-  const [orange, setOrange] = useState<DBHeroPawn>({} as DBHeroPawn);
+  const [green, setGreen] = useState<DBHeroPawn | undefined>(undefined);
+  const [yellow, setYellow] = useState<DBHeroPawn | undefined>(undefined);
+  const [purple, setPurple] = useState<DBHeroPawn | undefined>(undefined);
+  const [orange, setOrange] = useState<DBHeroPawn | undefined>(undefined);
 
   const { pawns } = room;
   const { green: greenPawn, yellow: yellowPawn, orange: orangePawn, purple: purplePawn } = pawns;

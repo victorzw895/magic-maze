@@ -43,22 +43,6 @@ const Space = memo(({
   highlightEscalator,
   tileIndex
 }: SpaceProps) => {
-  
-  // console.log('Re-render space', {
-  //   spaceType,
-  //   spaceColor,
-  //   spaceHasEscalator,
-  //   spaceEscalatorName,
-  //   spaceIsDisabled,
-  //   spaceWeaponStolen,
-  //   showMovableArea,
-  //   spacePosition,
-  //   colorSelected,
-  //   gridPosition,
-  //   highlightTeleporter,
-  //   highlightEscalator,
-  //   tileIndex
-  // });
   const { gameState } = useGame();
   const isTeleporter = spaceType === "teleporter";
   const teleporterColor = isTeleporter ? spaceColor : "";

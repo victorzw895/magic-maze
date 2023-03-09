@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { DBTile, Room } from '../types';
-import isEqual from 'lodash/isEqual'
 
 const useTiles = (room: Room): [DBTile[]] => {
   const [tiles, setTiles] = useState<DBTile[]>([]);

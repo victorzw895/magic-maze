@@ -1,8 +1,8 @@
-import { Dispatch, useEffect, SetStateAction, useState } from 'react';
-import { usePlayerState, usePlayerDispatch } from '../Contexts/PlayerContext';
+import { useEffect, useState } from 'react';
+import { usePlayerState } from '../Contexts/PlayerContext';
 import { DBPlayer, Room } from '../types';
 
-const usePlayer = (room: Room): [DBPlayer[], DBPlayer] => {
+const usePlayer = (room: Room): [DBPlayer[], DBPlayer, (player?: DBPlayer) => void, boolean] => {
   // const playerDispatch = usePlayerDispatch();
   const playerState = usePlayerState();
   // Players array should be firestore real time values, only updated by firestore changes
@@ -10,20 +10,33 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer] => {
   // player object should be local
   const [currentPlayer, setCurrentPlayer] = useState<DBPlayer>({} as DBPlayer);
 
+  const [allPlayersReady, setAllPlayersReady] = useState<boolean>(false);
 
   useEffect(() => {
-    // TODO not working correctly
-    console.log('room players update useEffect', room.players)
+    if (room.playersReady === room.players.length) setAllPlayersReady(true);
+  }, [room.playersReady])
+
+  useEffect(() => {
     setPlayers(room.players);
-  }, [room.players])
+  }, [room.players.length])
 
   useEffect(() => {
-    const currentPlayer = players.find(dbPlayer => dbPlayer.id === playerState?.id)
-    if (!currentPlayer) return;
-    setCurrentPlayer(currentPlayer)
-  }, [players])
+    if (!room.loadBoard) return;
 
-  return [players, currentPlayer];
+    const updatedPlayer = room.players.find(dbPlayer => dbPlayer.id === playerState?.id)
+    if (!updatedPlayer) return;
+
+    updateCurrentPlayer(updatedPlayer);
+  }, [room.loadBoard]);
+
+  const updateCurrentPlayer = (player?: DBPlayer) => {
+    if (!currentPlayer.number && !player) return;
+  
+    setCurrentPlayer(player || {} as DBPlayer)
+  }
+
+
+  return [players, currentPlayer, updateCurrentPlayer, allPlayersReady];
 };
 
 export default usePlayer;

@@ -3,7 +3,7 @@ import { setDoc as setDocument, doc as document, getDoc as getDocument } from "f
 import { getDownloadURL, ref } from "firebase/storage";
 import { gamesRef, storage } from "../Firestore";
 import { useDocumentData } from 'react-firebase-hooks/firestore'
-import { roomDefaultValues, jpgAssets, pngAssets, svgAssets } from '../constants';
+import { roomDefaultValues, pngAssets, svgAssets } from '../constants';
 import { allTiles } from '../Data/all-tiles-data';
 
 const dbInitialState: Room = {
@@ -45,20 +45,20 @@ const downloadAsset = (file: string) => {
 }
 
 export const downloadAssets = async () => {
-  const test = await downloadAsset(`${svgAssets[0]}.svg`);
-  console.log('test url', test)
+  const svgUrls = svgAssets.map(async (asset) => await downloadAsset(`${asset}.svg`))
+  const pngUrls = pngAssets.map(async (asset) => await downloadAsset(`${asset}.png`))
+  const tilesUrls =  allTiles.map(async (tile) => await downloadAsset(`${tile.id}.jpg`))
+  const res = await Promise.all([
+    ...svgUrls, 
+    ...pngUrls, 
+    ...tilesUrls
+  ])
 
-  // const svgUrls = svgAssets.map(async (asset) => await downloadAsset(`${asset}.svg`))
-  // const pngUrls = pngAssets.map(async (asset) => await downloadAsset(`${asset}.png`))
-  // const jpgUrls = jpgAssets.map(async (asset) => await downloadAsset(`${asset}.jpg`))
-  // const tilesUrls =  allTiles.map(async (tile) => await downloadAsset(`${tile.id}.png`))
-  // const assets = await Promise.all([
-  //   ...svgUrls, 
-  //   ...pngUrls, 
-  //   ...jpgUrls, 
-  //   ...tilesUrls
-  // ])
-
-  // console.log(assets)
-  // return assets
+  const assets = res.reduce((acc: any, value: any) => {
+    const url = new URL(value);
+    const assetName = url.pathname.split('/').pop() as string;
+    return {...acc, [assetName]: value};
+  }, {})
+  
+  return assets
 }

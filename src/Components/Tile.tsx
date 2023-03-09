@@ -1,27 +1,22 @@
-import { memo } from 'react';
 import Space from './Space';
 import { DBTile, TeleporterSpace, ExplorationSpace, WeaponSpace, ExitSpace, TimerSpace } from '../types';
 import { tileWallSize } from '../constants';
-import isEqual from 'lodash/isEqual';
 import { 
-  usePlayerDocState,
+  useCurrentPlayerDocState,
   usePlayerHeldPawnDocState,
   useWeaponsStolenDocState,
 } from '../Contexts/FirestoreContext';
 import { getDisplacementValue, shouldHighlightSpace } from '../Helpers/TileMethods';
+import { useAssets } from '../Contexts/AssetsContext';
 
 interface tileProps {
   tileData: DBTile,
   tileIndex: number,
 }
 
-const areEqual = (prevProps: tileProps, nextProps: tileProps) => {
-  return isEqual(prevProps, nextProps);
-}
-
-// memo could be good
 const Tile = ({tileIndex, tileData}: tileProps) => {
-  const { currentPlayer } = usePlayerDocState();
+  const { assets } = useAssets();
+  const { currentPlayer } = useCurrentPlayerDocState();
   const playerHeldPawn = usePlayerHeldPawnDocState()
   const weaponsStolen = useWeaponsStolenDocState();
   
@@ -84,7 +79,8 @@ const Tile = ({tileIndex, tileData}: tileProps) => {
           <img 
             key={tileData.id}
             draggable={false}
-            src={`/${tileData.id}.jpg`} alt={`tile-${tileData.id}`}
+            src={assets[`${tileData.id}.jpg`]}
+            alt={`tile-${tileData.id}`}
             style={{
               transform: `rotate(${tileData.rotation}deg)`,
             }}>

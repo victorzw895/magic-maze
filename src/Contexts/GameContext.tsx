@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { Game, direction, basicAbility, DBPlayer } from '../types';
-import { gamesRef } from "../Firestore";
-import { doc } from "firebase/firestore"; 
 
 type Action = {type: 'joinRoom', value: String} | // USED
               {type: 'toggleTimer', value: boolean} | 
@@ -16,7 +14,6 @@ type GameProviderProps = {children: React.ReactNode}
 const gameInitialState: Game = {
   // roomId: "PKHRP",
   roomId: "",
-  docRef: null,
   gameStarted: false, // TODO remove, can use values straight from DB
   gamePaused: false, // TODO remove, can use values straight from DB
   timerRunning: false, // TODO maybe not necessary
@@ -39,7 +36,7 @@ const randomize = (array: any[]) => {
   })
 }
 
-export const assignRandomActions = (players: DBPlayer[]) => {
+export const assignRandomActions = (players: DBPlayer[]): DBPlayer[] => {
   const randomPlayerOrder = randomize(players);
   
   return randomPlayerOrder.map(player => {
@@ -123,38 +120,31 @@ const gameReducer = (gameState: Game, action: any) => {
       // ]
       // newState.players = players;
       newState.roomId = action.value;
-      // newState.docRef = doc(gamesRef, action.value);
-      // newState.players.push(PlayerFactory(0, action.playerName))
       return newState;
     }
     case 'joinRoom': {
       newState.roomId = action.value;
-      // newState.docRef = doc(gamesRef, action.value);
-      // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
+      return newState;
+    }
+    case 'play': {
+      newState.timerRunning = true;
       return newState;
     }
     case 'startGame': {
-      // newState.players = assignRandomActions(newState.players);
-      newState.timerRunning = true;
       newState.gameStarted = true;
       return newState;
     }
     case 'timeLeft': {
-      // console.log("update time left")
       newState.minutesLeft = action.minutes;
       newState.secondsLeft = action.seconds;
-      // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
       return newState;
     }
     case 'toggleTimer': {
       newState.timerRunning = action.value;
       newState.gamePaused = !newState.gamePaused;
-      // newState.players.push(PlayerFactory(newState.players.length, action.playerName))
       return newState;
     }
     case 'gameOver': {
-      // newState.players = assignRandomActions(newState.players);
-      // newState.timerRunning = false;
       newState.minutesLeft = 0;
       newState.secondsLeft = 0;
       newState.gameOver = true;

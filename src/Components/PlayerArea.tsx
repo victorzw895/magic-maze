@@ -1,22 +1,20 @@
-import { memo, ReactNode, useEffect } from 'react';
 import { useGame } from '../Contexts/GameContext';
-import isEqual from 'lodash/isEqual';
 import PlayerAreaDisabled from './PlayerAreaDisabled';
 import Pinged from './Pinged';
-import { useGamePausedDocState, usePlayerDocState } from '../Contexts/FirestoreContext';
+import { useGamePausedDocState, useCurrentPlayerDocState, useWeaponsStolenDocState } from '../Contexts/FirestoreContext';
+import { useAssets } from '../Contexts/AssetsContext';
+import { availableTiles } from '../Contexts/TilesContext';
+
 interface PlayerAreaProps {
-  highlightNewTileArea: () => void,
-  children: ReactNode
+  highlightNewTileArea: () => void
 }
 
-const areEqual = (prevProps: PlayerAreaProps, nextProps: PlayerAreaProps) => {
-  return isEqual(prevProps, nextProps);
-}
-
-const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
+const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
+  const { assets } = useAssets();
   const { gameState } = useGame();
-  const { currentPlayer } = usePlayerDocState();
+  const { currentPlayer } = useCurrentPlayerDocState();
   const gamePaused = useGamePausedDocState();
+  const weaponsStolen = useWeaponsStolenDocState();
 
   return (
     <div className="player-area">
@@ -29,7 +27,7 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
                 <img 
                   key={direction}
                   draggable={false}
-                  src={`/${direction}.png`} 
+                  src={assets[`${direction}.png`]}
                   alt={direction} 
                   title={direction}
                   style={{
@@ -47,10 +45,10 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
                 // return <button key={ability} onClick={() => highlightNewTileArea()}>Add Tile</button>
                 return (
                   <img 
-                    draggable={false}
                     key={ability}
-                    onClick={gamePaused ? () => {} : highlightNewTileArea} // TODO: disable if game paused
-                    src={`/${ability}.png`} 
+                    draggable={false}
+                    onClick={gamePaused || availableTiles.length === 0 ? () => {} : highlightNewTileArea} // TODO: disable if game paused
+                    src={availableTiles.length === 0 ? assets[`${ability}-disabled.png`] : assets[`${ability}.png`]}
                     alt={ability} 
                     title={ability}
                     style={{
@@ -65,12 +63,12 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
                   <img 
                     key={ability}
                     draggable={false}
-                    src={`/${ability}.png`} 
+                    src={ability === 'teleport' && weaponsStolen.length === 4 ? assets[`${ability}-disabled.png`] : assets[`${ability}.png`]}
                     alt={ability} 
                     title={ability}
                     style={{
                       width: '80px',
-                      margin: '0 30px'
+                      margin: '0 30px',
                     }}
                       />
                 )
@@ -91,7 +89,5 @@ const PlayerArea = ({highlightNewTileArea, children} : PlayerAreaProps) => {
     </div>
   )
 }
-
-// PlayerArea.whyDidYouRender = true
 
 export default PlayerArea;

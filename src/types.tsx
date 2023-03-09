@@ -24,7 +24,6 @@ export interface Game {
   minutesLeft: number,
   secondsLeft: number,
   gameOver: boolean,
-  docRef: DocumentReference<any> | null,
   // weaponsStolen: heroColor[],
   // heroesEscaped: heroColor[]
   // players: Player[],
@@ -82,14 +81,16 @@ export interface DBPawns {
 export interface Room {
   // timerRunning: boolean
   // minutesLeft: number,
+  loadBoard: boolean,
+  gameStarted: boolean,
+  gamePaused: boolean,
   gameOver: boolean,
   gameWon: boolean,
-  gamePaused: boolean,
-  gameStarted: boolean,
   timeLeft: number,
   weaponsStolen: heroColor[],
   heroesEscaped: heroColor[],
   players: DBPlayer[],
+  playersReady: number,
   host: playerNumber,
   tiles: DBTile[],
   pawns: DBPawns,

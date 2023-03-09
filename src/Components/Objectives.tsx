@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
 import { roomDefaultValues } from '../constants';
 import { useWeaponsStolenDocState, useHeroesEscapedDocState } from '../Contexts/FirestoreContext';
+import { useAssets } from '../Contexts/AssetsContext';
 
 const objectives = Object.values(roomDefaultValues.pawns).map((pawn) => pawn.color);
 
 const Objectives = () => {
+  const { assets } = useAssets();
   const weaponsStolen = useWeaponsStolenDocState();
   const heroesEscaped = useHeroesEscapedDocState();
 
@@ -18,7 +19,7 @@ const Objectives = () => {
                 className={`exit ${color}${heroesEscaped.includes(color) ? ' escaped' : ''}`}
                 key={`exit-${color}`}
                 draggable={false}
-                src={`/exit-${color}.png`} 
+                src={assets[`exit-${color}.png`]} 
                 alt={`exit-${color}`} 
               />
             )
@@ -30,7 +31,7 @@ const Objectives = () => {
                 className={`objective ${color}${weaponsStolen.includes(color) ? ' stolen' : ''}`}
                 key={`objective-${color}`}
                 draggable={false}
-                src={`/objective-${color}.png`} 
+                src={assets[`objective-${color}.png`]} 
                 alt={`objective-${color}`} 
               />
             )

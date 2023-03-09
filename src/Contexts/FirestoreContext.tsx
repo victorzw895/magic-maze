@@ -1,11 +1,12 @@
-import React, { createContext, useContext, useEffect, Dispatch, SetStateAction, useState, useMemo } from 'react';
-import { DBPlayer, DBHeroPawn } from '../types';
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import { DBPlayer, DBHeroPawn, PlayerHeldPawn } from '../types';
 import { useGame } from '../Contexts/GameContext';
 import { useDocData } from '../utils/useFirestore';
 import useGamePaused from '../utils/useGamePaused';
 import useTiles from '../utils/useTiles';
 import usePlayer from '../utils/usePlayer';
 import usePawns from '../utils/usePawns';
+import useLoading from '../utils/useLoading';
 
 // type Action = {type: 'update', value: string} | undefined;
 // type Dispatch = (action: Action) => void;
@@ -13,21 +14,23 @@ import usePawns from '../utils/usePawns';
 type DBProviderProps = {children: React.ReactNode}
 
 
+const LoadingDocContext = createContext<any>(undefined);
 const GameStartedDocContext = createContext<any>(undefined);
 const GamePausedDocContext = createContext<boolean>(false);
 const GameOverDocContext = createContext<boolean>(false);
 const GameWonDocContext = createContext<boolean>(false);
 const WeaponsStolenDocContext = createContext<any>(undefined);
 const HeroesEscapedDocContext = createContext<any>(undefined);
-const PlayerHeldPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
-const GreenPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
-const YellowPawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
-const PurplePawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
-const OrangePawnDocContext = createContext<DBHeroPawn>({} as DBHeroPawn);
+const PlayerHeldPawnDocContext = createContext<PlayerHeldPawn>({} as PlayerHeldPawn);
+const GreenPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
+const YellowPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
+const PurplePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
+const OrangePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const TilesDocContext = createContext<any>(undefined);
-const PlayerDocContext = createContext<{ 
-  players: DBPlayer[],
-  currentPlayer: DBPlayer
+const PlayersDocContext = createContext<DBPlayer[] | undefined>(undefined);
+const CurrentPlayerDocContext = createContext<{
+  currentPlayer: DBPlayer,
+  updateCurrentPlayer: (player?: DBPlayer) => void,
 } | undefined>(undefined);
 const PingedDocContext = createContext<boolean>(false);
 
@@ -40,8 +43,9 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [weaponsStolen, setWeaponsStolen] = useState([]);
   
   const [gamePaused, gameOver, gameWon] = useGamePaused(room);
+  const [roomLoaded, loadBoard] = useLoading(room, gameState.roomId);
   const [tiles] = useTiles(room);
-  const [players, currentPlayer] = usePlayer(room);
+  const [players, currentPlayer, updateCurrentPlayer, allPlayersReady] = usePlayer(room);
   const pawns = usePawns(room, gameState.roomId);
   const {green, yellow, purple, orange, playerHeldPawn} = pawns;
 
@@ -68,17 +72,20 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
     setGameStarted(room.gameStarted)
   }, [room.gameStarted]);
 
-  const playerProviderValue = useMemo(() => { // TODO figure out why need useMemo???
-    return {players, currentPlayer}
-  }, [currentPlayer, players]);
+
+  const loadingProviderValue = useMemo(() => {
+    return {loadBoard, roomLoaded, allPlayersReady}
+  }, [loadBoard, roomLoaded, allPlayersReady])
 
   return (
+    <LoadingDocContext.Provider value={loadingProviderValue}>
     <GameStartedDocContext.Provider value={gameStarted}>
       <GamePausedDocContext.Provider value={gamePaused}>
       <GameOverDocContext.Provider value={gameOver}>
       <GameWonDocContext.Provider value={gameWon}>
         <TilesDocContext.Provider value={tiles}>
-          <PlayerDocContext.Provider value={playerProviderValue}>
+          <PlayersDocContext.Provider value={players}>
+            <CurrentPlayerDocContext.Provider value={{currentPlayer, updateCurrentPlayer}}>
             <GreenPawnDocContext.Provider value={green}>
             <YellowPawnDocContext.Provider value={yellow}>
             <PurplePawnDocContext.Provider value={purple}>
@@ -96,15 +103,25 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
             </PurplePawnDocContext.Provider>
             </YellowPawnDocContext.Provider>
             </GreenPawnDocContext.Provider>
-          </PlayerDocContext.Provider>
+            </CurrentPlayerDocContext.Provider>
+          </PlayersDocContext.Provider>
         </TilesDocContext.Provider>
       </GameWonDocContext.Provider>
       </GameOverDocContext.Provider>
       </GamePausedDocContext.Provider>
     </GameStartedDocContext.Provider>
+    </LoadingDocContext.Provider>
   )
 }
 
+
+const useLoadingDocState = () => {
+  const context = useContext(LoadingDocContext)
+  if (context === undefined) {
+    throw new Error('useLoadingDocState must be used within a LoadingDocContext');
+  }
+  return context;
+}
 
 const useGameStartedDocState = () => {
   const context = useContext(GameStartedDocContext)
@@ -186,10 +203,18 @@ const useTilesDocState = () => {
   return context;
 }
 
-const usePlayerDocState = () => {
-  const context = useContext(PlayerDocContext)
+const usePlayersDocState = () => {
+  const context = useContext(PlayersDocContext)
   if (context === undefined) {
-    throw new Error('usePlayerDocState must be used within a PlayerDocContext');
+    throw new Error('usePlayersDocState must be used within a PlayersDocContext');
+  }
+  return context;
+}
+
+const useCurrentPlayerDocState = () => {
+  const context = useContext(CurrentPlayerDocContext)
+  if (context === undefined) {
+    throw new Error('useCurrentPlayerDocState must be used within a CurrentPlayerDocContext');
   }
   return context;
 }
@@ -220,6 +245,7 @@ const usePingedDocState = () => {
 
 export { 
   FirestoreProvider,
+  useLoadingDocState,
   useGameStartedDocState,
   useGamePausedDocState,
   useGreenDocState,
@@ -227,7 +253,8 @@ export {
   usePurpleDocState,
   useOrangeDocState,
   useTilesDocState,
-  usePlayerDocState,
+  usePlayersDocState,
+  useCurrentPlayerDocState,
   usePlayerHeldPawnDocState,
   useWeaponsStolenDocState,
   useHeroesEscapedDocState,

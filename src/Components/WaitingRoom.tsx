@@ -1,24 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useGame, assignRandomActions } from '../Contexts/GameContext';
-import { pawnDBInitialState } from '../Contexts/PawnContext';
-import { Paper, Stack, Button, List, ListItem, Alert, Box, Modal, Typography } from '@mui/material';
-import { DBPlayer } from '../types';
-import { setDoc, useDocData, doc } from "../utils/useFirestore"; 
-import { allTiles } from '../Data/all-tiles-data';
+import { Paper, Stack, Button, List, ListItem, Box, Modal, Typography } from '@mui/material';
+import { setDoc, doc } from "../utils/useFirestore"; 
 import CloseIcon from '@mui/icons-material/Close';
-import { usePlayerDocState } from '../Contexts/FirestoreContext';
+import { usePlayersDocState, useCurrentPlayerDocState } from '../Contexts/FirestoreContext';
+import { pawnDBInitialState } from '../Contexts/PawnContext';
+import { allTiles } from '../Data/all-tiles-data';
 import { deleteDoc } from "firebase/firestore";
 import { usePlayerDispatch } from '../Contexts/PlayerContext';
 
 const WaitingRoom = () => {
+  console.log('re render waiting room')
   const { gameState, gameDispatch } = useGame();
   const [open, setOpen] = useState<boolean>(false)
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [room] = useDocData(gameState.roomId);
-  const { players } = room;
   const playerDispatch = usePlayerDispatch();
-  const { currentPlayer } = usePlayerDocState()
+  const players = usePlayersDocState()
+  const { currentPlayer, updateCurrentPlayer } = useCurrentPlayerDocState()
   
   // Assign actions to existing players ->
   // set initial tile ->
@@ -27,21 +26,21 @@ const WaitingRoom = () => {
   // update player with actions (local)
   const startGame = async () => {
     // set player actions
-    const dbPlayers: DBPlayer[] = assignRandomActions(players)
+    const dbPlayers = assignRandomActions(players)
     const firstTile = allTiles.find(tile => tile.id === "1a");
     const initTile = {
       ...firstTile,
       gridPosition: [8, 8]
     }
+
     await setDoc(gameState.roomId, 
       { 
         players: dbPlayers, 
-        gameStarted: true,
         tiles: [initTile],
-        pawns: pawnDBInitialState
+        pawns: pawnDBInitialState,
+        loadBoard: true,
       }
     )
-    gameDispatch({type: "startGame"})
   }
 
   const style = {
@@ -75,6 +74,7 @@ const WaitingRoom = () => {
     } 
     // remove player id locally
     playerDispatch({type: "setPlayer", value: null});  // TODO most likely needs id / or same change
+    updateCurrentPlayer();
     gameDispatch({ type: "exitRoom" })
   }
 
@@ -87,7 +87,7 @@ const WaitingRoom = () => {
   return (
     <>
       <h4 className="lobby-code">CODE: {gameState.roomId}</h4>
-      <Paper sx={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '100%', minHeight: '135px', maxWidth: '360px', bgcolor: '#63B0CD' }}>
+      <Paper sx={{display: 'grid', gridTemplateRows: 'repeat(2, minmax(50px, auto))', width: '100%', minHeight: '135px', maxWidth: '360px', bgcolor: '#63B0CD' }}>
         <List>
           {
             players && players.map((player: any) => 
@@ -108,7 +108,7 @@ const WaitingRoom = () => {
                 </Typography>
                 <Button aria-label="close" onClick={handleClose} sx={{padding: "0px"}}><CloseIcon /></Button>
               </Box>
-              { (currentPlayer.number === 1) &&
+              {(currentPlayer.number === 1) &&
                 <Stack>
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                   You are about to exit the room. You must reassign the host or end game for all.
@@ -140,26 +140,21 @@ const WaitingRoom = () => {
             </Box>
           </Modal>    
           }
-          {(currentPlayer.number === 1) && 
-            <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
-              <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
-              <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Exit Room</Button>          
-              <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room</Button>
-            </Stack>
-          }
-          {(currentPlayer.number !== 1) && players.length === 0 && 
-            <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
-              <Alert severity="info" style={{margin: "20px"}}>This game has been deleted. Please click "back" to return to the Lobby area</Alert>
-            </Stack>
-          }
-          {(currentPlayer.number !== 1) &&
-            <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0", display: "block"}}>
-              <Box textAlign='center'>
-                <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Back</Button>
-              </Box>
-            </Stack>
-          }
         </List>
+        {(currentPlayer.number === 1) && 
+          <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 10px"}}>
+            <Button variant="contained" size="small" disableElevation onClick={startGame}>Start Game</Button>
+            <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Exit Room</Button>          
+            <Button variant="contained" size="small" color="error" disableElevation onClick={deleteRoom}>Delete Room</Button>
+          </Stack>
+        }
+        {(currentPlayer.number !== 1) &&
+          <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 10px", display: "block"}}>
+            <Box textAlign='center'>
+              <Button variant="contained" size="small" id="back" disableElevation onClick={handleOpen}>Back</Button>
+            </Box>
+          </Stack>
+        }
  
       </Paper>
     </>

@@ -4,8 +4,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { usePlayerDispatch } from '../Contexts/PlayerContext';
-import { usePlayerDocState, useGameOverDocState, useGameWonDocState } from '../Contexts/FirestoreContext';
-import { DBPlayer, Player } from '../types';
+import { useGameOverDocState, useGameWonDocState } from '../Contexts/FirestoreContext';
 import { useGame } from '../Contexts/GameContext';
 import { useAudio } from '../Contexts/AudioContext';
 // import cheeringSound from '../assets/cheering.wav'; // download file from firestore storage instead

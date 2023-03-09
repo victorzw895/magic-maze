@@ -5,22 +5,24 @@ import { getDoc } from '../../utils/useFirestore';
 import { showMovableSpaces } from '../../Helpers/TileMethods';
 import { 
   useTilesDocState,
-  usePlayerDocState,
+  useCurrentPlayerDocState,
   useGamePausedDocState,
 } from '../../Contexts/FirestoreContext';
 import { getDisplacementValue } from '../../Helpers/TileMethods';
+import { useAssets } from '../../Contexts/AssetsContext';
 
 interface pawnProps {
   pawnData: DBHeroPawn,
 }
 
 const Pawn = ({pawnData}: pawnProps) => {
+  const { assets } = useAssets();
   const { color } = pawnData;
 
   const { gameState } = useGame();
   const gamePaused = useGamePausedDocState();
 
-  const { currentPlayer } = usePlayerDocState();
+  const { currentPlayer } = useCurrentPlayerDocState();
   const tiles: DBTile[] = useTilesDocState();
 
   const toggleMovableSpaces = async () => {
@@ -62,7 +64,7 @@ const Pawn = ({pawnData}: pawnProps) => {
             <img 
               key={`${color}-pawn`}
               draggable={false}
-              src={`/${color}-pawn.svg`} 
+              src={assets[`${color}-pawn.svg`]} 
               alt={`${color}-piece`} 
               style={{
                 border: 

@@ -1,10 +1,10 @@
 import { tileWallSize, spaceSize } from '../constants';
-import { direction, DBTile, DBHeroPawn, DBPawns, DBPlayer } from '../types';
+import { direction, DBTile, DBHeroPawn, DBPawns, DBPlayer, PlayerHeldPawn } from '../types';
 import { setDoc } from '../utils/useFirestore';
 import { getPlayerPawnActions } from '../Helpers/PawnMethods';
 import { getDefaultBlockedPositions } from '../constants';
 
-export const tileHasBlockedSpace = (tileData: DBTile, direction: direction, pawnHeld: DBHeroPawn) => {
+export const tileHasBlockedSpace = (tileData: DBTile, direction: direction, pawnHeld: PlayerHeldPawn) => {
   if (pawnHeld?.showMovableDirections?.includes(direction)) {
     if (pawnHeld.blockedPositions[direction].gridPosition && pawnHeld.blockedPositions[direction].position) {
       if (tileData.gridPosition[0] === pawnHeld.blockedPositions[direction].gridPosition![0] &&
@@ -63,14 +63,14 @@ export const showMovableSpaces = async (
 }
 
 export const shouldHighlightSpace = (
-  playerHeldPawn: DBHeroPawn,
+  playerHeldPawn: PlayerHeldPawn,
   player: DBPlayer,
   tileData: DBTile,
   colIndex: number,
   rowIndex: number
 ): boolean => {
   let highlightSpace = false;
-
+  
   if (playerHeldPawn && playerHeldPawn.playerHeld === player.number) {
     if (playerHeldPawn.showMovableDirections.length) {
       if (tileData.gridPosition[0] !== playerHeldPawn.gridPosition[0] || tileData.gridPosition[1] !== playerHeldPawn.gridPosition[1]) {
