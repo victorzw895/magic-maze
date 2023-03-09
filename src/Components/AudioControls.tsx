@@ -13,9 +13,9 @@ const AudioControls = () => {
   }, [soundOn]);
 
   const handleChange = (event: Event, newValue: number | number[]) => {
-    // const volumeValue: number = newValue / 100;
+    const volumeValue: number = (newValue as number) / 100;
     setValue(newValue as number);
-    setVolume(0.2);
+    setVolume(volumeValue);
   }
 
   return (
@@ -31,11 +31,11 @@ const AudioControls = () => {
         : 
         <IconButton color="primary" aria-label="turn off sound" component="label" onClick={() => setSoundOn(true)} title="Music Off"><VolumeMute /> </IconButton> 
       }
-      <Box sx={{ width: 200}}>
-        <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
-          <VolumeDown color="primary" />
-          <Slider aria-label="Volume" value={value} onChange={handleChange} />
-          <VolumeUp color="primary" />
+      <Box sx={{ width: 200, verticalAlign: "middle", mr: "10px", display: "inline-block"}}>
+        <Stack spacing={2} direction="row"  alignItems="center">
+          <IconButton color="primary" aria-label="turn off sound" component="label" onClick={() => setSoundOn(true)} title="Music Off"><VolumeMute /> </IconButton> 
+          <Slider aria-label="Volume" value={value} title='Sound Effects and Music Volume Adjustment' onChange={handleChange} />
+          <IconButton color="primary" aria-label="turn off sound" component="label" onClick={() => setSoundOn(false)} title="Music On"><VolumeUp /> </IconButton> 
         </Stack>
       </Box>
     </div>
