@@ -53,7 +53,6 @@ const Timer = () => {
   // autoStart: false after attaching start() to waiting room start
   } = useTimer({ expiryTimestamp: time, autoStart: false, onExpire: async () => {
     gameDispatch({type: "gameOver"})
-    gameAudio.pause();
     await setDoc(gameState.roomId, {
       gameOver: true,
       gameWon: false,
@@ -70,6 +69,7 @@ const Timer = () => {
   const toggleTimer = (pauseGame: boolean) => {
     if (pauseGame) {
       pause();
+      gameAudio.pause();
       // TODO: Notification Game Paused at 'minutes' 'seconds', Time remaining when resuming: restart time
       console.log("toggle timer here", seconds, minutes)
     }
