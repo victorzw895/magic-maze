@@ -19,9 +19,11 @@ const Lobby = () => {
   const [promptCode, setPromptCode] = useState(false);
   const [existingRoomCode, setExistingRoomCode] = useState("");
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState<string>("");
-  const [count, setCount] = useState<number>(0)
-  const [show, setShow] = useState<boolean>(false)
-  const { updateCurrentPlayer } = useCurrentPlayerDocState()
+  const [count, setCount] = useState<number>(0);
+  const [show, setShow] = useState<boolean>(false);
+  const { updateCurrentPlayer } = useCurrentPlayerDocState();
+  const [snapCollect, setSnapCollect] = useState<any>("");
+  const [expiredDocsCount, setexpiredDocsCount] = useState<number>(0);
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -109,27 +111,41 @@ const Lobby = () => {
     }
   }, [failJoinRoomMessage, count])
 
-  const expiredDocs = async () => {
-
+  const getExpiredDocs = async () => {
     const timeNow = new Date().valueOf()
     const yesterday = timeNow - (24 * 60 * 60 * 1000)
 
     const snap = query(gamesRef, where("createdDateInSeconds","<", yesterday))
 
     const snapShot = await getDocs(snap)
-    console.log("snapshot", snapShot)
-    snapShot.forEach((game) => {
-      // console.log("gameId", game.id)
-      deleteDoc(doc(game.id))
+    setSnapCollect(snapShot);
+    const expiredGamesCount = snapShot.size
+    setexpiredDocsCount(expiredGamesCount)
+  }
+
+  const deleteExpiredDocs = () => {
+    snapCollect.forEach((game:any) => {
+      console.log("game", game.id)
+    //   // deleteDoc(doc(game.id))
     });
   }
+
 
   return (
     <header className="App-header">
       <h3>
         Welcome to <span onClick={() => setCount(count +1)}> Magic Maze. </span>
       </h3>
-      { show ? <Button variant='contained' size='small' color='error' disableElevation style={{marginBottom: "20px"}} onClick={expiredDocs}>Delete Expired Documents</Button> : ""}
+      { show ? 
+        <>
+          {
+            expiredDocsCount === 0 ? <Button variant='contained' size='small' color='primary' disableElevation style={{marginBottom: "20px"}} onClick={getExpiredDocs}>Get Expired Documents</Button> : <h4>{expiredDocsCount} games found</h4>
+          }
+          <Button variant='contained' size='small' color='error' disableElevation style={{marginBottom: "20px"}} onClick={deleteExpiredDocs}>Delete Expired Documents</Button> 
+        </>
+        : 
+        ""
+        }
       {gameState.roomId ?
         <WaitingRoom />
           :
