@@ -98,7 +98,9 @@ const useSounds = () => {
       setMusicOn(true);
     };
 
-    gameAudio.volume = num;
+    if (gameAudio !== null) {
+      gameAudio.volume = num;
+    }
     
     warningAudio.volume = num;
     selectAudio.volume = num;
