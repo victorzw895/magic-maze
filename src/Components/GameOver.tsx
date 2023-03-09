@@ -46,7 +46,7 @@ const GameOver = () => {
 
     if (gameWon) playCheeringSound() && setMusicOn(false);
     else playLoseSound() && setMusicOn(false);
-  }, [gameOver, gameWon, soundOn])
+  }, [gameOver, gameWon])
 
   const handleClick = async () => {
     playerDispatch({type: 'setPlayer', value: null});
