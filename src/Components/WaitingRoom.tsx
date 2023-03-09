@@ -3,19 +3,21 @@ import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { Paper, Stack, Button, List, ListItem, Box, Modal, Typography } from '@mui/material';
 import { setDoc, doc } from "../utils/useFirestore"; 
 import CloseIcon from '@mui/icons-material/Close';
-import { usePlayerDocState } from '../Contexts/FirestoreContext';
+import { usePlayersDocState, useCurrentPlayerDocState } from '../Contexts/FirestoreContext';
 import { pawnDBInitialState } from '../Contexts/PawnContext';
 import { allTiles } from '../Data/all-tiles-data';
 import { deleteDoc } from "firebase/firestore";
 import { usePlayerDispatch } from '../Contexts/PlayerContext';
 
 const WaitingRoom = () => {
+  console.log('re render waiting room')
   const { gameState, gameDispatch } = useGame();
   const [open, setOpen] = useState<boolean>(false)
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const playerDispatch = usePlayerDispatch();
-  const { currentPlayer, players } = usePlayerDocState()
+  const players = usePlayersDocState()
+  const { currentPlayer, updateCurrentPlayer } = useCurrentPlayerDocState()
   
   // Assign actions to existing players ->
   // set initial tile ->
@@ -72,6 +74,7 @@ const WaitingRoom = () => {
     } 
     // remove player id locally
     playerDispatch({type: "setPlayer", value: null});  // TODO most likely needs id / or same change
+    updateCurrentPlayer();
     gameDispatch({ type: "exitRoom" })
   }
 
@@ -84,7 +87,7 @@ const WaitingRoom = () => {
   return (
     <>
       <h4 className="lobby-code">CODE: {gameState.roomId}</h4>
-      <Paper sx={{display: 'grid', gridTemplateRows: 'repeat(2, minmax(50px, 1fr))', width: '100%', minHeight: '135px', maxWidth: '360px', bgcolor: '#63B0CD' }}>
+      <Paper sx={{display: 'grid', gridTemplateRows: 'repeat(2, minmax(50px, auto))', width: '100%', minHeight: '135px', maxWidth: '360px', bgcolor: '#63B0CD' }}>
         <List>
           {
             players && players.map((player: any) => 
@@ -105,7 +108,7 @@ const WaitingRoom = () => {
                 </Typography>
                 <Button aria-label="close" onClick={handleClose} sx={{padding: "0px"}}><CloseIcon /></Button>
               </Box>
-              { (currentPlayer.number === 1) &&
+              {(currentPlayer.number === 1) &&
                 <Stack>
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                   You are about to exit the room. You must reassign the host or end game for all.

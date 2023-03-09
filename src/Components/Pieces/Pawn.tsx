@@ -5,7 +5,7 @@ import { getDoc } from '../../utils/useFirestore';
 import { showMovableSpaces } from '../../Helpers/TileMethods';
 import { 
   useTilesDocState,
-  usePlayerDocState,
+  useCurrentPlayerDocState,
   useGamePausedDocState,
 } from '../../Contexts/FirestoreContext';
 import { getDisplacementValue } from '../../Helpers/TileMethods';
@@ -22,7 +22,7 @@ const Pawn = ({pawnData}: pawnProps) => {
   const { gameState } = useGame();
   const gamePaused = useGamePausedDocState();
 
-  const { currentPlayer } = usePlayerDocState();
+  const { currentPlayer } = useCurrentPlayerDocState();
   const tiles: DBTile[] = useTilesDocState();
 
   const toggleMovableSpaces = async () => {

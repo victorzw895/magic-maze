@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { usePlayerState } from '../Contexts/PlayerContext';
 import { DBPlayer, Room } from '../types';
 
-const usePlayer = (room: Room): [DBPlayer[], DBPlayer, boolean] => {
+const usePlayer = (room: Room): [DBPlayer[], DBPlayer, (player?: DBPlayer) => void, boolean] => {
   // const playerDispatch = usePlayerDispatch();
   const playerState = usePlayerState();
   // Players array should be firestore real time values, only updated by firestore changes
@@ -13,31 +13,30 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer, boolean] => {
   const [allPlayersReady, setAllPlayersReady] = useState<boolean>(false);
 
   useEffect(() => {
-    if (room.playersReady.length === room.players.length) setAllPlayersReady(true);
-  }, [room.playersReady.length])
+    if (room.playersReady === room.players.length) setAllPlayersReady(true);
+  }, [room.playersReady])
 
   useEffect(() => {
     setPlayers(room.players);
   }, [room.players.length])
 
   useEffect(() => {
-    const player = room.players.find(dbPlayer => dbPlayer.id === playerState?.id)
-    
-    if (!currentPlayer.number && !player) {
-        return;
-    }
-    console.log('useEffect usePlayer', {
-      roomPlayers: room.players,
-      players: players,
-      player,
-      currentPlayer
-    })
+    if (!room.loadBoard) return;
+
+    const updatedPlayer = room.players.find(dbPlayer => dbPlayer.id === playerState?.id)
+    if (!updatedPlayer) return;
+
+    updateCurrentPlayer(updatedPlayer);
+  }, [room.loadBoard]);
+
+  const updateCurrentPlayer = (player?: DBPlayer) => {
+    if (!currentPlayer.number && !player) return;
   
     setCurrentPlayer(player || {} as DBPlayer)
-  }, [room.players])
+  }
 
 
-  return [players, currentPlayer, allPlayersReady];
+  return [players, currentPlayer, updateCurrentPlayer, allPlayersReady];
 };
 
 export default usePlayer;

@@ -9,7 +9,7 @@ import WaitingRoom from './WaitingRoom';
 import { roomDefaultValues } from '../constants';
 import { query, where, getDocs, deleteDoc } from "firebase/firestore";
 import { gamesRef } from '../Firestore';
-import { usePlayerDocState } from '../Contexts/FirestoreContext';
+import { useCurrentPlayerDocState } from '../Contexts/FirestoreContext';
 
 const Lobby = () => {
   const { gameState, gameDispatch } = useGame();
@@ -21,7 +21,7 @@ const Lobby = () => {
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState<string>("");
   const [count, setCount] = useState<number>(0)
   const [show, setShow] = useState<boolean>(false)
-  const { currentPlayer } = usePlayerDocState()
+  const { updateCurrentPlayer } = useCurrentPlayerDocState()
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -44,13 +44,14 @@ const Lobby = () => {
     // create new player
     const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, 0)
 
-    // save player id Locally
-    playerDispatch({type: "setPlayer", value: player});
-
     await setDoc(newGameCode, {
       ...roomDefaultValues,
       players: [dbPlayer],
     })
+
+    // save player id Locally
+    playerDispatch({type: "setPlayer", value: player});
+    updateCurrentPlayer(dbPlayer);
   }
 
   const joinRoom = async () => {
@@ -77,15 +78,16 @@ const Lobby = () => {
       ];
 
       gameDispatch({type: "joinRoom", value: existingRoomCode});
-      // save player id locally
-      playerDispatch({type: "setPlayer", value: player});
-
+      
       await setDoc(existingRoomCode, 
         {
           ...roomFound,
           players: playersInRoom
         },
       )
+      // save player id locally
+      playerDispatch({type: "setPlayer", value: player});
+      updateCurrentPlayer(dbPlayer);
     }
     else if (!roomFound) {
       setFailJoinRoomMessage("Room code not found");
@@ -128,10 +130,10 @@ const Lobby = () => {
         Welcome to <span onClick={() => setCount(count +1)}> Magic Maze. </span>
       </h3>
       { show ? <Button variant='contained' size='small' color='error' disableElevation style={{marginBottom: "20px"}} onClick={expiredDocs}>Delete Expired Documents</Button> : ""}
-      {gameState.roomId && currentPlayer.number ?
+      {gameState.roomId ?
         <WaitingRoom />
           :
-        <Paper className="lobby-actions" sx={{ display: 'grid', gridTemplateRows: 'repeat(2, minmax(50px, 1fr))', width: '100%', maxWidth: 360, bgcolor: '#63B0CD' }}>
+        <Paper className="lobby-actions" sx={{ display: 'grid', gridTemplateRows: 'repeat(2, minmax(50px, auto))', width: '100%', maxWidth: 360, bgcolor: '#63B0CD' }}>
           {
             promptCode ? 
               <>

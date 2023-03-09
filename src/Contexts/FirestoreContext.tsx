@@ -6,6 +6,7 @@ import useGamePaused from '../utils/useGamePaused';
 import useTiles from '../utils/useTiles';
 import usePlayer from '../utils/usePlayer';
 import usePawns from '../utils/usePawns';
+import useLoading from '../utils/useLoading';
 
 // type Action = {type: 'update', value: string} | undefined;
 // type Dispatch = (action: Action) => void;
@@ -26,9 +27,10 @@ const YellowPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const PurplePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const OrangePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const TilesDocContext = createContext<any>(undefined);
-const PlayerDocContext = createContext<{ 
-  players: DBPlayer[],
+const PlayersDocContext = createContext<DBPlayer[] | undefined>(undefined);
+const CurrentPlayerDocContext = createContext<{
   currentPlayer: DBPlayer,
+  updateCurrentPlayer: (player?: DBPlayer) => void,
 } | undefined>(undefined);
 const PingedDocContext = createContext<boolean>(false);
 
@@ -37,13 +39,13 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [room] = useDocData(gameState.roomId);
 
   const [gameStarted, setGameStarted] = useState(false);
-  const [loadBoard, setLoadBoard] = useState(false);
   const [heroesEscaped, setHeroesEscaped] = useState([]);
   const [weaponsStolen, setWeaponsStolen] = useState([]);
   
   const [gamePaused, gameOver, gameWon] = useGamePaused(room);
+  const [roomLoaded, loadBoard] = useLoading(room, gameState.roomId);
   const [tiles] = useTiles(room);
-  const [players, currentPlayer, allPlayersReady] = usePlayer(room);
+  const [players, currentPlayer, updateCurrentPlayer, allPlayersReady] = usePlayer(room);
   const pawns = usePawns(room, gameState.roomId);
   const {green, yellow, purple, orange, playerHeldPawn} = pawns;
 
@@ -70,17 +72,10 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
     setGameStarted(room.gameStarted)
   }, [room.gameStarted]);
 
-  useEffect(() => {
-    setLoadBoard(room.loadBoard)
-  }, [room.loadBoard]);
-
-  const playerProviderValue = useMemo(() => { // TODO figure out why need useMemo???
-    return {players, currentPlayer}
-  }, [players, currentPlayer]);
 
   const loadingProviderValue = useMemo(() => {
-    return {loadBoard, allPlayersReady}
-  }, [loadBoard, allPlayersReady])
+    return {loadBoard, roomLoaded, allPlayersReady}
+  }, [loadBoard, roomLoaded, allPlayersReady])
 
   return (
     <LoadingDocContext.Provider value={loadingProviderValue}>
@@ -89,7 +84,8 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
       <GameOverDocContext.Provider value={gameOver}>
       <GameWonDocContext.Provider value={gameWon}>
         <TilesDocContext.Provider value={tiles}>
-          <PlayerDocContext.Provider value={playerProviderValue}>
+          <PlayersDocContext.Provider value={players}>
+            <CurrentPlayerDocContext.Provider value={{currentPlayer, updateCurrentPlayer}}>
             <GreenPawnDocContext.Provider value={green}>
             <YellowPawnDocContext.Provider value={yellow}>
             <PurplePawnDocContext.Provider value={purple}>
@@ -107,7 +103,8 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
             </PurplePawnDocContext.Provider>
             </YellowPawnDocContext.Provider>
             </GreenPawnDocContext.Provider>
-          </PlayerDocContext.Provider>
+            </CurrentPlayerDocContext.Provider>
+          </PlayersDocContext.Provider>
         </TilesDocContext.Provider>
       </GameWonDocContext.Provider>
       </GameOverDocContext.Provider>
@@ -206,10 +203,18 @@ const useTilesDocState = () => {
   return context;
 }
 
-const usePlayerDocState = () => {
-  const context = useContext(PlayerDocContext)
+const usePlayersDocState = () => {
+  const context = useContext(PlayersDocContext)
   if (context === undefined) {
-    throw new Error('usePlayerDocState must be used within a PlayerDocContext');
+    throw new Error('usePlayersDocState must be used within a PlayersDocContext');
+  }
+  return context;
+}
+
+const useCurrentPlayerDocState = () => {
+  const context = useContext(CurrentPlayerDocContext)
+  if (context === undefined) {
+    throw new Error('useCurrentPlayerDocState must be used within a CurrentPlayerDocContext');
   }
   return context;
 }
@@ -248,7 +253,8 @@ export {
   usePurpleDocState,
   useOrangeDocState,
   useTilesDocState,
-  usePlayerDocState,
+  usePlayersDocState,
+  useCurrentPlayerDocState,
   usePlayerHeldPawnDocState,
   useWeaponsStolenDocState,
   useHeroesEscapedDocState,

@@ -1,9 +1,8 @@
 import Space from './Space';
 import { DBTile, TeleporterSpace, ExplorationSpace, WeaponSpace, ExitSpace, TimerSpace } from '../types';
 import { tileWallSize } from '../constants';
-import isEqual from 'lodash/isEqual';
 import { 
-  usePlayerDocState,
+  useCurrentPlayerDocState,
   usePlayerHeldPawnDocState,
   useWeaponsStolenDocState,
 } from '../Contexts/FirestoreContext';
@@ -17,7 +16,7 @@ interface tileProps {
 
 const Tile = ({tileIndex, tileData}: tileProps) => {
   const { assets } = useAssets();
-  const { currentPlayer } = usePlayerDocState();
+  const { currentPlayer } = useCurrentPlayerDocState();
   const playerHeldPawn = usePlayerHeldPawnDocState()
   const weaponsStolen = useWeaponsStolenDocState();
   

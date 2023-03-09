@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Room } from '../types';
-import { useGamePausedDocState, usePlayerDocState, usePingedDocState } from '../Contexts/FirestoreContext';
+import { useGamePausedDocState, usePlayersDocState, useCurrentPlayerDocState, usePingedDocState } from '../Contexts/FirestoreContext';
 import { useGame } from '../Contexts/GameContext';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import Popover from '@mui/material/Popover';
@@ -25,7 +25,8 @@ const Pinged = () => {
   const { assets } = useAssets();
   const { gameState } = useGame();
   const gamePaused = useGamePausedDocState();
-  const { currentPlayer, players } = usePlayerDocState();
+  const players = usePlayersDocState();
+  const { currentPlayer } = useCurrentPlayerDocState();
   const pinged = usePingedDocState();
 
   useEffect(() => {

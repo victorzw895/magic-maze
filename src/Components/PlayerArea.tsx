@@ -1,7 +1,7 @@
 import { useGame } from '../Contexts/GameContext';
 import PlayerAreaDisabled from './PlayerAreaDisabled';
 import Pinged from './Pinged';
-import { useGamePausedDocState, usePlayerDocState, useWeaponsStolenDocState } from '../Contexts/FirestoreContext';
+import { useGamePausedDocState, useCurrentPlayerDocState, useWeaponsStolenDocState } from '../Contexts/FirestoreContext';
 import { useAssets } from '../Contexts/AssetsContext';
 import { availableTiles } from '../Contexts/TilesContext';
 
@@ -12,7 +12,7 @@ interface PlayerAreaProps {
 const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
   const { assets } = useAssets();
   const { gameState } = useGame();
-  const { currentPlayer } = usePlayerDocState();
+  const { currentPlayer } = useCurrentPlayerDocState();
   const gamePaused = useGamePausedDocState();
   const weaponsStolen = useWeaponsStolenDocState();
 

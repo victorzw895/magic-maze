@@ -18,16 +18,16 @@ ReactDOM.render(
   <React.StrictMode>
     <GameProvider>
       <PlayerProvider>
-        <FirestoreProvider>
-          <TilesProvider>
-            <AudioProvider>
-              <AssetsProvider>
+        <AssetsProvider>
+          <FirestoreProvider>
+            <TilesProvider>
+              <AudioProvider>
                 <App />
                 {/* <Test /> */}
-              </AssetsProvider>
-            </AudioProvider>
-          </TilesProvider>
-        </FirestoreProvider>
+              </AudioProvider>
+            </TilesProvider>
+          </FirestoreProvider>
+        </AssetsProvider>
       </PlayerProvider>
     </GameProvider>
   </React.StrictMode>,
