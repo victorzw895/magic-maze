@@ -91,6 +91,15 @@ const useSounds = () => {
   }
 
   const setVolume = (num: number) => {
+    
+    if (num === 0) {
+      setSoundOn(false);
+      setMusicOn(false);
+    } else {
+      setSoundOn(true);
+      setMusicOn(true);
+    };
+
     gameAudio.volume = num;
     
     warningAudio.volume = num;
