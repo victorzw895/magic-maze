@@ -6,18 +6,19 @@ import Modal from '@mui/material/Modal';
 import { usePlayerDispatch } from '../Contexts/PlayerContext';
 import { useGameOverDocState, useGameWonDocState } from '../Contexts/FirestoreContext';
 import { useGame } from '../Contexts/GameContext';
-import cheeringSound from '../assets/cheering.wav'; // download file from firestore storage instead
-import loseSound from '../assets/lose.wav'; // download file from firestore storage instead
+import { useAudio } from '../Contexts/AudioContext';
+// import cheeringSound from '../assets/cheering.wav'; // download file from firestore storage instead
+// import loseSound from '../assets/lose.wav'; // download file from firestore storage instead
 
-const playLose = () => {
-  const audio = new Audio(loseSound);
-  audio.play();
-}
+// const playLose = () => {
+//   const audio = new Audio(loseSound);
+//   audio.play();
+// }
 
-const playCheering = () => {
-  const audio = new Audio(cheeringSound);
-  audio.play();
-}
+// const playCheering = () => {
+//   const audio = new Audio(cheeringSound);
+//   audio.play();
+// }
 
 const style = {
   position: 'absolute',
@@ -36,10 +37,16 @@ const GameOver = () => {
   const {gameDispatch} = useGame();
   const gameOver = useGameOverDocState();
   const gameWon = useGameWonDocState();
+  const { setMusicOn, soundOn, playCheeringSound, playLoseSound } = useAudio();
 
   useEffect(() => {
-    if (gameOver && gameWon) playCheering();
-    else if (gameOver && !gameWon) playLose();
+    if (!soundOn) return;
+    if (!gameOver) return;
+
+    if (gameWon) playCheeringSound()
+    else playLoseSound()
+
+    setMusicOn(false);
   }, [gameOver, gameWon])
 
   const handleClick = async () => {

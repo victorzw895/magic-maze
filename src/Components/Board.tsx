@@ -15,6 +15,7 @@ import { Room } from '../types';
 import Objectives from './Objectives';
 import GameOver from './GameOver';
 import { downloadAssets } from '../utils/useFirestore';
+import AudioControls from './AudioControls';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -29,6 +30,7 @@ const BoardComponent = ({timer, children}: {timer: ReactNode, children: ReactNod
   return (
     <>
       <Objectives /> {/* minimize when playing, can click to expand */}
+      <AudioControls />
       {gameStarted ? timer : <></>}
       <Draggable
         nodeRef={draggableNodeRef}

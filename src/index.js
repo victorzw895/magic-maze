@@ -12,6 +12,7 @@ import { PlayerProvider } from './Contexts/PlayerContext';
 import Test from './Components/Test';
 import { TilesProvider } from './Contexts/TilesContext';
 import { AssetsProvider } from './Contexts/AssetsContext';
+import { AudioProvider } from './Contexts/AudioContext';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -19,10 +20,12 @@ ReactDOM.render(
       <PlayerProvider>
         <FirestoreProvider>
           <TilesProvider>
-            <AssetsProvider>
-              <App />
-            {/* <Test /> */}
-            </AssetsProvider>
+            <AudioProvider>
+              <AssetsProvider>
+                <App />
+                {/* <Test /> */}
+              </AssetsProvider>
+            </AudioProvider>
           </TilesProvider>
         </FirestoreProvider>
       </PlayerProvider>

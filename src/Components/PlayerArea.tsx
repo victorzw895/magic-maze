@@ -29,6 +29,7 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
                   draggable={false}
                   src={assets[`${direction}.png`]}
                   alt={direction} 
+                  title={direction}
                   style={{
                     width: '80px',
                     margin: '0 30px'
@@ -49,6 +50,7 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
                     onClick={gamePaused || availableTiles.length === 0 ? () => {} : highlightNewTileArea} // TODO: disable if game paused
                     src={availableTiles.length === 0 ? assets[`${ability}-disabled.png`] : assets[`${ability}.png`]}
                     alt={ability} 
+                    title={ability}
                     style={{
                       width: '80px',
                       margin: '0 30px'
@@ -63,6 +65,7 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
                     draggable={false}
                     src={ability === 'teleport' && weaponsStolen.length === 4 ? assets[`${ability}-disabled.png`] : assets[`${ability}.png`]}
                     alt={ability} 
+                    title={ability}
                     style={{
                       width: '80px',
                       margin: '0 30px',

@@ -3,37 +3,7 @@ import { useGame } from '../Contexts/GameContext';
 import { heroColor, Escalator, SpaceTypeName } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
-
-import achievementSound from '../assets/achievement.mp3'; // download file from firestore storage instead
-import teleporterSound from '../assets/teleporter.mp3'; // download file from firestore storage instead
-import exitSound from '../assets/exit.mp3'; // download file from firestore storage instead
-import selectSound from '../assets/select.mp3'; // download file from firestore storage instead
-import winSound from '../assets/win.wav'; // download file from firestore storage instead
-
-const playWin = () => {
-  const audio = new Audio(winSound);
-  audio.play();
-}
-
-const playSelect = () => {
-  const audio = new Audio(selectSound);
-  audio.play();
-}
-
-const playTeleporter = () => {
-  const audio = new Audio(teleporterSound);
-  audio.play();
-}
-
-const playExit = () => {
-  const audio = new Audio(exitSound);
-  audio.play();
-}
-
-const playAchievement = () => {
-  const audio = new Audio(achievementSound);
-  audio.play();
-}
+import { useAudio } from '../Contexts/AudioContext';
 
 interface SpaceProps {
   spaceType: SpaceTypeName,
@@ -88,6 +58,7 @@ const Space = memo(({
 
   const [showTeleport, setShowTeleport] = useState(false)
   const [showEscalator, setShowEscalator] = useState(false);
+  const { playSelectSound, playAchievementSound, playTeleporterSound, playExitSound, playWinSound } = useAudio();
 
   // BUG: NEED TO FINE TUNE teleport and escalator
   useEffect(() => {
@@ -175,7 +146,7 @@ const Space = memo(({
         };
         if (isTeleporter && showTeleport) {
           // playWarp();
-          playTeleporter();
+          playTeleporterSound();
         }
         else if (isTimer && !spaceIsDisabled) {
           // pause and update db with pause
@@ -184,17 +155,17 @@ const Space = memo(({
         }
         // Might not require weaponStolen boolean on space, weaponStolen array may be enough
         else if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
-          playAchievement();
+          playAchievementSound();
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.weaponStolen = true;
           newRoomValue.weaponsStolen = [...newRoomValue.weaponsStolen, colorSelected]
         }
         else if (isExit && spaceColor === colorSelected) {
           if (newRoomValue.weaponsStolen.length === 4 && !newRoomValue.heroesEscaped.includes(colorSelected)) {
             newRoomValue.heroesEscaped = [...newRoomValue.heroesEscaped, colorSelected]
-            playExit();
+            playExitSound();
             // if last exit, celebration soundtrack
             if (newRoomValue.heroesEscaped.length === 4) {
-              playWin();
+              playWinSound();
               await setDoc(gameState.roomId, {
                 gameOver: true,
                 gameWon: true,
@@ -203,7 +174,7 @@ const Space = memo(({
           }
         }
         else {
-          playSelect();
+          playSelectSound();
         }
 
         await setDoc(
