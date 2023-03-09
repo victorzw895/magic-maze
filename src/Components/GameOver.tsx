@@ -44,8 +44,10 @@ const GameOver = () => {
     if (!soundOn) return;
     if (!gameOver) return;
 
-    if (gameWon) playCheeringSound() && setMusicOn(false);
-    else playLoseSound() && setMusicOn(false);
+    if (gameWon) playCheeringSound()
+    else playLoseSound()
+
+    setMusicOn(false);
   }, [gameOver, gameWon])
 
   const handleClick = async () => {

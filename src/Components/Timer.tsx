@@ -13,19 +13,19 @@ const Timer = () => {
   const gamePaused = useGamePausedDocState();
   const weaponsStolen = useWeaponsStolenDocState();
   const time = new Date();
-  const { gameAudio, loadEscapeSoundtrack, playWarningSound, musicOn } = useAudio();
+  const { gameAudio, loadEscapeSoundtrack, setGameAudio, playWarningSound, musicOn, loadGameSoundtrack } = useAudio();
 
   useEffect(() => {
-
     if (weaponsStolen.length === 4) {
       gameAudio.pause();
-      loadEscapeSoundtrack();
-
+      const escapeSoundtrack = loadEscapeSoundtrack();
+      setGameAudio(escapeSoundtrack)
+      
       if (musicOn) { 
         playWarningSound(); 
-      
+        
         const warningTimer = setTimeout(async () => {
-          loadEscapeSoundtrack();
+          escapeSoundtrack.play();
         }, 5100);
         return () => clearTimeout(warningTimer);
       }
@@ -39,9 +39,11 @@ const Timer = () => {
     console.log("start timer?")
 
     time.setSeconds(time.getSeconds() + 200);
+
+    const gameSoundtrack = loadGameSoundtrack();
+    gameSoundtrack.play();
+    setGameAudio(gameSoundtrack);
   }, [])
-
-
 
   const {
     seconds,
@@ -82,7 +84,9 @@ const Timer = () => {
         // time.setSeconds(time.getSeconds() + restartTime);
         // restart(time)
       }
+      if (musicOn && gameAudio) {
         gameAudio.play();
+      }
     }
   }
 
