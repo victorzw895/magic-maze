@@ -19,30 +19,32 @@ const winAudio = new Audio(winSound)
 const cheeringAudio = new Audio(cheeringSound);
 const loseAudio = new Audio(loseSound);
 
+const loadGameSoundtrack = () => {
+  const gameSoundtrack = new Audio(gameSound);
+  gameSoundtrack.loop = true;
+  return gameSoundtrack;
+}
+
+const loadEscapeSoundtrack = () => {
+  const escapeSoundtrack = new Audio(escapeSound);
+  escapeSoundtrack.loop = true;
+  return escapeSoundtrack;
+};
 // ? Do we want to include Ping here?
 
 const useSounds = () => {
   const [musicOn, setMusicOn] = useState<boolean>(true);
   const [soundOn, setSoundOn] = useState<boolean>(true);
   // gameAudio can play, pause. SetGameAudio is to change tracks
-  const [gameAudio, setGameAudio] = useState<HTMLAudioElement>(() => {
-    const gameSoundtrack = new Audio(gameSound);
-    gameSoundtrack.loop = true;
-    return gameSoundtrack;
-  });
+  const [gameAudio, setGameAudio] = useState<HTMLAudioElement | null>(null);
 
   // Game Music soundtrack useEffects
-
   useEffect(() => {
+    if (!gameAudio) return;
+
     if (musicOn) gameAudio.play();
     else gameAudio.pause();
   }, [musicOn])
-
-  const loadEscapeSoundtrack = () => {
-    const escapeSoundtrack = new Audio(escapeSound);
-    escapeSoundtrack.loop = true;
-    setGameAudio(escapeSoundtrack);
-  };
 
   // Sounds methods
   const playWarningSound = () => {
@@ -91,7 +93,9 @@ const useSounds = () => {
     soundOn, // Might not be necessary to export
     setSoundOn, 
     gameAudio,
+    loadGameSoundtrack,
     loadEscapeSoundtrack,
+    setGameAudio,
     playWarningSound,
     playSelectSound,
     playAchievementSound,
