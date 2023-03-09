@@ -40,7 +40,7 @@ const useSounds = () => {
   }, [musicOn])
 
   useEffect(() => {
-    console.log("value set at?", value)
+    
   }, [value])
 
   const loadEscapeSoundtrack = () => {
