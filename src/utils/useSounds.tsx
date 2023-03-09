@@ -35,6 +35,7 @@ const loadEscapeSoundtrack = () => {
 const useSounds = () => {
   const [musicOn, setMusicOn] = useState<boolean>(true);
   const [soundOn, setSoundOn] = useState<boolean>(true);
+  const [value, setValue] = useState<number>(100);
   // gameAudio can play, pause. SetGameAudio is to change tracks
   const [gameAudio, setGameAudio] = useState<HTMLAudioElement | null>(null);
 
@@ -87,6 +88,32 @@ const useSounds = () => {
     else cheeringAudio.pause();
   }
 
+  const setVolume = (num: number) => {
+    
+    if (num === 0) {
+      setSoundOn(false);
+      setMusicOn(false);
+    } else {
+      setSoundOn(true);
+      setMusicOn(true);
+    };
+
+    if (gameAudio !== null) {
+      gameAudio.volume = num;
+    }
+    
+    warningAudio.volume = num;
+    selectAudio.volume = num;
+    achievementAudio.volume = num;
+    teleporterAudio.volume = num;
+    exitAudio.volume = num;
+    winAudio.volume = num;
+    loseAudio.volume = num;
+    cheeringAudio.volume = num;
+
+    console.log("volume level?", num)
+  }
+
   return {
     musicOn, // Might not be necessary to export
     setMusicOn,
@@ -104,6 +131,9 @@ const useSounds = () => {
     playWinSound,
     playLoseSound,
     playCheeringSound, 
+    value,
+    setValue,
+    setVolume
   }
 } 
 
