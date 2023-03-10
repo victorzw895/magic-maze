@@ -90,10 +90,11 @@ const useSounds = () => {
 
   const setVolume = (num: number) => {
     
-    if (num === 0) {
+    if (num === 0 && soundOn && musicOn) {
       setSoundOn(false);
       setMusicOn(false);
-    } else {
+    }
+    else if (!soundOn && !musicOn){
       setSoundOn(true);
       setMusicOn(true);
     };
