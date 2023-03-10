@@ -5,6 +5,7 @@ import {
   useCurrentPlayerDocState,
   usePlayerHeldPawnDocState,
   useWeaponsStolenDocState,
+  useLoadingDocState,
 } from '../Contexts/FirestoreContext';
 import { getDisplacementValue, shouldHighlightSpace } from '../Helpers/TileMethods';
 import { useAssets } from '../Contexts/AssetsContext';
@@ -16,6 +17,7 @@ interface tileProps {
 
 const Tile = ({tileIndex, tileData}: tileProps) => {
   const { assets } = useAssets();
+  const { setTileLoaded } = useLoadingDocState();
   const { currentPlayer } = useCurrentPlayerDocState();
   const playerHeldPawn = usePlayerHeldPawnDocState()
   const weaponsStolen = useWeaponsStolenDocState();
@@ -77,6 +79,7 @@ const Tile = ({tileIndex, tileData}: tileProps) => {
             )
           })}
           <img 
+            onLoad={() => setTileLoaded(true)}
             key={tileData.id}
             draggable={false}
             src={assets[`${tileData.id}.jpg`]}

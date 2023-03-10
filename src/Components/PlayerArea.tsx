@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react';
 import { useGame } from '../Contexts/GameContext';
 import PlayerAreaDisabled from './PlayerAreaDisabled';
 import Pinged from './Pinged';
-import { useGamePausedDocState, useCurrentPlayerDocState, useWeaponsStolenDocState } from '../Contexts/FirestoreContext';
+import { useGamePausedDocState, useCurrentPlayerDocState, useWeaponsStolenDocState, useLoadingDocState } from '../Contexts/FirestoreContext';
 import { useAssets } from '../Contexts/AssetsContext';
 import { availableTiles } from '../Contexts/TilesContext';
+import after from 'lodash/after';
 
 interface PlayerAreaProps {
   highlightNewTileArea: () => void
@@ -11,11 +13,18 @@ interface PlayerAreaProps {
 
 const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
   const { assets } = useAssets();
+  const { setAbilitiesLoaded } = useLoadingDocState();
   const { gameState } = useGame();
   const { currentPlayer } = useCurrentPlayerDocState();
   const gamePaused = useGamePausedDocState();
   const weaponsStolen = useWeaponsStolenDocState();
+  const [assetLodedCount, setAssetLodedCount] = useState(0);
 
+  useEffect(() => {
+    if (assetLodedCount !== currentPlayer.playerDirections.length + currentPlayer.playerAbilities.length) return;
+    setAbilitiesLoaded(true)
+  }, [assetLodedCount])
+  
   return (
     <div className="player-area">
       {
@@ -25,6 +34,7 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
             currentPlayer.playerDirections.map(direction => {
               return (
                 <img 
+                  onLoad={() => setAssetLodedCount((prev) => prev + 1)}
                   key={direction}
                   draggable={false}
                   src={assets[`${direction}.png`]}
@@ -45,6 +55,7 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
                 // return <button key={ability} onClick={() => highlightNewTileArea()}>Add Tile</button>
                 return (
                   <img 
+                    onLoad={() => setAssetLodedCount((prev) => prev + 1)}
                     key={ability}
                     draggable={false}
                     onClick={gamePaused || availableTiles.length === 0 ? () => {} : highlightNewTileArea} // TODO: disable if game paused
@@ -61,6 +72,7 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
               else {
                 return (
                   <img 
+                    onLoad={() => setAssetLodedCount((prev) => prev + 1)}
                     key={ability}
                     draggable={false}
                     src={ability === 'teleport' && weaponsStolen.length === 4 ? assets[`${ability}-disabled.png`] : assets[`${ability}.png`]}

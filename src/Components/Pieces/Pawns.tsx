@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { Room, DBHeroPawn, DBTile } from '../../types';
 import { setDoc, getDoc } from '../../utils/useFirestore';
 import { 
@@ -9,6 +9,7 @@ import {
   useOrangeDocState,
   usePurpleDocState,
   useHeroesEscapedDocState,
+  // useLoadingDocState,
 } from '../../Contexts/FirestoreContext';
 import { useGame } from '../../Contexts/GameContext';
 import { getPlayerPawnActions } from '../../Helpers/PawnMethods';
@@ -19,6 +20,13 @@ const Pawns = () => {
   const { currentPlayer } = useCurrentPlayerDocState();
   const tiles: DBTile[] = useTilesDocState();
   const heroesEscaped = useHeroesEscapedDocState();
+  // const { onPawnsLoaded } = useLoadingDocState();
+  // const [assetLodedCount, setAssetLodedCount] = useState(0);
+
+  // useEffect(() => {
+  //   if (assetLodedCount !== 4) return;
+  //   setPawnsLoaded(true)
+  // }, [assetLodedCount])
 
   useEffect(() => {
     (async () => {
