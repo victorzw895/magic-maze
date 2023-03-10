@@ -1,9 +1,10 @@
 import { useEffect, useState, memo } from 'react';
 import { useGame } from '../Contexts/GameContext';
-import { heroColor, Escalator, SpaceTypeName } from '../types';
+import { heroColor, Escalator, SpaceTypeName, DBPlayer, basicAbility, direction } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
 import { useAudio } from '../Contexts/AudioContext';
+import { async } from '@firebase/util';
 
 interface SpaceProps {
   spaceType: SpaceTypeName,
@@ -126,9 +127,11 @@ const Space = memo(({
   // add into movePawn click, if space is timer, pause timer!
   const movePawn = async () => {
     const docSnap = await getDoc(gameState.roomId);
+    
 
     if (docSnap.exists()) {
       const newRoomValue = {...docSnap.data()}
+      const playersArray = docSnap.data().players
 
       if (newRoomValue && newRoomValue.pawns) {
         if (!colorSelected) return;
@@ -152,6 +155,7 @@ const Space = memo(({
           // pause and update db with pause
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
           newRoomValue.gamePaused = true;
+          rotateAbilities(playersArray)
         }
         // Might not require weaponStolen boolean on space, weaponStolen array may be enough
         else if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
@@ -191,6 +195,37 @@ const Space = memo(({
     }
   }
 
+  const rotateArray = (array: any[] ) => {
+    const newArray = array.slice(1);
+    newArray.push(array[0]);
+    return newArray;
+  }
+
+  const rotateAbilities = async (players: DBPlayer[]) => {
+
+    if (players.length === 1) return;
+    else {
+      const updatedPlayers = [...players]
+      const abilitiesArray = players.map(player => player.playerAbilities);
+      const directionsArray = players.map(player => player.playerDirections);
+
+      const rotatedAbilitiesArray = rotateArray(abilitiesArray);
+      const rotatedDirectionsArray = rotateArray(directionsArray);
+      console.log("abilities array", abilitiesArray)
+      console.log("rotated Abilities",rotatedAbilitiesArray);
+
+      updatedPlayers.forEach((player, i) => {
+        player.playerAbilities = rotatedAbilitiesArray[i];
+        player.playerDirections = rotatedDirectionsArray[i];
+      })
+
+      console.log("updatedPlayers", updatedPlayers)
+
+      await setDoc(gameState.roomId, {
+        players: updatedPlayers
+      })
+    }
+  }
 
   return (
     <div 
