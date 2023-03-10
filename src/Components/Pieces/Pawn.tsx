@@ -18,7 +18,6 @@ interface pawnProps {
 }
 
 const Pawn = ({pawnData}: pawnProps) => {
-  console.log('rendering pawn')
   const { assets } = useAssets();
   const { onPawnsLoaded } = useLoadingDocState();
   const { color } = pawnData;

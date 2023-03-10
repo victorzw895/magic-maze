@@ -16,7 +16,6 @@ const useLoading = (room: Room, roomId: string): [roomLoaded: boolean, loadBoard
   const { setAssets } = useAssets();
 
   const onPawnsLoaded = after(4, () => setPawnsLoaded(true));
-  // const onAbilitiesLoaded = after(4, () => setAbilitiesLoaded(true));
 
   useEffect(() => {
     (async () => {
