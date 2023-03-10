@@ -134,6 +134,7 @@ const Lobby = () => {
     });
     setOpenToast(true);
     setShowDocsFound(false);
+    setShow(false);
   }
 
   const handleToastClose = (event?: SyntheticEvent | Event, reason?: string) => {
@@ -162,15 +163,15 @@ const Lobby = () => {
               :
               <Button variant='contained' size='small' color='primary' disableElevation style={{marginBottom: "32px"}} onClick={getExpiredDocs}>Get Expired Documents</Button> 
           }
-          <Snackbar open={openToast} autoHideDuration={5000} onClose={handleToastClose}>
-            <Alert onClose={handleToastClose} severity="success" sx={{ width: '100%' }}>
-              Success! Deleted {expiredDocsCount} games. 
-            </Alert>
-          </Snackbar>
         </>
         : 
         ""
-        }
+      }
+        <Snackbar open={openToast} autoHideDuration={5000} onClose={handleToastClose}>
+          <Alert onClose={handleToastClose} severity="success" sx={{ width: '100%' }}>
+            Success! Deleted {expiredDocsCount} games. 
+          </Alert>
+        </Snackbar>        
       {gameState.roomId ?
         <WaitingRoom />
           :
