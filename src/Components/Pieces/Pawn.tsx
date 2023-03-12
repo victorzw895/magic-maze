@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from 'react';
 import { Room, DBHeroPawn, DBTile } from '../../types';
 import { tileWallSize } from '../../constants';
 import { useGame } from '../../Contexts/GameContext';
@@ -7,6 +8,7 @@ import {
   useTilesDocState,
   useCurrentPlayerDocState,
   useGamePausedDocState,
+  useLoadingDocState,
 } from '../../Contexts/FirestoreContext';
 import { getDisplacementValue } from '../../Helpers/TileMethods';
 import { useAssets } from '../../Contexts/AssetsContext';
@@ -17,6 +19,7 @@ interface pawnProps {
 
 const Pawn = ({pawnData}: pawnProps) => {
   const { assets } = useAssets();
+  const { onPawnsLoaded } = useLoadingDocState();
   const { color } = pawnData;
 
   const { gameState } = useGame();
@@ -62,6 +65,7 @@ const Pawn = ({pawnData}: pawnProps) => {
             }}
           >
             <img 
+              onLoad={() => onPawnsLoaded()}
               key={`${color}-pawn`}
               draggable={false}
               src={assets[`${color}-pawn.svg`]} 

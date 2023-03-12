@@ -13,6 +13,7 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer, (player?: DBPlayer) => vo
   const [allPlayersReady, setAllPlayersReady] = useState<boolean>(false);
 
   useEffect(() => {
+    if (room.players.length === 0) return;
     if (room.playersReady === room.players.length) setAllPlayersReady(true);
   }, [room.playersReady])
 

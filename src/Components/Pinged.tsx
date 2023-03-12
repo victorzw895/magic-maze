@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Room } from '../types';
-import { useGamePausedDocState, usePlayersDocState, useCurrentPlayerDocState, usePingedDocState } from '../Contexts/FirestoreContext';
+import { useGamePausedDocState, usePlayersDocState, useCurrentPlayerDocState, usePingedDocState, useLoadingDocState } from '../Contexts/FirestoreContext';
 import { useGame } from '../Contexts/GameContext';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import Popover from '@mui/material/Popover';
@@ -23,6 +23,7 @@ const playAlert = () => {
 
 const Pinged = () => {
   const { assets } = useAssets();
+  const { setPingLoaded } = useLoadingDocState();
   const { gameState } = useGame();
   const gamePaused = useGamePausedDocState();
   const players = usePlayersDocState();
@@ -90,6 +91,7 @@ const Pinged = () => {
                         />
                       :
                     <img 
+                      onLoad={() => setPingLoaded(true)}
                       key={'bell'}
                       {...bindTrigger(popupState)}
                       draggable={false}
