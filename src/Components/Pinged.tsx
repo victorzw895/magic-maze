@@ -30,8 +30,6 @@ const Pinged = () => {
   const { currentPlayer } = useCurrentPlayerDocState();
   const pinged = usePingedDocState();
 
-  const otherPlayers = players.filter((dbPlayer) => dbPlayer.id !== currentPlayer.id)
-
   useEffect(() => {
     if (pinged) {
       const alertAudio = playAlert();
@@ -121,7 +119,7 @@ const Pinged = () => {
                     key={`list-${popupState.popupId}`}
                     dense={true}>
                     {
-                      otherPlayers.map((otherPlayer) => {
+                      players.filter((dbPlayer) => dbPlayer.id !== currentPlayer.id).map((otherPlayer) => {
                         console.log('otherPlayer', {otherPlayer}, `${otherPlayer.playerDirections.join(', ')}, ${otherPlayer.playerAbilities.join(', ')}`)
                         return (
                           <ListItemButton 
