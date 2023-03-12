@@ -19,7 +19,7 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer, (player?: DBPlayer) => vo
 
   useEffect(() => {
     setPlayers(room.players);
-  }, [room.players.length])
+  }, [room.players])
 
   useEffect(() => {
     if (!room.loadBoard) return;

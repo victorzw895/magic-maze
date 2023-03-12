@@ -30,6 +30,8 @@ const Pinged = () => {
   const { currentPlayer } = useCurrentPlayerDocState();
   const pinged = usePingedDocState();
 
+  const otherPlayers = players.filter((dbPlayer) => dbPlayer.id !== currentPlayer.id)
+
   useEffect(() => {
     if (pinged) {
       const alertAudio = playAlert();
@@ -118,20 +120,28 @@ const Pinged = () => {
                   <List 
                     key={`list-${popupState.popupId}`}
                     dense={true}>
-                    <ListItemButton 
-                      key={`ListItemButton-${popupState.popupId}`}
-                      onClick={() => {
-                        popupState.close()
-                        if (!gamePaused) handleClick(currentPlayer.number)
-                      }}>
-                      <ListItemIcon>
-                        <NotificationsIcon />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={currentPlayer.name}
-                        secondary={`${currentPlayer.playerDirections.join(', ')}, ${currentPlayer.playerAbilities.join(', ')}`}
-                      />
-                    </ListItemButton>
+                    {
+                      otherPlayers.map((otherPlayer) => {
+                        console.log('otherPlayer', {otherPlayer}, `${otherPlayer.playerDirections.join(', ')}, ${otherPlayer.playerAbilities.join(', ')}`)
+                        return (
+                          <ListItemButton 
+                            key={`ListItemButton-${popupState.popupId}`}
+                            onClick={() => {
+                              popupState.close()
+                              if (!gamePaused) handleClick(otherPlayer.number)
+                            }} >
+                            <ListItemIcon key={`ListItemIcon-${popupState.popupId}`}>
+                              <NotificationsIcon key={`NotificationsIcon-${popupState.popupId}`}/>
+                            </ListItemIcon>
+                            <ListItemText
+                              key={`ListItemText-${popupState.popupId}`}
+                              primary={otherPlayer.name}
+                              secondary={`${otherPlayer.playerDirections.join(', ')}, ${otherPlayer.playerAbilities.join(', ')}`}
+                            />
+                          </ListItemButton>
+                        )
+                      })
+                    }
                   </List>
                 </Popover>
               </>
