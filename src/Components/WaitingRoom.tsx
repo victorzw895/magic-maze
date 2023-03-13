@@ -17,7 +17,7 @@ const WaitingRoom = () => {
   const handleClose = () => setOpen(false);
   const playerDispatch = usePlayerDispatch();
   const players = usePlayersDocState()
-  const { currentPlayer, updateCurrentPlayer } = useCurrentPlayerDocState()
+  const currentPlayer = useCurrentPlayerDocState();
   
   // Assign actions to existing players ->
   // set initial tile ->
@@ -39,6 +39,7 @@ const WaitingRoom = () => {
         tiles: [initTile],
         pawns: pawnDBInitialState,
         loadBoard: true,
+        updateAbilitiesCount: 1,
       }
     )
   }
@@ -74,7 +75,6 @@ const WaitingRoom = () => {
     } 
     // remove player id locally
     playerDispatch({type: "setPlayer", value: null});  // TODO most likely needs id / or same change
-    updateCurrentPlayer();
     gameDispatch({ type: "exitRoom" })
   }
 

@@ -53,7 +53,7 @@ const Timer = () => {
     restart
   // } = useTimer({ expiryTimestamp: time, onExpire: () => gameDispatch({type: "gameOver"}) });
   // autoStart: false after attaching start() to waiting room start
-  } = useTimer({ expiryTimestamp: time, autoStart: false, onExpire: async () => {
+  } = useTimer({ expiryTimestamp: time, onExpire: async () => {
     gameDispatch({type: "gameOver"})
     await setDoc(gameState.roomId, {
       gameOver: true,
@@ -78,11 +78,11 @@ const Timer = () => {
     else {
       const restartTime = startSeconds - ((minutes * 60) + seconds);
       if (restartTime === startSeconds) {
-        // start();
+        start();
       } else {
-        // const time = new Date();
-        // time.setSeconds(time.getSeconds() + restartTime);
-        // restart(time)
+        const time = new Date();
+        time.setSeconds(time.getSeconds() + restartTime);
+        restart(time)
       }
       if (musicOn && gameAudio) {
         gameAudio.play();

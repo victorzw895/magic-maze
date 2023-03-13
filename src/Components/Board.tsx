@@ -1,4 +1,3 @@
-import { ReactNode, FunctionComponent } from 'react';
 import './Board.scss';
 
 import Loading from './Loading';
@@ -9,11 +8,13 @@ import GameOver from './GameOver';
 import GameTable from './GameTable';
 
 import { useLoadingDocState, useGameStartedDocState } from '../Contexts/FirestoreContext';
+import { useAssets } from '../Contexts/AssetsContext';
 
 const Board = () => {
   console.log('re rendering Board');
   const gameStarted = useGameStartedDocState();
-  const { loadBoard, roomLoaded } = useLoadingDocState();
+  const { loadBoard } = useLoadingDocState();
+  const { assets } = useAssets();
 
   return (
     <div className="Board">
@@ -24,7 +25,7 @@ const Board = () => {
           <></>
       }
       {
-        roomLoaded &&
+        assets &&
           <>
             <GameTable
               timer={<Timer />}

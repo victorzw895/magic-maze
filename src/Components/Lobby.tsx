@@ -9,7 +9,6 @@ import WaitingRoom from './WaitingRoom';
 import { roomDefaultValues } from '../constants';
 import { query, where, getDocs, deleteDoc } from "firebase/firestore";
 import { gamesRef } from '../Firestore';
-import { useCurrentPlayerDocState } from '../Contexts/FirestoreContext';
 
 const Lobby = () => {
   const { gameState, gameDispatch } = useGame();
@@ -55,7 +54,6 @@ const Lobby = () => {
 
     // save player id Locally
     playerDispatch({type: "setPlayer", value: player});
-    updateCurrentPlayer(dbPlayer);
   }
 
   const joinRoom = async () => {
@@ -91,7 +89,6 @@ const Lobby = () => {
       )
       // save player id locally
       playerDispatch({type: "setPlayer", value: player});
-      updateCurrentPlayer(dbPlayer);
     }
     else if (!roomFound) {
       setFailJoinRoomMessage("Room code not found");

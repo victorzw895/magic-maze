@@ -28,10 +28,7 @@ const PurplePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const OrangePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const TilesDocContext = createContext<any>(undefined);
 const PlayersDocContext = createContext<DBPlayer[] | undefined>(undefined);
-const CurrentPlayerDocContext = createContext<{
-  currentPlayer: DBPlayer,
-  updateCurrentPlayer: (player?: DBPlayer) => void,
-} | undefined>(undefined);
+const CurrentPlayerDocContext = createContext<DBPlayer | undefined>(undefined);
 const PingedDocContext = createContext<boolean>(false);
 
 const FirestoreProvider = ({children}: DBProviderProps) => {
@@ -43,9 +40,9 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [weaponsStolen, setWeaponsStolen] = useState([]);
   
   const [gamePaused, gameOver, gameWon] = useGamePaused(room);
-  const [roomLoaded, loadBoard] = useLoading(room, gameState.roomId);
+  const [roomLoaded, loadBoard, onPawnsLoaded, setTileLoaded, setObjectivesLoaded, setAbilitiesLoaded, setPingLoaded] = useLoading(room, gameState.roomId);
   const [tiles] = useTiles(room);
-  const [players, currentPlayer, updateCurrentPlayer, allPlayersReady] = usePlayer(room);
+  const [players, currentPlayer, allPlayersReady] = usePlayer(room);
   const pawns = usePawns(room, gameState.roomId);
   const {green, yellow, purple, orange, playerHeldPawn} = pawns;
 
@@ -72,9 +69,8 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
     setGameStarted(room.gameStarted)
   }, [room.gameStarted]);
 
-
   const loadingProviderValue = useMemo(() => {
-    return {loadBoard, roomLoaded, allPlayersReady}
+    return {loadBoard, roomLoaded, allPlayersReady, onPawnsLoaded, setTileLoaded, setObjectivesLoaded, setAbilitiesLoaded, setPingLoaded}
   }, [loadBoard, roomLoaded, allPlayersReady])
 
   return (
@@ -85,7 +81,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
       <GameWonDocContext.Provider value={gameWon}>
         <TilesDocContext.Provider value={tiles}>
           <PlayersDocContext.Provider value={players}>
-            <CurrentPlayerDocContext.Provider value={{currentPlayer, updateCurrentPlayer}}>
+            <CurrentPlayerDocContext.Provider value={currentPlayer}>
             <GreenPawnDocContext.Provider value={green}>
             <YellowPawnDocContext.Provider value={yellow}>
             <PurplePawnDocContext.Provider value={purple}>
