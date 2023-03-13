@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { usePlayerState } from '../Contexts/PlayerContext';
 import { DBPlayer, Room } from '../types';
 
@@ -19,23 +19,18 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer, (player?: DBPlayer) => vo
 
   useEffect(() => {
     setPlayers(room.players);
-  }, [room.players])
-
-  useEffect(() => {
-    if (!room.loadBoard) return;
 
     const updatedPlayer = room.players.find(dbPlayer => dbPlayer.id === playerState?.id)
     if (!updatedPlayer) return;
 
     updateCurrentPlayer(updatedPlayer);
-  }, [room.loadBoard]);
+  }, [room.players.length, room.updateAbilitiesCount])
 
   const updateCurrentPlayer = (player?: DBPlayer) => {
     if (!currentPlayer.number && !player) return;
   
     setCurrentPlayer(player || {} as DBPlayer)
   }
-
 
   return [players, currentPlayer, updateCurrentPlayer, allPlayersReady];
 };

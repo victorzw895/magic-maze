@@ -22,6 +22,7 @@ const playAlert = () => {
 }
 
 const Pinged = () => {
+  console.log('here pinged')
   const { assets } = useAssets();
   const { setPingLoaded } = useLoadingDocState();
   const { gameState } = useGame();
@@ -119,22 +120,22 @@ const Pinged = () => {
                     key={`list-${popupState.popupId}`}
                     dense={true}>
                     {
-                      players.filter((dbPlayer) => dbPlayer.id !== currentPlayer.id).map((otherPlayer) => {
-                        console.log('otherPlayer', {otherPlayer}, `${otherPlayer.playerDirections.join(', ')}, ${otherPlayer.playerAbilities.join(', ')}`)
+                      players.map((dbPlayer) => {
                         return (
                           <ListItemButton 
-                            key={`ListItemButton-${popupState.popupId}`}
+                            key={`ListItemButton-${dbPlayer.id}`}
+                            disabled={dbPlayer.number === currentPlayer.number}
                             onClick={() => {
                               popupState.close()
-                              if (!gamePaused) handleClick(otherPlayer.number)
+                              if (!gamePaused) handleClick(dbPlayer.number)
                             }} >
-                            <ListItemIcon key={`ListItemIcon-${popupState.popupId}`}>
-                              <NotificationsIcon key={`NotificationsIcon-${popupState.popupId}`}/>
+                            <ListItemIcon key={`ListItemIcon-${dbPlayer.id}`}>
+                              <NotificationsIcon key={`NotificationsIcon-${dbPlayer.id}`}/>
                             </ListItemIcon>
                             <ListItemText
-                              key={`ListItemText-${popupState.popupId}`}
-                              primary={otherPlayer.name}
-                              secondary={`${otherPlayer.playerDirections.join(', ')}, ${otherPlayer.playerAbilities.join(', ')}`}
+                              key={`ListItemText-${dbPlayer.id}`}
+                              primary={dbPlayer.name}
+                              secondary={`${dbPlayer.playerDirections.join(', ')}, ${dbPlayer.playerAbilities.join(', ')}`}
                             />
                           </ListItemButton>
                         )
