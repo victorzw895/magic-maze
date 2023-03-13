@@ -16,7 +16,7 @@ import Pawn from './Pawn';
 
 const Pawns = () => {
   const { gameState } = useGame();
-  const { currentPlayer } = useCurrentPlayerDocState();
+  const currentPlayer = useCurrentPlayerDocState();
   const tiles: DBTile[] = useTilesDocState();
   const heroesEscaped = useHeroesEscapedDocState();
 
