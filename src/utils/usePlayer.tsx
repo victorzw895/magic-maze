@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { usePlayerState } from '../Contexts/PlayerContext';
 import { DBPlayer, Room } from '../types';
 
-const usePlayer = (room: Room): [DBPlayer[], DBPlayer, (player?: DBPlayer) => void, boolean] => {
+const usePlayer = (room: Room): [DBPlayer[], DBPlayer, boolean] => {
   // const playerDispatch = usePlayerDispatch();
   const playerState = usePlayerState();
   // Players array should be firestore real time values, only updated by firestore changes
@@ -24,7 +24,7 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer, (player?: DBPlayer) => vo
     if (!updatedPlayer) return;
 
     updateCurrentPlayer(updatedPlayer);
-  }, [room.players.length, room.updateAbilitiesCount])
+  }, [room.players.length, room.updateAbilitiesCount, playerState?.id])
 
   const updateCurrentPlayer = (player?: DBPlayer) => {
     if (!currentPlayer.number && !player) return;
@@ -32,7 +32,7 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer, (player?: DBPlayer) => vo
     setCurrentPlayer(player || {} as DBPlayer)
   }
 
-  return [players, currentPlayer, updateCurrentPlayer, allPlayersReady];
+  return [players, currentPlayer, allPlayersReady];
 };
 
 export default usePlayer;

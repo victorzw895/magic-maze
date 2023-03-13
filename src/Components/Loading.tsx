@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 const Loading = () => {
   const { gameState } = useGame();
   const { roomLoaded, allPlayersReady } = useLoadingDocState();
-  const { currentPlayer } = useCurrentPlayerDocState();
+  const currentPlayer = useCurrentPlayerDocState();
 
   const startGame = async () => {
     await setDoc(gameState.roomId, 

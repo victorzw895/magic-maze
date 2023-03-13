@@ -25,7 +25,7 @@ const Pawn = ({pawnData}: pawnProps) => {
   const { gameState } = useGame();
   const gamePaused = useGamePausedDocState();
 
-  const { currentPlayer } = useCurrentPlayerDocState();
+  const currentPlayer = useCurrentPlayerDocState();
   const tiles: DBTile[] = useTilesDocState();
 
   const toggleMovableSpaces = async () => {

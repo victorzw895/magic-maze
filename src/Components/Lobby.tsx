@@ -9,7 +9,6 @@ import WaitingRoom from './WaitingRoom';
 import { roomDefaultValues } from '../constants';
 import { query, where, getDocs, deleteDoc } from "firebase/firestore";
 import { gamesRef } from '../Firestore';
-import { useCurrentPlayerDocState } from '../Contexts/FirestoreContext';
 
 const Lobby = () => {
   const { gameState, gameDispatch } = useGame();
@@ -21,7 +20,6 @@ const Lobby = () => {
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState<string>("");
   const [count, setCount] = useState<number>(0)
   const [show, setShow] = useState<boolean>(false)
-  const { updateCurrentPlayer } = useCurrentPlayerDocState()
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -51,7 +49,6 @@ const Lobby = () => {
 
     // save player id Locally
     playerDispatch({type: "setPlayer", value: player});
-    updateCurrentPlayer(dbPlayer);
   }
 
   const joinRoom = async () => {

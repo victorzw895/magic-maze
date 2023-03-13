@@ -15,7 +15,7 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
   const { assets } = useAssets();
   const { setAbilitiesLoaded } = useLoadingDocState();
   const { gameState } = useGame();
-  const { currentPlayer } = useCurrentPlayerDocState();
+  const currentPlayer = useCurrentPlayerDocState();
   const gamePaused = useGamePausedDocState();
   const weaponsStolen = useWeaponsStolenDocState();
   const [assetLodedCount, setAssetLodedCount] = useState(0);

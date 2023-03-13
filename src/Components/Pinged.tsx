@@ -28,7 +28,7 @@ const Pinged = () => {
   const { gameState } = useGame();
   const gamePaused = useGamePausedDocState();
   const players = usePlayersDocState();
-  const { currentPlayer } = useCurrentPlayerDocState();
+  const currentPlayer = useCurrentPlayerDocState();
   const pinged = usePingedDocState();
 
   useEffect(() => {

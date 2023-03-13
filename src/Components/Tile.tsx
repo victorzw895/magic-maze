@@ -18,7 +18,7 @@ interface tileProps {
 const Tile = ({tileIndex, tileData}: tileProps) => {
   const { assets } = useAssets();
   const { setTileLoaded } = useLoadingDocState();
-  const { currentPlayer } = useCurrentPlayerDocState();
+  const currentPlayer = useCurrentPlayerDocState();
   const playerHeldPawn = usePlayerHeldPawnDocState()
   const weaponsStolen = useWeaponsStolenDocState();
   

@@ -17,7 +17,7 @@ const WaitingRoom = () => {
   const handleClose = () => setOpen(false);
   const playerDispatch = usePlayerDispatch();
   const players = usePlayersDocState()
-  const { currentPlayer, updateCurrentPlayer } = useCurrentPlayerDocState()
+  const currentPlayer = useCurrentPlayerDocState();
   
   // Assign actions to existing players ->
   // set initial tile ->
