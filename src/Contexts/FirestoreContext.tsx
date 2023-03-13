@@ -41,6 +41,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [heroesEscaped, setHeroesEscaped] = useState([]);
   const [weaponsStolen, setWeaponsStolen] = useState([]);
+  const [playersArray, setPlayersArray] = useState({});
   
   const [gamePaused, gameOver, gameWon] = useGamePaused(room);
   const [roomLoaded, loadBoard] = useLoading(room, gameState.roomId);
@@ -71,6 +72,11 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   useEffect(() => {
     setGameStarted(room.gameStarted)
   }, [room.gameStarted]);
+
+  useEffect(() => {
+    setPlayersArray(room.players);    
+    console.log("updating players abilities & directions")
+  }, [room.players.playerAbilities, room.players.playerDirections])
 
 
   const loadingProviderValue = useMemo(() => {

@@ -4,7 +4,6 @@ import { heroColor, Escalator, SpaceTypeName, DBPlayer, basicAbility, direction 
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
 import { useAudio } from '../Contexts/AudioContext';
-import { async } from '@firebase/util';
 
 interface SpaceProps {
   spaceType: SpaceTypeName,
@@ -155,7 +154,8 @@ const Space = memo(({
           // pause and update db with pause
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
           newRoomValue.gamePaused = true;
-          rotateAbilities(playersArray)
+          console.log("new room value count", newRoomValue.updateAbilitiesCount)
+          rotateAbilities(playersArray, newRoomValue.updateAbilitiesCount)
         }
         // Might not require weaponStolen boolean on space, weaponStolen array may be enough
         else if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
@@ -201,7 +201,7 @@ const Space = memo(({
     return newArray;
   }
 
-  const rotateAbilities = async (players: DBPlayer[]) => {
+  const rotateAbilities = async (players: DBPlayer[], count: number) => {
 
     if (players.length === 1) return;
     else {
@@ -211,8 +211,6 @@ const Space = memo(({
 
       const rotatedAbilitiesArray = rotateArray(abilitiesArray);
       const rotatedDirectionsArray = rotateArray(directionsArray);
-      console.log("abilities array", abilitiesArray)
-      console.log("rotated Abilities",rotatedAbilitiesArray);
 
       updatedPlayers.forEach((player, i) => {
         player.playerAbilities = rotatedAbilitiesArray[i];
@@ -220,9 +218,11 @@ const Space = memo(({
       })
 
       console.log("updatedPlayers", updatedPlayers)
+      console.log("update abilities count", count)
 
       await setDoc(gameState.roomId, {
-        players: updatedPlayers
+        players: updatedPlayers,
+        updateAbilitiesCount: count + 1
       })
     }
   }

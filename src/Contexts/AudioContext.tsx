@@ -8,8 +8,6 @@ const AudioContext = createContext<any>(undefined);
 // TODO KRIS: Context Provider -> like a component with all states, useEffects and returns provider wrapping children
 const AudioProvider = ({children}: {children: ReactNode}) => {
 
-  console.log("useSounds in Context", useSounds())
-
   return (
     <AudioContext.Provider value={useSounds()}>
       {children}
