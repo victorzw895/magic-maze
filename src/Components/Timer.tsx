@@ -77,6 +77,7 @@ const Timer = () => {
     }
     else {
       const restartTime = startSeconds - ((minutes * 60) + seconds);
+      console.log("restart time", restartTime)
       if (restartTime === startSeconds) {
         start();
       } else {

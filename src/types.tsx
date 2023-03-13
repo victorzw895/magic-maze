@@ -97,7 +97,8 @@ export interface Room {
   pawns: DBPawns,
   pings: playerNumber[], // ?? add debouncer or throttle, or batch update/consume from firestore
   createdDate: Date,
-  createdDateInSeconds: number
+  createdDateInSeconds: number,
+  timerDisabledCount: number
 }
 
 
