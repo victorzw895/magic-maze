@@ -14,7 +14,7 @@ const usePlayer = (room: Room): [DBPlayer[], DBPlayer, (player?: DBPlayer) => vo
 
   useEffect(() => {
     if (room.players.length === 0) return;
-    if (room.playersReady === room.players.length) setAllPlayersReady(true);
+    if (room.playersReady.length === room.players.length) setAllPlayersReady(true);
   }, [room.playersReady])
 
   useEffect(() => {

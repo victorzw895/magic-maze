@@ -2,10 +2,12 @@ import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { Room } from '../types';
 import { setDoc } from '../utils/useFirestore';
 import { useAssets } from '../Contexts/AssetsContext';
+import { usePlayerState } from '../Contexts/PlayerContext';
 import { downloadAssets } from '../utils/useFirestore';
 import after from 'lodash/after';
 
 const useLoading = (room: Room, roomId: string): [roomLoaded: boolean, loadBoard: boolean, onPawnsLoaded: () => void, ...rest: Dispatch<SetStateAction<boolean>>[]] => {
+  const playerState = usePlayerState();
   const [loadBoard, setLoadBoard] = useState(false);
   const [tileLoaded, setTileLoaded] = useState<boolean>(false);
   const [pawnsLoaded, setPawnsLoaded] = useState<boolean>(false);
@@ -34,7 +36,7 @@ const useLoading = (room: Room, roomId: string): [roomLoaded: boolean, loadBoard
       
       await setDoc(roomId, 
         { 
-          playersReady: room.playersReady + 1,
+          playersReady: [...room.playersReady, playerState?.id],
         }
       )
       setRoomLoaded(true)

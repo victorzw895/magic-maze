@@ -11,6 +11,7 @@ interface PlayerAreaProps {
 }
 
 const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
+  console.log('here player area')
   const { assets } = useAssets();
   const { setAbilitiesLoaded } = useLoadingDocState();
   const { gameState } = useGame();
