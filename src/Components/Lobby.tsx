@@ -20,7 +20,6 @@ const Lobby = () => {
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState<string>("");
   const [count, setCount] = useState<number>(0);
   const [show, setShow] = useState<boolean>(false);
-  const { updateCurrentPlayer } = useCurrentPlayerDocState();
   const [snapCollect, setSnapCollect] = useState<any>("");
   const [expiredDocsCount, setExpiredDocsCount] = useState<number>(0);
   const [showDocsFound, setShowDocsFound] = useState<boolean>(false);
