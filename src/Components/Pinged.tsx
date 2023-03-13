@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Room } from '../types';
-import { useGamePausedDocState, usePlayersDocState, useCurrentPlayerDocState, usePingedDocState } from '../Contexts/FirestoreContext';
+import { useGamePausedDocState, usePlayersDocState, useCurrentPlayerDocState, usePingedDocState, useLoadingDocState } from '../Contexts/FirestoreContext';
 import { useGame } from '../Contexts/GameContext';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import Popover from '@mui/material/Popover';
@@ -22,11 +22,13 @@ const playAlert = () => {
 }
 
 const Pinged = () => {
+  console.log('here pinged')
   const { assets } = useAssets();
+  const { setPingLoaded } = useLoadingDocState();
   const { gameState } = useGame();
   const gamePaused = useGamePausedDocState();
   const players = usePlayersDocState();
-  const { currentPlayer } = useCurrentPlayerDocState();
+  const currentPlayer = useCurrentPlayerDocState();
   const pinged = usePingedDocState();
 
   useEffect(() => {
@@ -90,6 +92,7 @@ const Pinged = () => {
                         />
                       :
                     <img 
+                      onLoad={() => setPingLoaded(true)}
                       key={'bell'}
                       {...bindTrigger(popupState)}
                       draggable={false}
@@ -116,20 +119,28 @@ const Pinged = () => {
                   <List 
                     key={`list-${popupState.popupId}`}
                     dense={true}>
-                    <ListItemButton 
-                      key={`ListItemButton-${popupState.popupId}`}
-                      onClick={() => {
-                        popupState.close()
-                        if (!gamePaused) handleClick(currentPlayer.number)
-                      }}>
-                      <ListItemIcon>
-                        <NotificationsIcon />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={currentPlayer.name}
-                        secondary={`${currentPlayer.playerDirections.join(', ')}, ${currentPlayer.playerAbilities.join(', ')}`}
-                      />
-                    </ListItemButton>
+                    {
+                      players.map((dbPlayer) => {
+                        return (
+                          <ListItemButton 
+                            key={`ListItemButton-${dbPlayer.id}`}
+                            disabled={dbPlayer.number === currentPlayer.number}
+                            onClick={() => {
+                              popupState.close()
+                              if (!gamePaused) handleClick(dbPlayer.number)
+                            }} >
+                            <ListItemIcon key={`ListItemIcon-${dbPlayer.id}`}>
+                              <NotificationsIcon key={`NotificationsIcon-${dbPlayer.id}`}/>
+                            </ListItemIcon>
+                            <ListItemText
+                              key={`ListItemText-${dbPlayer.id}`}
+                              primary={dbPlayer.name}
+                              secondary={`${dbPlayer.playerDirections.join(', ')}, ${dbPlayer.playerAbilities.join(', ')}`}
+                            />
+                          </ListItemButton>
+                        )
+                      })
+                    }
                   </List>
                 </Popover>
               </>

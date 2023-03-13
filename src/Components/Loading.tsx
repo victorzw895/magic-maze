@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 const Loading = () => {
   const { gameState } = useGame();
   const { roomLoaded, allPlayersReady } = useLoadingDocState();
-  const { currentPlayer } = useCurrentPlayerDocState();
+  const currentPlayer = useCurrentPlayerDocState();
 
   const startGame = async () => {
     await setDoc(gameState.roomId, 
@@ -31,15 +31,15 @@ const Loading = () => {
           currentPlayer.number === 1 ?
             <Button 
               variant='contained' 
-              onClick={startGame}
-              disabled={!allPlayersReady}
+              onClick={!allPlayersReady ? () => {} : startGame}
+              color={!allPlayersReady ? 'warning': 'primary'}
             >
-              {!allPlayersReady ? 'Waiting for other players...' : 'Start'}
+              {!allPlayersReady ? 'Waiting for all players to be ready...' : 'Start'}
             </Button>
               :
             <Button 
               variant='contained' 
-              color='success'
+              color={!roomLoaded ? 'warning': 'success'}
             >
               Waiting for Host to start...
             </Button>

@@ -1,13 +1,17 @@
 import { roomDefaultValues } from '../constants';
-import { useWeaponsStolenDocState, useHeroesEscapedDocState } from '../Contexts/FirestoreContext';
+import { useWeaponsStolenDocState, useHeroesEscapedDocState, useLoadingDocState } from '../Contexts/FirestoreContext';
 import { useAssets } from '../Contexts/AssetsContext';
+import after from 'lodash/after';
 
 const objectives = Object.values(roomDefaultValues.pawns).map((pawn) => pawn.color);
 
 const Objectives = () => {
   const { assets } = useAssets();
+  const { setObjectivesLoaded } = useLoadingDocState();
   const weaponsStolen = useWeaponsStolenDocState();
   const heroesEscaped = useHeroesEscapedDocState();
+
+  const onImagesLoaded = after(objectives.length, () => setObjectivesLoaded(true));
 
   return (
     <div className='objectives'>
@@ -28,6 +32,7 @@ const Objectives = () => {
           objectives.map(color => {
             return (
               <img 
+                onLoad={() => onImagesLoaded()}
                 className={`objective ${color}${weaponsStolen.includes(color) ? ' stolen' : ''}`}
                 key={`objective-${color}`}
                 draggable={false}

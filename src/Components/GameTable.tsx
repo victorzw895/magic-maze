@@ -9,6 +9,7 @@ import Objectives from './Objectives';
 import AudioControls from './AudioControls';
 
 const GameTable = ({timer, children}: {timer: ReactNode, children: ReactNode}) => {
+  console.log('game table re render')
   const draggableNodeRef = useRef(null);
   const { gameState } = useGame();
   const gameStarted = useGameStartedDocState();
