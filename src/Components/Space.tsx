@@ -130,7 +130,7 @@ const Space = memo(({
 
     if (docSnap.exists()) {
       const newRoomValue = {...docSnap.data()}
-      const playersArray = docSnap.data().players
+      const playersArray = newRoomValue.players
 
       if (newRoomValue && newRoomValue.pawns) {
         if (!colorSelected) return;
