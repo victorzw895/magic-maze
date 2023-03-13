@@ -72,7 +72,6 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
     setGameStarted(room.gameStarted)
   }, [room.gameStarted]);
 
-
   const loadingProviderValue = useMemo(() => {
     return {loadBoard, roomLoaded, allPlayersReady, onPawnsLoaded, setTileLoaded, setObjectivesLoaded, setAbilitiesLoaded, setPingLoaded}
   }, [loadBoard, roomLoaded, allPlayersReady])

@@ -87,7 +87,6 @@ const Lobby = () => {
       )
       // save player id locally
       playerDispatch({type: "setPlayer", value: player});
-      updateCurrentPlayer(dbPlayer);
     }
     else if (!roomFound) {
       setFailJoinRoomMessage("Room code not found");
