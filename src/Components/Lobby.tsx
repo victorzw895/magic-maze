@@ -1,8 +1,8 @@
-import { useState, ChangeEvent, useEffect } from 'react';
+import { useState, ChangeEvent, useEffect, SyntheticEvent } from 'react';
 import cryptoRandomString from 'crypto-random-string';
 import { useGame } from '../Contexts/GameContext';
 import { usePlayerDispatch, PlayerFactory, PlayerFactoryType } from '../Contexts/PlayerContext';
-import { Stack, Button, TextField, Paper, Alert } from '@mui/material';
+import { Stack, Button, TextField, Paper, Alert, Snackbar } from '@mui/material';
 import { Room } from '../types';
 import { setDoc, getDoc, doc } from '../utils/useFirestore';
 import WaitingRoom from './WaitingRoom';
@@ -18,8 +18,12 @@ const Lobby = () => {
   const [promptCode, setPromptCode] = useState(false);
   const [existingRoomCode, setExistingRoomCode] = useState("");
   const [failJoinRoomMessage, setFailJoinRoomMessage] = useState<string>("");
-  const [count, setCount] = useState<number>(0)
-  const [show, setShow] = useState<boolean>(false)
+  const [count, setCount] = useState<number>(0);
+  const [show, setShow] = useState<boolean>(false);
+  const [snapCollect, setSnapCollect] = useState<any>("");
+  const [expiredDocsCount, setExpiredDocsCount] = useState<number>(0);
+  const [showDocsFound, setShowDocsFound] = useState<boolean>(false);
+  const [openToast, setOpenToast] = useState<boolean>(false);
 
   const _handleRoomCode = (e: ChangeEvent<HTMLInputElement>) => {
     setExistingRoomCode(e.target.value)
@@ -98,26 +102,43 @@ const Lobby = () => {
 
   useEffect(() => {
     if (count === 3) {
-      setShow(true)
-    } else if ( show === true && count > 3) {
-      setCount(0)
-      setShow(false)
+      setShow(true);
+    } else if (show && count > 3) {
+      setCount(0);
+      setShow(false);
+    } else if (!show && count > 3) {
+      setCount(0);
     }
   }, [failJoinRoomMessage, count])
 
-  const expiredDocs = async () => {
-
+  const getExpiredDocs = async () => {
     const timeNow = new Date().valueOf()
     const yesterday = timeNow - (24 * 60 * 60 * 1000)
 
     const snap = query(gamesRef, where("createdDateInSeconds","<", yesterday))
 
     const snapShot = await getDocs(snap)
-    console.log("snapshot", snapShot)
-    snapShot.forEach((game) => {
-      // console.log("gameId", game.id)
-      deleteDoc(doc(game.id))
+    setSnapCollect(snapShot);
+    const expiredGamesCount = snapShot.size
+    setExpiredDocsCount(expiredGamesCount);
+    setShowDocsFound(true);
+  }
+
+  const deleteExpiredDocs = () => {
+    snapCollect.forEach((game:any) => {
+      deleteDoc(doc(game.id));
     });
+    setOpenToast(true);
+    setShowDocsFound(false);
+    setShow(false);
+  }
+
+  const handleToastClose = (event?: SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setOpenToast(false);
+    setExpiredDocsCount(0);
+    setShow(false);
+    setShowDocsFound(false);
   }
 
   return (
@@ -125,7 +146,28 @@ const Lobby = () => {
       <h3>
         Welcome to <span onClick={() => setCount(count +1)}> Magic Maze. </span>
       </h3>
-      { show ? <Button variant='contained' size='small' color='error' disableElevation style={{marginBottom: "20px"}} onClick={expiredDocs}>Delete Expired Documents</Button> : ""}
+      { show ? 
+        <>
+          {
+            showDocsFound ?  
+              <>
+                <h4 style={{marginTop: "0"}}>{expiredDocsCount} games found</h4> 
+                {
+                  expiredDocsCount === 0 ? "" : <Button variant='contained' size='small' color='error' disableElevation style={{marginBottom: "20px"}} onClick={deleteExpiredDocs}>Delete Expired Documents</Button>
+                }
+              </>
+              :
+              <Button variant='contained' size='small' color='primary' disableElevation style={{marginBottom: "32px"}} onClick={getExpiredDocs}>Get Expired Documents</Button> 
+          }
+        </>
+        : 
+        ""
+      }
+        <Snackbar open={openToast} autoHideDuration={5000} onClose={handleToastClose}>
+          <Alert onClose={handleToastClose} severity="success" sx={{ width: '100%' }}>
+            Success! Deleted {expiredDocsCount} games. 
+          </Alert>
+        </Snackbar>        
       {gameState.roomId ?
         <WaitingRoom />
           :
