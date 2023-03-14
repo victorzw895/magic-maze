@@ -31,6 +31,7 @@ const useLoading = (room: Room, roomId: string): [roomLoaded: boolean, loadBoard
 
   useEffect(() => {
     (async () => {
+      console.log({tileLoaded, pawnsLoaded, objectivesLoaded, abilitiesLoaded, pingLoaded})
       if (!tileLoaded || !pawnsLoaded || !objectivesLoaded || !abilitiesLoaded) return;
       if (room.players.length > 1 && !pingLoaded) return;
       

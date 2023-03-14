@@ -37,14 +37,14 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
 
   const [gameStarted, setGameStarted] = useState(false);
   const [heroesEscaped, setHeroesEscaped] = useState([]);
-  const [weaponsStolen, setWeaponsStolen] = useState([]);
+  const [weaponsStolen, setWeaponsStolen] = useState(false);
   
   const [gamePaused, gameOver, gameWon] = useGamePaused(room);
   const [roomLoaded, loadBoard, onPawnsLoaded, setTileLoaded, setObjectivesLoaded, setAbilitiesLoaded, setPingLoaded] = useLoading(room, gameState.roomId);
   const [tiles] = useTiles(room);
   const [players, currentPlayer, allPlayersReady] = usePlayer(room);
   const pawns = usePawns(room, gameState.roomId);
-  const {green, yellow, purple, orange, playerHeldPawn} = pawns;
+  const {green, yellow, purple, orange, playerHeldPawn, onWeapons} = pawns;
 
   const [pinged, setPinged] = useState(false);
 
@@ -59,7 +59,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
 
   useEffect(() => {
     setWeaponsStolen(room.weaponsStolen)
-  }, [room.weaponsStolen.length])
+  }, [room.weaponsStolen])
 
   useEffect(() => {
     setHeroesEscaped(room.heroesEscaped)
@@ -87,7 +87,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
             <PurplePawnDocContext.Provider value={purple}>
             <OrangePawnDocContext.Provider value={orange}>
               <PlayerHeldPawnDocContext.Provider value={playerHeldPawn}>
-                <WeaponsStolenDocContext.Provider value={weaponsStolen}>
+                <WeaponsStolenDocContext.Provider value={{weaponsStolen, onWeapons}}>
                   <HeroesEscapedDocContext.Provider value={heroesEscaped}>
                     <PingedDocContext.Provider value={pinged}>
                       {children}

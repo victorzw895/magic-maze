@@ -17,7 +17,7 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
   const { gameState } = useGame();
   const currentPlayer = useCurrentPlayerDocState();
   const gamePaused = useGamePausedDocState();
-  const weaponsStolen = useWeaponsStolenDocState();
+  const { weaponsStolen } = useWeaponsStolenDocState();
   const [assetLodedCount, setAssetLodedCount] = useState(0);
 
   useEffect(() => {
@@ -64,7 +64,8 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
                     title={ability}
                     style={{
                       width: '80px',
-                      margin: '0 30px'
+                      margin: '0 30px',
+                      cursor: 'pointer',
                     }}
                       />
                 )
@@ -75,7 +76,7 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
                     onLoad={() => setAssetLodedCount((prev) => prev + 1)}
                     key={ability}
                     draggable={false}
-                    src={ability === 'teleport' && weaponsStolen.length === 4 ? assets[`${ability}-disabled.png`] : assets[`${ability}.png`]}
+                    src={ability === 'teleport' && weaponsStolen ? assets[`${ability}-disabled.png`] : assets[`${ability}.png`]}
                     alt={ability} 
                     title={ability}
                     style={{

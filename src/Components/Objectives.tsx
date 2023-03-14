@@ -1,22 +1,34 @@
 import { roomDefaultValues } from '../constants';
 import { useWeaponsStolenDocState, useHeroesEscapedDocState, useLoadingDocState } from '../Contexts/FirestoreContext';
+import { useGame } from '../Contexts/GameContext';
+import { setDoc } from '../utils/useFirestore';
 import { useAssets } from '../Contexts/AssetsContext';
+import { useAudio } from '../Contexts/AudioContext';
 import after from 'lodash/after';
 
 const objectives = Object.values(roomDefaultValues.pawns).map((pawn) => pawn.color);
 
 const Objectives = () => {
+  const { gameState } = useGame();
   const { assets } = useAssets();
   const { setObjectivesLoaded } = useLoadingDocState();
-  const weaponsStolen = useWeaponsStolenDocState();
+  const { weaponsStolen, onWeapons } = useWeaponsStolenDocState();
   const heroesEscaped = useHeroesEscapedDocState();
+  const { playAchievementSound } = useAudio();
 
   const onImagesLoaded = after(objectives.length, () => setObjectivesLoaded(true));
+
+  const stealWeaponsHandler = async () => {
+    await setDoc(gameState.roomId, {
+      weaponsStolen: true,
+    })
+    playAchievementSound();
+  }
 
   return (
     <div className='objectives'>
       {
-        weaponsStolen.length === 4 ?
+        weaponsStolen ?
           objectives.map(color => {
             return (
               <img 
@@ -29,18 +41,28 @@ const Objectives = () => {
             )
           })
             :
-          objectives.map(color => {
-            return (
-              <img 
-                onLoad={() => onImagesLoaded()}
-                className={`objective ${color}${weaponsStolen.includes(color) ? ' stolen' : ''}`}
-                key={`objective-${color}`}
-                draggable={false}
-                src={assets[`objective-${color}.png`]} 
-                alt={`objective-${color}`} 
-              />
-            )
-          })
+          onWeapons.length < 4 ?
+            objectives.map(color => {
+              return (
+                <img 
+                  onLoad={() => onImagesLoaded()}
+                  className={`objective ${onWeapons.includes(color) ? ' on-weapon' : ''}`}
+                  key={`objective-${color}`}
+                  draggable={false}
+                  src={assets[`objective-${color}.png`]} 
+                  alt={`objective-${color}`} 
+                />
+              )
+            })
+              :
+            <img 
+              onClick={weaponsStolen ? () => {} : stealWeaponsHandler}
+              className={`objective steal`}
+              key={`steal-weapons`}
+              draggable={false}
+              src={assets['steal.png']} 
+              alt={`steal-weapons`} 
+            />
       }
     </div>
   )
