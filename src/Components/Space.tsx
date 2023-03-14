@@ -127,9 +127,11 @@ const Space = memo(({
   const movePawn = async () => {
     const docSnap = await getDoc(gameState.roomId);
     
+    
     if (docSnap.exists()) {
       const newRoomValue = {...docSnap.data()}
       console.log("new room value", newRoomValue)
+      let timerCount = newRoomValue.timerDisabledCount;
 
       if (newRoomValue && newRoomValue.pawns) {
         if (!colorSelected) return;
@@ -151,11 +153,9 @@ const Space = memo(({
         }
         else if (isTimer && !spaceIsDisabled) {
           // pause and update db with pause
-          console.log("!spaceisDisable", !spaceIsDisabled)
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
-          spaceIsDisabled = true;
           newRoomValue.gamePaused = true; // TODO: remove this as we do not pause, we just flip sand timer
-          console.log("please disable the timer space and flip the sand timer")
+          timerCount++
         }
         // Might not require weaponStolen boolean on space, weaponStolen array may be enough
         else if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
@@ -190,7 +190,8 @@ const Space = memo(({
             pawns: newRoomValue.pawns, 
             tiles: newRoomValue.tiles,
             weaponsStolen: newRoomValue.weaponsStolen,
-            heroesEscaped: newRoomValue.heroesEscaped
+            heroesEscaped: newRoomValue.heroesEscaped,
+            timerDisabledCount: timerCount
           },
         )
       }
