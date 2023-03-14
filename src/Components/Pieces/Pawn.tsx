@@ -34,7 +34,7 @@ const Pawn = ({pawnData}: pawnProps) => {
     const roomFound: Room = docSnap.data() as Room;
     const { pawns, weaponsStolen } = roomFound;
 
-    const disableTeleport = weaponsStolen.length === 4;
+    const disableTeleport = weaponsStolen;
 
     await showMovableSpaces(gameState.roomId, pawns, currentPlayer, pawnData, tiles, disableTeleport)
   }
@@ -61,7 +61,8 @@ const Pawn = ({pawnData}: pawnProps) => {
             style={{
               gridColumnStart: pawnData?.position[0] + 1,
               gridRowStart: pawnData?.position[1] + 1,
-              position: "relative"
+              position: "relative",
+              cursor: 'pointer',
             }}
           >
             <img 
