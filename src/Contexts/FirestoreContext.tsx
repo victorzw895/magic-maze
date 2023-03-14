@@ -40,7 +40,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [weaponsStolen, setWeaponsStolen] = useState(false);
   
   const [gamePaused, gameOver, gameWon] = useGamePaused(room);
-  const [roomLoaded, loadBoard, onPawnsLoaded, setTileLoaded, setObjectivesLoaded, setAbilitiesLoaded, setPingLoaded] = useLoading(room, gameState.roomId);
+  const [roomLoaded, loadBoard, onPawnsLoaded, onObjectivesLoaded, setTileLoaded, setAbilitiesLoaded, setPingLoaded] = useLoading(room, gameState.roomId);
   const [tiles] = useTiles(room);
   const [players, currentPlayer, allPlayersReady] = usePlayer(room);
   const pawns = usePawns(room, gameState.roomId);
@@ -70,7 +70,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   }, [room.gameStarted]);
 
   const loadingProviderValue = useMemo(() => {
-    return {loadBoard, roomLoaded, allPlayersReady, onPawnsLoaded, setTileLoaded, setObjectivesLoaded, setAbilitiesLoaded, setPingLoaded}
+    return {loadBoard, roomLoaded, allPlayersReady, onPawnsLoaded, onObjectivesLoaded, setTileLoaded, setAbilitiesLoaded, setPingLoaded}
   }, [loadBoard, roomLoaded, allPlayersReady])
 
   return (

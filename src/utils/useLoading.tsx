@@ -6,7 +6,15 @@ import { usePlayerState } from '../Contexts/PlayerContext';
 import { downloadAssets } from '../utils/useFirestore';
 import after from 'lodash/after';
 
-const useLoading = (room: Room, roomId: string): [roomLoaded: boolean, loadBoard: boolean, onPawnsLoaded: () => void, ...rest: Dispatch<SetStateAction<boolean>>[]] => {
+const useLoading = 
+  (room: Room, roomId: string): 
+  [
+    roomLoaded: boolean, 
+    loadBoard: boolean, 
+    onPawnsLoaded: () => void, 
+    onObjectivesLoaded: () => void, 
+    ...rest: Dispatch<SetStateAction<boolean>>[]
+  ] => {
   const playerState = usePlayerState();
   const [loadBoard, setLoadBoard] = useState(false);
   const [tileLoaded, setTileLoaded] = useState<boolean>(false);
@@ -18,6 +26,7 @@ const useLoading = (room: Room, roomId: string): [roomLoaded: boolean, loadBoard
   const { setAssets } = useAssets();
 
   const onPawnsLoaded = after(4, () => setPawnsLoaded(true));
+  const onObjectivesLoaded = after(4, () => setObjectivesLoaded(true));
 
   useEffect(() => {
     (async () => {
@@ -44,7 +53,7 @@ const useLoading = (room: Room, roomId: string): [roomLoaded: boolean, loadBoard
     })()
   }, [tileLoaded, pawnsLoaded, objectivesLoaded, abilitiesLoaded, pingLoaded])
 
-  return [roomLoaded, loadBoard, onPawnsLoaded, setTileLoaded, setObjectivesLoaded, setAbilitiesLoaded, setPingLoaded];
+  return [roomLoaded, loadBoard, onPawnsLoaded, onObjectivesLoaded, setTileLoaded, setAbilitiesLoaded, setPingLoaded];
 };
 
 export default useLoading;

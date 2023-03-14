@@ -82,6 +82,7 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
                     style={{
                       width: '80px',
                       margin: '0 30px',
+                      transform: ability === 'teleport' ? 'scaleX(-1)' : 'none',
                     }}
                       />
                 )
