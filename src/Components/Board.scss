@@ -29,10 +29,9 @@
   top: 0;
   right: 0;
   z-index: 200;
-  height: 100px;
-  // background-color: white;
-  // margin: 20px 40px;
-  // border-radius: 5px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
 }
 
 .objective {
@@ -50,9 +49,16 @@
   border-radius: 5%;
   transform: all 300ms;
 
-  &.stolen, &.escaped {
+  &.on-weapon, &.escaped {
     filter: brightness(0.2);
-    border: none;
+    border-color: transparent;
+  }
+
+  &.steal {
+    cursor: pointer;
+    background-color: white;
+    border-color: red;
+    padding: 8px;
   }
 }
 
@@ -107,11 +113,13 @@
   &.active {
     z-index: 3;
     border: 2px solid yellow;
+    cursor: pointer;
   }
 
   &.escalator {
     z-index: 3;
     border: 2px solid greenyellow;
+    cursor: pointer;
   }
 
   &.teleporter {
@@ -120,6 +128,7 @@
     align-content: center;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 
     .circle-multiple {
       position: relative;
@@ -149,21 +158,6 @@
       }
     }
   }
-
-  &.disabled-teleporter::after {
-    width: 80%;
-    height: 80%;
-    content: "";
-    position: absolute;
-    background-color: black;
-    opacity: 0.2;
-    z-index: 1;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    margin-left: -18.5px;
-    margin-top: -18.5px;
-  }
 }
 
 
@@ -171,6 +165,7 @@
 .new-tile-area {
   box-sizing: border-box;
   border: 2px solid blue;
+  cursor: pointer;
 }
 
 .new-tile-area {

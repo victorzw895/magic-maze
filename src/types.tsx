@@ -87,7 +87,7 @@ export interface Room {
   gameOver: boolean,
   gameWon: boolean,
   timeLeft: number,
-  weaponsStolen: heroColor[],
+  weaponsStolen: boolean,
   heroesEscaped: heroColor[],
   players: DBPlayer[],
   updateAbilitiesCount: number,
@@ -116,6 +116,7 @@ interface HeroPawnState<T> extends PawnActions {
   gridPosition: number[],
   ability: string,
   canUseAbility: boolean,
+  onWeapon: boolean,
 }
 
 export interface DBHeroPawn extends HeroPawnState<heroColor> {}
