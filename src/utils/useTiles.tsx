@@ -10,7 +10,7 @@ const useTiles = (room: Room): [DBTile[]] => {
 
   useEffect(() => {
     setTiles(room.tiles);
-  }, [room.tiles])
+  }, [room.tiles.length])
 
   return [tiles];
 };
