@@ -23,6 +23,7 @@ export const pngAssets = [
   'objective-yellow',
   'objective-purple',
   'objective-orange',
+  'steal',
 ]
 
 export const svgAssets = [
@@ -71,6 +72,7 @@ export const pawnDefaultValues = {
   ability: '',
   canUseAbility: false,
   blockedPositions: getDefaultBlockedPositions(),
+  onWeapon: false,
   showMovableDirections: [],
   showTeleportSpaces: null,
   showEscalatorSpaces: [],
@@ -87,7 +89,7 @@ export const roomDefaultValues: Room = {
   gamePaused: false,
   gameOver: false,
   gameWon: false,
-  weaponsStolen: [],
+  weaponsStolen: false,
   heroesEscaped: [],
   timeLeft: 200,
   tiles: [],

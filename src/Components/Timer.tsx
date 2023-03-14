@@ -11,12 +11,12 @@ const Timer = () => {
   const { gameState, gameDispatch } = useGame();
   const gameOver = useGameOverDocState();
   const gamePaused = useGamePausedDocState();
-  const weaponsStolen = useWeaponsStolenDocState();
+  const { weaponsStolen } = useWeaponsStolenDocState();
   const time = new Date();
   const { gameAudio, loadEscapeSoundtrack, setGameAudio, playWarningSound, musicOn, loadGameSoundtrack } = useAudio();
 
   useEffect(() => {
-    if (weaponsStolen.length === 4) {
+    if (weaponsStolen) {
       gameAudio.pause();
       const escapeSoundtrack = loadEscapeSoundtrack();
       setGameAudio(escapeSoundtrack)

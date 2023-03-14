@@ -58,7 +58,7 @@ const Space = memo(({
 
   const [showTeleport, setShowTeleport] = useState(false)
   const [showEscalator, setShowEscalator] = useState(false);
-  const { playSelectSound, playAchievementSound, playTeleporterSound, playExitSound, playWinSound } = useAudio();
+  const { playSelectSound, playTeleporterSound, playExitSound, playWinSound } = useAudio();
 
   // BUG: NEED TO FINE TUNE teleport and escalator
   useEffect(() => {
@@ -139,6 +139,7 @@ const Space = memo(({
         newRoomValue.pawns[colorSelected].showEscalatorSpaces = [];
         newRoomValue.pawns[colorSelected].showMovableDirections = [];
         newRoomValue.pawns[colorSelected].showTeleportSpaces = null;
+        newRoomValue.pawns[colorSelected].onWeapon = false;
         newRoomValue.pawns[colorSelected].blockedPositions = {
           up: {position: null, gridPosition: null},
           down: {position: null, gridPosition: null},
@@ -157,12 +158,10 @@ const Space = memo(({
         }
         // Might not require weaponStolen boolean on space, weaponStolen array may be enough
         else if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
-          playAchievementSound();
-          newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.weaponStolen = true;
-          newRoomValue.weaponsStolen = [...newRoomValue.weaponsStolen, colorSelected]
+          newRoomValue.pawns[colorSelected].onWeapon = true;
         }
         else if (isExit && spaceColor === colorSelected) {
-          if (newRoomValue.weaponsStolen.length === 4 && !newRoomValue.heroesEscaped.includes(colorSelected)) {
+          if (newRoomValue.weaponsStolen && !newRoomValue.heroesEscaped.includes(colorSelected)) {
             newRoomValue.heroesEscaped = [...newRoomValue.heroesEscaped, colorSelected]
             playExitSound();
             // if last exit, celebration soundtrack
@@ -199,7 +198,7 @@ const Space = memo(({
 
   return (
     <div 
-      className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}${showEscalator ? " escalator" : ""}${disableTeleporter ? " disabled-teleporter" : ""}`}
+      className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}${showEscalator ? " escalator" : ""}`}
       onClick={showMovableArea || showTeleport || showEscalator ? movePawn : () => {}}
        // TODO: disable if game paused
     >
