@@ -63,19 +63,18 @@ const Timer = () => {
   }, [gameOver])
 
   const toggleTimer = () => {
-      const restartTime = startSeconds - ((minutes * 60) + seconds);
-      console.log("restart time", restartTime)
-      if (restartTime === startSeconds) {
-        start();
-      } else {
-        const time = new Date();
-        time.setSeconds(time.getSeconds() + restartTime);
-        restart(time)
-      }
-      if (musicOn && gameAudio) {
-        gameAudio.play();
-      }
-    // }
+    const restartTime = startSeconds - ((minutes * 60) + seconds);
+    console.log("restart time", restartTime)
+    if (restartTime === startSeconds) {
+      start();
+    } else {
+      const time = new Date();
+      time.setSeconds(time.getSeconds() + restartTime);
+      restart(time)
+    }
+    if (musicOn && gameAudio) {
+      gameAudio.play();
+    }
   }
 
   // from db to Pause game
