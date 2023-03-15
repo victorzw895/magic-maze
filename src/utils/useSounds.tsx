@@ -112,7 +112,6 @@ const useSounds = () => {
     loseAudio.volume = num;
     cheeringAudio.volume = num;
 
-    console.log("volume level?", num)
   }
 
   return {

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { DBTile, Room } from '../types';
 
-const useTiles = (room: Room): [DBTile[]] => {
+const useTiles = (room: Room): [DBTile[], number] => {
   const [tiles, setTiles] = useState<DBTile[]>([]);
+  const [sandTimerCount, setSandTimerCount] = useState<number>(0);
 
   // TODO May consider adding a useEffect for specific changes such as
   // isOccupied
@@ -12,7 +13,11 @@ const useTiles = (room: Room): [DBTile[]] => {
     setTiles(room.tiles);
   }, [room.tiles.length, room.timerDisabledCount])
 
-  return [tiles];
+  useEffect(() => {
+    setSandTimerCount(room.timerDisabledCount)
+  }, [room.timerDisabledCount])
+
+  return [tiles, sandTimerCount];
 };
 
 export default useTiles;

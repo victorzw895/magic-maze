@@ -30,6 +30,7 @@ const TilesDocContext = createContext<any>(undefined);
 const PlayersDocContext = createContext<DBPlayer[] | undefined>(undefined);
 const CurrentPlayerDocContext = createContext<DBPlayer | undefined>(undefined);
 const PingedDocContext = createContext<boolean>(false);
+const SandTimerContext = createContext<number>(0);
 
 const FirestoreProvider = ({children}: DBProviderProps) => {
   const { gameState } = useGame();
@@ -38,14 +39,12 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [heroesEscaped, setHeroesEscaped] = useState([]);
   const [weaponsStolen, setWeaponsStolen] = useState(false);
-  
   const [gamePaused, gameOver, gameWon] = useGamePaused(room);
   const [roomLoaded, loadBoard, onPawnsLoaded, onObjectivesLoaded, setTileLoaded, setAbilitiesLoaded, setPingLoaded] = useLoading(room, gameState.roomId);
-  const [tiles] = useTiles(room);
+  const [tiles, sandTimerCount] = useTiles(room);
   const [players, currentPlayer, allPlayersReady] = usePlayer(room);
   const pawns = usePawns(room, gameState.roomId);
   const {green, yellow, purple, orange, playerHeldPawn, onWeapons} = pawns;
-
   const [pinged, setPinged] = useState(false);
 
   useEffect(() => {
@@ -76,6 +75,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   return (
     <LoadingDocContext.Provider value={loadingProviderValue}>
     <GameStartedDocContext.Provider value={gameStarted}>
+      <SandTimerContext.Provider value={sandTimerCount}>
       <GamePausedDocContext.Provider value={gamePaused}>
       <GameOverDocContext.Provider value={gameOver}>
       <GameWonDocContext.Provider value={gameWon}>
@@ -105,6 +105,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
       </GameWonDocContext.Provider>
       </GameOverDocContext.Provider>
       </GamePausedDocContext.Provider>
+      </SandTimerContext.Provider>
     </GameStartedDocContext.Provider>
     </LoadingDocContext.Provider>
   )
@@ -239,6 +240,14 @@ const usePingedDocState = () => {
   return context;
 }
 
+const useSandTimerState = () => {
+  const context = useContext(SandTimerContext)
+  if (context === undefined) {
+    throw new Error('useSandTimerState must be used within a SandTimerContext');
+  }
+  return context;
+}
+
 export { 
   FirestoreProvider,
   useLoadingDocState,
@@ -257,4 +266,5 @@ export {
   usePingedDocState,
   useGameOverDocState,
   useGameWonDocState,
+  useSandTimerState
 };

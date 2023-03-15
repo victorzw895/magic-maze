@@ -153,8 +153,8 @@ const Space = memo(({
         else if (isTimer && !spaceIsDisabled) {
           // pause and update db with pause
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
-          newRoomValue.gamePaused = true; // TODO: remove this as we do not pause, we just flip sand timer
-          newRoomValue.timerDisabledCount++
+          // newRoomValue.gamePaused = true; // TODO: remove this as we do not pause, we just flip sand timer
+          newRoomValue.timerDisabledCount++ // I want the flipSandTimer to be a count
         }
         // Might not require weaponStolen boolean on space, weaponStolen array may be enough
         else if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
