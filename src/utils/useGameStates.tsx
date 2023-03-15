@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Room } from '../types';
 
-const useGameStates = (room: Room): [boolean, boolean] => {
+const useGameStates = (room: Room): boolean[] => {
   const [gameOver, setGameOver] = useState(false);
   const [gameWon, setGameWon] = useState(false);
   
