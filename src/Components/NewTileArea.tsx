@@ -5,7 +5,6 @@ import { generateTile } from '../utils/TilesFactory';
 import { useGame } from '../Contexts/GameContext';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
-import { useGamePausedDocState } from '../Contexts/FirestoreContext';
 import { getDisplacementValue } from '../Helpers/TileMethods';
 import { getDefaultBlockedPositions } from '../constants';
 
@@ -22,7 +21,6 @@ const NewTileArea = memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
   const { gridPosition, placementDirection } = tile;
   
   const { gameState } = useGame();
-  const gamePaused = useGamePausedDocState();
 
   const addNewTile = async (newTile: DBTile) => {
     const docSnap = await getDoc(gameState.roomId);
@@ -60,7 +58,7 @@ const NewTileArea = memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
 
   return (
     <div className={`tile new-tile-area ${placementDirection ? placementDirection : "placeholder"}`}
-      onClick={gamePaused ? () => {} :placeNewTile}
+      onClick={placeNewTile}
       style={
         {
           gridColumnStart: gridPosition[0], 

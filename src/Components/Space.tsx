@@ -178,7 +178,6 @@ const Space = memo(({
         await setDoc(
           gameState.roomId, 
           {
-            gamePaused: newRoomValue.gamePaused,
             pawns: newRoomValue.pawns, 
             tiles: newRoomValue.tiles,
             weaponsStolen: newRoomValue.weaponsStolen,
@@ -226,7 +225,6 @@ const Space = memo(({
     <div 
       className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}${showEscalator ? " escalator" : ""}`}
       onClick={showMovableArea || showTeleport || showEscalator ? movePawn : () => {}}
-       // TODO: disable if game paused
     >
       <div className={`${teleporterColor}${showTeleport? ' circle-multiple' : ''}`}>
         {

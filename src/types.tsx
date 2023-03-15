@@ -78,7 +78,6 @@ export interface Room {
   // minutesLeft: number,
   loadBoard: boolean,
   gameStarted: boolean,
-  gamePaused: boolean,
   gameOver: boolean,
   gameWon: boolean,
   timeLeft: number,

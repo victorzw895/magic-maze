@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Room } from '../types';
 
-const useGamePaused = (room: Room): [boolean, boolean, boolean] => {
-  const [gamePaused, setGamePaused] = useState(false);
+const useGameStates = (room: Room): [boolean, boolean] => {
   const [gameOver, setGameOver] = useState(false);
   const [gameWon, setGameWon] = useState(false);
   
@@ -14,11 +13,7 @@ const useGamePaused = (room: Room): [boolean, boolean, boolean] => {
     setGameWon(room.gameWon);
   }, [room.gameWon])
 
-  useEffect(() => {
-    setGamePaused(room.gamePaused);
-  }, [room.gamePaused])
-
-  return [gamePaused, gameOver, gameWon];
+  return [gameOver, gameWon];
 };
 
-export default useGamePaused;
+export default useGameStates;

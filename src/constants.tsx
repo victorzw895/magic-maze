@@ -86,7 +86,6 @@ export const roomDefaultValues: Room = {
   pings: [],
   loadBoard: false,
   gameStarted: false,
-  gamePaused: false,
   gameOver: false,
   gameWon: false,
   weaponsStolen: false,

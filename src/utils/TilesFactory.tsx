@@ -56,7 +56,7 @@ const getUpdatedDirectionValue = (direction: direction, rotationValue: number) =
 
 const updateSpaceDirections = (spaces: Space[][], rotationValue: number) => {
   const newSpaces = [...spaces];
-  return newSpaces.map((row, rowIndex) => row.map((col: any, colIndex) => 
+  return newSpaces.map((row) => row.map((col: any) => 
     {
       if (col.details) {
         if (col.details.sideWalls) {

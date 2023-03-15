@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useReducer } from 'react';
-import { HeroPawn, heroName, heroWeapon, heroColor, DBHeroPawn } from '../types';
-import { pawnStartPositions, spaceSize, pawnDefaultValues } from '../constants';
+import { heroColor, DBHeroPawn } from '../types';
+import { pawnStartPositions, pawnDefaultValues } from '../constants';
 
 const randomPosition = pawnStartPositions.sort(() => {
   return 0.5 - Math.random();
