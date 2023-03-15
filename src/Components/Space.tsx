@@ -89,7 +89,6 @@ const Space = memo(({
     })()
   }, [highlightTeleporter, colorSelected, disableTeleporter])
 
-
   useEffect(() => {
     (async () => {
       if (!isEscalator) return;
@@ -147,7 +146,6 @@ const Space = memo(({
           left: {position: null, gridPosition: null},
         };
         if (isTeleporter && showTeleport) {
-          // playWarp();
           playTeleporterSound();
         }
         else if (isTimer && !spaceIsDisabled) {
@@ -173,10 +171,7 @@ const Space = memo(({
               })
             }
           }
-        } else if (isTimer && spaceIsDisabled) {
-          console.log("the timer space is disabled")
-        }
-        else {
+        } else {
           playSelectSound();
         }
 
