@@ -90,8 +90,6 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
             })
           }
           <Pinged />
-          {/* TODO: when firestore gamePaused, update gameState */}
-          {gamePaused && <PlayerAreaDisabled />}
           {
               gameState.gameOver && 
               <div className="game-paused">

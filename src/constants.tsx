@@ -112,5 +112,6 @@ export const roomDefaultValues: Room = {
     }
   },
   createdDateInSeconds: Timestamp.fromDate(new Date()).toMillis(),
-  createdDate: new Date()
+  createdDate: new Date(),
+  timerDisabledCount: 0
 }

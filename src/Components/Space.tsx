@@ -89,7 +89,6 @@ const Space = memo(({
     })()
   }, [highlightTeleporter, colorSelected, disableTeleporter])
 
-
   useEffect(() => {
     (async () => {
       if (!isEscalator) return;
@@ -127,7 +126,6 @@ const Space = memo(({
   const movePawn = async () => {
     const docSnap = await getDoc(gameState.roomId);
     
-
     if (docSnap.exists()) {
       const newRoomValue = {...docSnap.data()}
       const playersArray = newRoomValue.players
@@ -148,14 +146,12 @@ const Space = memo(({
           left: {position: null, gridPosition: null},
         };
         if (isTeleporter && showTeleport) {
-          // playWarp();
           playTeleporterSound();
         }
         else if (isTimer && !spaceIsDisabled) {
           // pause and update db with pause
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
-          newRoomValue.gamePaused = true;
-          console.log("new room value count", newRoomValue.updateAbilitiesCount)
+          newRoomValue.timerDisabledCount++ // I want the flipSandTimer to be a count
           rotateAbilities(playersArray, newRoomValue.updateAbilitiesCount)
         }
         // Might not require weaponStolen boolean on space, weaponStolen array may be enough
@@ -175,8 +171,7 @@ const Space = memo(({
               })
             }
           }
-        }
-        else {
+        } else {
           playSelectSound();
         }
 
@@ -187,7 +182,8 @@ const Space = memo(({
             pawns: newRoomValue.pawns, 
             tiles: newRoomValue.tiles,
             weaponsStolen: newRoomValue.weaponsStolen,
-            heroesEscaped: newRoomValue.heroesEscaped
+            heroesEscaped: newRoomValue.heroesEscaped,
+            timerDisabledCount: newRoomValue.timerDisabledCount
           },
         )
       }

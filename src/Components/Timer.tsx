@@ -1,16 +1,14 @@
 import { useEffect } from 'react';
 import { useTimer } from 'react-timer-hook';
 import { useGame } from '../Contexts/GameContext';
-import { useGamePausedDocState, useGameOverDocState, useWeaponsStolenDocState } from '../Contexts/FirestoreContext';
+import { useGameOverDocState, useWeaponsStolenDocState, useSandTimerState } from '../Contexts/FirestoreContext';
 import { setDoc } from '../utils/useFirestore';
 import { useAudio } from '../Contexts/AudioContext';
 
-
 const Timer = () => {
-  console.log('Render timer') // 28 times
   const { gameState, gameDispatch } = useGame();
   const gameOver = useGameOverDocState();
-  const gamePaused = useGamePausedDocState();
+  const flipSandTimerCount = useSandTimerState();
   const { weaponsStolen } = useWeaponsStolenDocState();
   const time = new Date();
   const { gameAudio, loadEscapeSoundtrack, setGameAudio, playWarningSound, musicOn, loadGameSoundtrack } = useAudio();
@@ -36,8 +34,6 @@ const Timer = () => {
   useEffect(() => {
     // IDEALLY on game start
     // maybe move timer to firestore ???
-    console.log("start timer?")
-
     time.setSeconds(time.getSeconds() + 200);
 
     const gameSoundtrack = loadGameSoundtrack();
@@ -51,8 +47,6 @@ const Timer = () => {
     start,
     pause,
     restart
-  // } = useTimer({ expiryTimestamp: time, onExpire: () => gameDispatch({type: "gameOver"}) });
-  // autoStart: false after attaching start() to waiting room start
   } = useTimer({ expiryTimestamp: time, onExpire: async () => {
     gameDispatch({type: "gameOver"})
     await setDoc(gameState.roomId, {
@@ -68,25 +62,18 @@ const Timer = () => {
     }
   }, [gameOver])
 
-  const toggleTimer = (pauseGame: boolean) => {
-    if (pauseGame) {
-      pause();
-      gameAudio.pause();
-      // TODO: Notification Game Paused at 'minutes' 'seconds', Time remaining when resuming: restart time
-      console.log("toggle timer here", seconds, minutes)
+  const toggleTimer = () => {
+    const restartTime = startSeconds - ((minutes * 60) + seconds);
+    console.log("restart time", restartTime)
+    if (restartTime === startSeconds) {
+      start();
+    } else {
+      const time = new Date();
+      time.setSeconds(time.getSeconds() + restartTime);
+      restart(time)
     }
-    else {
-      const restartTime = startSeconds - ((minutes * 60) + seconds);
-      if (restartTime === startSeconds) {
-        start();
-      } else {
-        const time = new Date();
-        time.setSeconds(time.getSeconds() + restartTime);
-        restart(time)
-      }
-      if (musicOn && gameAudio) {
-        gameAudio.play();
-      }
+    if (musicOn && gameAudio) {
+      gameAudio.play();
     }
   }
 
@@ -94,8 +81,8 @@ const Timer = () => {
   // this toggles pause on timer, missing game pause.
   // for accuracy, best to move timer into firebase
   useEffect(() => {
-    toggleTimer(gamePaused);
-  }, [gamePaused])
+    toggleTimer();
+  }, [flipSandTimerCount])
 
   return (
     <div className="timer">
