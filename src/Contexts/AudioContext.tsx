@@ -1,7 +1,7 @@
 import {createContext, useContext, ReactNode} from 'react';
-import useSounds from '../utils/useSounds';
+import useSounds, { useSoundsType } from '../utils/useSounds';
 
-const AudioContext = createContext<any>(undefined);
+const AudioContext = createContext<useSoundsType | undefined>(undefined);
 
 const AudioProvider = ({children}: {children: ReactNode}) => {
 

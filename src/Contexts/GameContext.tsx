@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { Game, direction, basicAbility, DBPlayer } from '../types';
 
-type Action = {type: 'joinRoom', value: String} | // USED
-              {type: 'gameOver'} |  // USED
-              {type: 'exitRoom'} | undefined;
+type Action = {type: 'joinRoom', value: string} |
+              {type: 'gameOver'} |
+              {type: 'exitRoom'};
 type Dispatch = (action: Action) => void;
 
 type GameProviderProps = {children: React.ReactNode}
@@ -78,7 +78,7 @@ export const assignRandomActions = (players: DBPlayer[]): DBPlayer[] => {
 
 const GameContext = createContext<{gameState: Game; gameDispatch: Dispatch} | undefined>(undefined);
 
-const gameReducer = (gameState: Game, action: any) => {
+const gameReducer = (gameState: Game, action: Action) => {
   let newState = {...gameState};
 
   switch (action.type) {
@@ -97,7 +97,7 @@ const gameReducer = (gameState: Game, action: any) => {
       return newState
     }
     default: {
-      throw new Error(`Unhandled action type: ${action.type}`)
+      throw new Error(`Unhandled action type`)
     }
   }
 }

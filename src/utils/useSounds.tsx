@@ -135,4 +135,6 @@ const useSounds = () => {
   }
 } 
 
+export type useSoundsType = ReturnType<typeof useSounds>
+
 export default useSounds;

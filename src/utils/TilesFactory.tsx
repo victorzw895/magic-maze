@@ -39,7 +39,7 @@ const rotateTileSpaces = (matrix: any) => {          // function statement
   const N = matrix.length - 1;   // use a constant
   // use arrow functions and nested map;
   const result = matrix.map((row: any, i: any) => 
-        row.map((val: any, j: any) => matrix[N - j][i])
+        row.map((_: any, j: any) => matrix[N - j][i])
   );
   matrix.length = 0;       // hold original array reference
   matrix.push(...result);  // Spread operator

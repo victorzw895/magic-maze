@@ -15,7 +15,7 @@ const Timer = () => {
 
   useEffect(() => {
     if (weaponsStolen) {
-      gameAudio.pause();
+      gameAudio?.pause();
       const escapeSoundtrack = loadEscapeSoundtrack();
       setGameAudio(escapeSoundtrack)
       

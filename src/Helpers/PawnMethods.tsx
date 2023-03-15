@@ -24,7 +24,7 @@ const findDirectionAdjacentTile = (tiles: DBTile[], pawn: DBHeroPawn, alignmentP
   const positionConstantValue = alignmentPositionConstant === "col" ? 0 : 1;
   const positionVariantValue = alignmentPositionConstant === "col" ? 1 : 0;
   if (tiles.length > 1) {
-    const tileFound = tiles.find((tile: any) => 
+    const tileFound = tiles.find((tile) => 
       tile.gridPosition[positionConstantValue] === pawn.gridPosition[positionConstantValue] &&
       tile.gridPosition[positionVariantValue] - directionPositionValue[direction] === pawn.gridPosition[positionVariantValue]
     )
@@ -107,7 +107,7 @@ const getAllDirectionalSpaces = (tiles: DBTile[], pawn: DBHeroPawn, direction: d
 }
 
 const isSpaceOccupied = (pawns: DBPawns, tileGridPosition: number[], colIndex: number, rowIndex: number) => {
-  return Object.values(pawns).some((pawn: any) => {
+  return Object.values(pawns).some((pawn) => {
     if (pawn.gridPosition[0] !== tileGridPosition[0] || pawn.gridPosition[1] !== tileGridPosition[1]) {
       return false;
     }
@@ -124,10 +124,10 @@ export const getEscalatorSpace = (tiles: DBTile[], pawns: DBPawns, pawn: DBHeroP
   let escalatorGridPosition = null;
   let escalatorName = null;
 
-  const currentTile = tiles.find((tile: any) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
+  const currentTile = tiles.find((tile) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
   if (currentTile) {
-    const tileRow = Object.values(currentTile.spaces!).find((row, rowIndex) => rowIndex === startRow);
-    const currentSpace = (tileRow as any).find((col: any, colIndex: number) => colIndex === startCol);
+    const tileRow = Object.values(currentTile.spaces!).find((_, rowIndex) => rowIndex === startRow);
+    const currentSpace = (tileRow as any).find((_: any, colIndex: number) => colIndex === startCol);
     if (currentSpace && currentSpace.details?.hasEscalator) {
       escalatorSpacePosition = [startCol, startRow];
       escalatorGridPosition = currentTile.gridPosition;
@@ -221,8 +221,8 @@ export const getFirstBlockedSpace = (tiles: DBTile[], pawns: DBPawns,  pawn: DBH
 
   const currentTile = tiles.find((tile) => tile.gridPosition[0] === pawn.gridPosition[0] && tile.gridPosition[1] === pawn.gridPosition[1]);
   if (currentTile) {
-    const tileRow = Object.values(currentTile.spaces).find((row, rowIndex) => rowIndex === startRow);
-    const currentSpace = (tileRow as any).find((col: any, colIndex: number) => colIndex === startCol);
+    const tileRow = Object.values(currentTile.spaces).find((_, rowIndex) => rowIndex === startRow);
+    const currentSpace = (tileRow as any).find((_: any, colIndex: number) => colIndex === startCol);
     if (currentSpace && currentSpace.details?.sideWalls?.includes(direction)) {
       return {
         position: [startCol, startRow],
