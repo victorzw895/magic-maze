@@ -4,6 +4,7 @@ import { heroColor, Escalator, SpaceTypeName, DBPlayer, basicAbility, direction 
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
 import { useAudio } from '../Contexts/AudioContext';
+import { Close } from '@mui/icons-material';
 
 interface SpaceProps {
   spaceType: SpaceTypeName,
@@ -230,7 +231,7 @@ const Space = memo(({
     >
       {
         (isTimer && spaceIsDisabled) ?
-          <div>Disabled</div>
+          <div style={{position: "absolute", zIndex: "2", padding: "2px 0 0 4px"}}><Close sx={{ fontSize: 40, color: "#795548" }}/></div>
             :
           <></>
       }
