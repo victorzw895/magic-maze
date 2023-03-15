@@ -4,7 +4,7 @@ import { Paper, Stack, Button, List, ListItem, Box, Modal, Typography } from '@m
 import { setDoc, doc } from "../utils/useFirestore"; 
 import CloseIcon from '@mui/icons-material/Close';
 import { usePlayersDocState, useCurrentPlayerDocState } from '../Contexts/FirestoreContext';
-import { pawnDBInitialState } from '../Contexts/PawnContext';
+import { pawnDBInitialState } from '../utils/PawnFactory';
 import { allTiles } from '../Data/all-tiles-data';
 import { deleteDoc } from "firebase/firestore";
 import { usePlayerDispatch } from '../Contexts/PlayerContext';

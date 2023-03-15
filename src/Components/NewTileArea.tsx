@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { DBHeroPawn, DBTile, Room } from '../types';
 import { tileWallSize } from '../constants';
-import { generateTile } from '../Contexts/TilesContext';
+import { generateTile } from '../utils/TilesFactory';
 import { useGame } from '../Contexts/GameContext';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';

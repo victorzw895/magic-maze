@@ -4,7 +4,7 @@ import PlayerAreaDisabled from './PlayerAreaDisabled';
 import Pinged from './Pinged';
 import { useGamePausedDocState, useCurrentPlayerDocState, useWeaponsStolenDocState, useLoadingDocState } from '../Contexts/FirestoreContext';
 import { useAssets } from '../Contexts/AssetsContext';
-import { availableTiles } from '../Contexts/TilesContext';
+import { availableTiles } from '../utils/TilesFactory';
 
 interface PlayerAreaProps {
   highlightNewTileArea: () => void

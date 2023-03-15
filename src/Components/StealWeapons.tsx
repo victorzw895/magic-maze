@@ -4,7 +4,6 @@ import { useGame } from '../Contexts/GameContext';
 import { setDoc } from '../utils/useFirestore';
 import { useAssets } from '../Contexts/AssetsContext';
 import { useAudio } from '../Contexts/AudioContext';
-import after from 'lodash/after';
 
 const objectives = Object.values(roomDefaultValues.pawns).map((pawn) => pawn.color);
 
@@ -14,12 +13,6 @@ const StealWeapons = () => {
   const { onObjectivesLoaded } = useLoadingDocState();
   const { onWeapons } = useWeaponsStolenDocState();
   const { playAchievementSound } = useAudio();
-
-  // const onImagesLoaded = () => {
-  //   console.log('onimages loaded')
-
-  //   return after(objectives.length, () => setObjectivesLoaded(true))
-  // };
 
   const stealWeaponsHandler = async () => {
     await setDoc(gameState.roomId, {
