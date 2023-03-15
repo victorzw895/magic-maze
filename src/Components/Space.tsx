@@ -228,6 +228,12 @@ const Space = memo(({
       onClick={showMovableArea || showTeleport || showEscalator ? movePawn : () => {}}
        // TODO: disable if game paused
     >
+      {
+        (isTimer && spaceIsDisabled) ?
+          <div>Disabled</div>
+            :
+          <></>
+      }
       <div className={`${teleporterColor}${showTeleport? ' circle-multiple' : ''}`}>
         {
           showTeleport ?
