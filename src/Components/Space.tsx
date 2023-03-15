@@ -1,6 +1,6 @@
 import { useEffect, useState, memo } from 'react';
 import { useGame } from '../Contexts/GameContext';
-import { heroColor, Escalator, SpaceTypeName } from '../types';
+import { heroColor, Escalator, SpaceTypeName, DBPlayer, basicAbility, direction } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
 import { useAudio } from '../Contexts/AudioContext';
@@ -127,9 +127,9 @@ const Space = memo(({
   const movePawn = async () => {
     const docSnap = await getDoc(gameState.roomId);
     
-    
     if (docSnap.exists()) {
       const newRoomValue = {...docSnap.data()}
+      const playersArray = newRoomValue.players
 
       if (newRoomValue && newRoomValue.pawns) {
         if (!colorSelected) return;
@@ -153,8 +153,8 @@ const Space = memo(({
         else if (isTimer && !spaceIsDisabled) {
           // pause and update db with pause
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
-          // newRoomValue.gamePaused = true; // TODO: remove this as we do not pause, we just flip sand timer
           newRoomValue.timerDisabledCount++ // I want the flipSandTimer to be a count
+          rotateAbilities(playersArray, newRoomValue.updateAbilitiesCount)
         }
         // Might not require weaponStolen boolean on space, weaponStolen array may be enough
         else if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
@@ -195,6 +195,37 @@ const Space = memo(({
     }
   }
 
+  const rotateArray = (array: any[] ) => {
+    const newArray = array.slice(1);
+    newArray.push(array[0]);
+    return newArray;
+  }
+
+  const rotateAbilities = async (players: DBPlayer[], count: number) => {
+
+    if (players.length === 1) return;
+    else {
+      const updatedPlayers = [...players]
+      const abilitiesArray = players.map(player => player.playerAbilities);
+      const directionsArray = players.map(player => player.playerDirections);
+
+      const rotatedAbilitiesArray = rotateArray(abilitiesArray);
+      const rotatedDirectionsArray = rotateArray(directionsArray);
+
+      updatedPlayers.forEach((player, i) => {
+        player.playerAbilities = rotatedAbilitiesArray[i];
+        player.playerDirections = rotatedDirectionsArray[i];
+      })
+
+      console.log("updatedPlayers", updatedPlayers)
+      console.log("update abilities count", count)
+
+      await setDoc(gameState.roomId, {
+        players: updatedPlayers,
+        updateAbilitiesCount: count + 1
+      })
+    }
+  }
 
   return (
     <div 
