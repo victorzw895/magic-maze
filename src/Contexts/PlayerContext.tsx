@@ -46,7 +46,7 @@ const playerReducer = (playerState: PlayerState, action: Action) => {
   let newState = {...playerState} as PlayerState;
 
   switch (action?.type) {
-    case 'setPlayer': { // ONLY THIS used
+    case 'setPlayer': {
       newState = action.value;
       return newState;
     }
@@ -59,10 +59,6 @@ const playerReducer = (playerState: PlayerState, action: Action) => {
 const PlayerProvider = ({children}: PlayerProviderProps) => {
 
   const [playerState, playerDispatch] = useReducer(playerReducer, playerInitialState);
-  // TODO split player state, static values and dynamic values
-  // eg
-  // number, playerDirections, playerAbilities
-  // showMovables ....
 
   return (
     <PlayerStateContext.Provider value={playerState}>

@@ -24,11 +24,6 @@ export interface Game {
   minutesLeft: number,
   secondsLeft: number,
   gameOver: boolean,
-  // weaponsStolen: heroColor[],
-  // heroesEscaped: heroColor[]
-  // players: Player[],
-  gameStarted: boolean
-  gamePaused: boolean
 }
 
 export interface Escalator {
@@ -83,7 +78,6 @@ export interface Room {
   // minutesLeft: number,
   loadBoard: boolean,
   gameStarted: boolean,
-  gamePaused: boolean,
   gameOver: boolean,
   gameWon: boolean,
   timeLeft: number,

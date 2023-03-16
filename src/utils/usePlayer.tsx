@@ -1,13 +1,10 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { usePlayerState } from '../Contexts/PlayerContext';
 import { DBPlayer, Room } from '../types';
 
 const usePlayer = (room: Room): [DBPlayer[], DBPlayer, boolean] => {
-  // const playerDispatch = usePlayerDispatch();
   const playerState = usePlayerState();
-  // Players array should be firestore real time values, only updated by firestore changes
   const [players, setPlayers] = useState<DBPlayer[]>([{} as DBPlayer]);
-  // player object should be local
   const [currentPlayer, setCurrentPlayer] = useState<DBPlayer>({} as DBPlayer);
 
   const [allPlayersReady, setAllPlayersReady] = useState<boolean>(false);

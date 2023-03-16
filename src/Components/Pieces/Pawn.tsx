@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from 'react';
 import { Room, DBHeroPawn, DBTile } from '../../types';
 import { tileWallSize } from '../../constants';
 import { useGame } from '../../Contexts/GameContext';
@@ -7,7 +6,6 @@ import { showMovableSpaces } from '../../Helpers/TileMethods';
 import { 
   useTilesDocState,
   useCurrentPlayerDocState,
-  useGamePausedDocState,
   useLoadingDocState,
 } from '../../Contexts/FirestoreContext';
 import { getDisplacementValue } from '../../Helpers/TileMethods';
@@ -23,7 +21,6 @@ const Pawn = ({pawnData}: pawnProps) => {
   const { color } = pawnData;
 
   const { gameState } = useGame();
-  const gamePaused = useGamePausedDocState();
 
   const currentPlayer = useCurrentPlayerDocState();
   const tiles: DBTile[] = useTilesDocState();
@@ -55,9 +52,7 @@ const Pawn = ({pawnData}: pawnProps) => {
           }}>
           <div 
             className={`pawn ${color}`} 
-             // TODO: disable pawn for escapedHeroes || or just remove component
-            onClick={gameState.gameOver ? () => {} : !gamePaused ? toggleMovableSpaces : () => {}}
-            // onClick={gameState.gameOver || room.heroesEscaped.includes(color) ? () => {} : !room.gamePaused ? toggleMovableSpaces : () => {}}
+            onClick={gameState.gameOver ? () => {} : toggleMovableSpaces}
             style={{
               gridColumnStart: pawnData?.position[0] + 1,
               gridRowStart: pawnData?.position[1] + 1,

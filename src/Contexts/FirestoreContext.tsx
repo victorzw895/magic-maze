@@ -1,32 +1,30 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
-import { DBPlayer, DBHeroPawn, PlayerHeldPawn } from '../types';
+import { DBPlayer, DBHeroPawn, PlayerHeldPawn, heroColor, DBTile } from '../types';
 import { useGame } from '../Contexts/GameContext';
 import { useDocData } from '../utils/useFirestore';
-import useGamePaused from '../utils/useGamePaused';
+import useGameStates from '../utils/useGameStates';
 import useTiles from '../utils/useTiles';
 import usePlayer from '../utils/usePlayer';
 import usePawns from '../utils/usePawns';
 import useLoading from '../utils/useLoading';
 
-// type Action = {type: 'update', value: string} | undefined;
-// type Dispatch = (action: Action) => void;
-
 type DBProviderProps = {children: React.ReactNode}
 
-
 const LoadingDocContext = createContext<any>(undefined);
-const GameStartedDocContext = createContext<any>(undefined);
-const GamePausedDocContext = createContext<boolean>(false);
+const GameStartedDocContext = createContext<boolean>(false);
 const GameOverDocContext = createContext<boolean>(false);
 const GameWonDocContext = createContext<boolean>(false);
-const WeaponsStolenDocContext = createContext<any>(undefined);
-const HeroesEscapedDocContext = createContext<any>(undefined);
+const WeaponsStolenDocContext = createContext<{
+  weaponsStolen: boolean,
+  onWeapons: heroColor[],
+} | undefined>(undefined);
+const HeroesEscapedDocContext = createContext<heroColor[]>([]);
 const PlayerHeldPawnDocContext = createContext<PlayerHeldPawn>({} as PlayerHeldPawn);
 const GreenPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const YellowPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const PurplePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const OrangePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
-const TilesDocContext = createContext<any>(undefined);
+const TilesDocContext = createContext<DBTile[] | undefined>(undefined);
 const PlayersDocContext = createContext<DBPlayer[] | undefined>(undefined);
 const CurrentPlayerDocContext = createContext<DBPlayer | undefined>(undefined);
 const PingedDocContext = createContext<boolean>(false);
@@ -39,7 +37,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [heroesEscaped, setHeroesEscaped] = useState([]);
   const [weaponsStolen, setWeaponsStolen] = useState(false);
-  const [gamePaused, gameOver, gameWon] = useGamePaused(room);
+  const [gameOver, gameWon] = useGameStates(room);
   const [roomLoaded, loadBoard, onPawnsLoaded, onObjectivesLoaded, setTileLoaded, setAbilitiesLoaded, setPingLoaded] = useLoading(room, gameState.roomId);
   const [tiles, flipSandTimerCount] = useTiles(room);
   const [players, currentPlayer, allPlayersReady] = usePlayer(room);
@@ -76,7 +74,6 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
     <LoadingDocContext.Provider value={loadingProviderValue}>
     <GameStartedDocContext.Provider value={gameStarted}>
       <SandTimerContext.Provider value={flipSandTimerCount}>
-      <GamePausedDocContext.Provider value={gamePaused}>
       <GameOverDocContext.Provider value={gameOver}>
       <GameWonDocContext.Provider value={gameWon}>
         <TilesDocContext.Provider value={tiles}>
@@ -104,7 +101,6 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
         </TilesDocContext.Provider>
       </GameWonDocContext.Provider>
       </GameOverDocContext.Provider>
-      </GamePausedDocContext.Provider>
       </SandTimerContext.Provider>
     </GameStartedDocContext.Provider>
     </LoadingDocContext.Provider>
@@ -124,14 +120,6 @@ const useGameStartedDocState = () => {
   const context = useContext(GameStartedDocContext)
   if (context === undefined) {
     throw new Error('useGameStartedDocState must be used within a GameStartedDocContext');
-  }
-  return context;
-}
-
-const useGamePausedDocState = () => {
-  const context = useContext(GamePausedDocContext)
-  if (context === undefined) {
-    throw new Error('useGamePausedDocState must be used within a GamePausedDocContext');
   }
   return context;
 }
@@ -252,7 +240,6 @@ export {
   FirestoreProvider,
   useLoadingDocState,
   useGameStartedDocState,
-  useGamePausedDocState,
   useGreenDocState,
   useYellowDocState,
   usePurpleDocState,

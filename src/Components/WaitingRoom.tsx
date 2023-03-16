@@ -4,10 +4,11 @@ import { Paper, Stack, Button, List, ListItem, Box, Modal, Typography } from '@m
 import { setDoc, doc } from "../utils/useFirestore"; 
 import CloseIcon from '@mui/icons-material/Close';
 import { usePlayersDocState, useCurrentPlayerDocState } from '../Contexts/FirestoreContext';
-import { pawnDBInitialState } from '../Contexts/PawnContext';
+import { pawnDBInitialState } from '../utils/PawnFactory';
 import { allTiles } from '../Data/all-tiles-data';
 import { deleteDoc } from "firebase/firestore";
 import { usePlayerDispatch } from '../Contexts/PlayerContext';
+import { playerNumber } from '../types';
 
 const WaitingRoom = () => {
   console.log('re render waiting room')
@@ -64,9 +65,9 @@ const WaitingRoom = () => {
     if (players && players.length) {
       // ! Feel like there could be async issues below but need revision
       // * remove current player from player list 
-      const updatedPlayers = players.filter((dbPlayer: any) => dbPlayer.id !== currentPlayer.id)
+      const updatedPlayers = players.filter((dbPlayer) => dbPlayer.id !== currentPlayer.id)
       // re-assign player numbers
-      updatedPlayers.map((player: any, playerNumber: number) => player.number = playerNumber + 1)
+      updatedPlayers.map((player, playerIndex) => player.number = playerIndex + 1 as playerNumber)
       
       // Update players and numbers
       await setDoc(gameState.roomId, {
@@ -90,7 +91,7 @@ const WaitingRoom = () => {
       <Paper sx={{display: 'grid', gridTemplateRows: 'repeat(2, minmax(50px, auto))', width: '100%', minHeight: '135px', maxWidth: '360px', bgcolor: '#63B0CD' }}>
         <List>
           {
-            players && players.map((player: any) => 
+            players && players.map((player) => 
               <ListItem key={player.number}>{`${player.number}  ${player.name}`}</ListItem>
             )
           }

@@ -9,8 +9,6 @@ import reportWebVitals from './reportWebVitals';
 import { GameProvider } from './Contexts/GameContext';
 import { FirestoreProvider } from './Contexts/FirestoreContext';
 import { PlayerProvider } from './Contexts/PlayerContext';
-import Test from './Components/Test';
-import { TilesProvider } from './Contexts/TilesContext';
 import { AssetsProvider } from './Contexts/AssetsContext';
 import { AudioProvider } from './Contexts/AudioContext';
 
@@ -20,12 +18,9 @@ ReactDOM.render(
       <PlayerProvider>
         <AssetsProvider>
           <FirestoreProvider>
-            <TilesProvider>
-              <AudioProvider>
-                <App />
-                {/* <Test /> */}
-              </AudioProvider>
-            </TilesProvider>
+            <AudioProvider>
+              <App />
+            </AudioProvider>
           </FirestoreProvider>
         </AssetsProvider>
       </PlayerProvider>

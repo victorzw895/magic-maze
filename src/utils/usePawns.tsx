@@ -10,7 +10,16 @@ const initPlayerHeldPawn = {
   gridPosition: [8, 8],
 }
 
-const usePawns = (room: Room, roomId: string): any => {
+interface UsePawns {
+  green: DBHeroPawn | undefined,
+  yellow: DBHeroPawn | undefined,
+  purple: DBHeroPawn | undefined,
+  orange: DBHeroPawn | undefined,
+  playerHeldPawn: PlayerHeldPawn,
+  onWeapons: heroColor[]
+}
+
+const usePawns = (room: Room, roomId: string): UsePawns => {
   const playerState = usePlayerState();
   const [playerHeldPawn, setPlayerHeldPawn] = useState<PlayerHeldPawn>(initPlayerHeldPawn);
   const [green, setGreen] = useState<DBHeroPawn | undefined>(undefined);

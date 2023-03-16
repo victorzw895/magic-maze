@@ -1,6 +1,6 @@
 import { useEffect, useState, memo } from 'react';
 import { useGame } from '../Contexts/GameContext';
-import { heroColor, Escalator, SpaceTypeName, DBPlayer, basicAbility, direction } from '../types';
+import { heroColor, Escalator, SpaceTypeName, DBPlayer, basicAbility, direction, DBHeroPawn } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
 import { useAudio } from '../Contexts/AudioContext';
@@ -73,7 +73,7 @@ const Space = memo(({
         let isOccupied = false;
         const docSnap = await getDoc(gameState.roomId);
         if (docSnap.exists()) {
-          isOccupied = Object.values(docSnap.data().pawns).some((pawn: any) => {
+          isOccupied = Object.values(docSnap.data().pawns as DBHeroPawn[]).some((pawn) => {
             if (pawn.gridPosition[0] === gridPosition[0] && pawn.gridPosition[1] === gridPosition[1]) {
               if (pawn.position[0] === spacePosition[0] && pawn.position[1] === spacePosition[1]) {
                 return true;
@@ -102,7 +102,7 @@ const Space = memo(({
                 let isOccupied = false;
                 const docSnap = await getDoc(gameState.roomId);
                 if (docSnap.exists()) {
-                  isOccupied = Object.values(docSnap.data().pawns).some((pawn: any) => {
+                  isOccupied = Object.values(docSnap.data().pawns as DBHeroPawn[]).some((pawn) => {
                     if (pawn.gridPosition[0] === gridPosition[0] && pawn.gridPosition[1] === gridPosition[1]) {
                       if (pawn.position[0] === spacePosition[0] && pawn.position[1] === spacePosition[1]) {
                         return true;
@@ -179,7 +179,6 @@ const Space = memo(({
         await setDoc(
           gameState.roomId, 
           {
-            gamePaused: newRoomValue.gamePaused,
             pawns: newRoomValue.pawns, 
             tiles: newRoomValue.tiles,
             weaponsStolen: newRoomValue.weaponsStolen,
@@ -227,7 +226,6 @@ const Space = memo(({
     <div 
       className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}${showEscalator ? " escalator" : ""}`}
       onClick={showMovableArea || showTeleport || showEscalator ? movePawn : () => {}}
-       // TODO: disable if game paused
     >
       {
         (isTimer && spaceIsDisabled) ?

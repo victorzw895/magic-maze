@@ -1,6 +1,6 @@
-import React, { useEffect, useState, MouseEvent } from 'react';
+import { useEffect, useState, MouseEvent } from 'react';
 import { useAudio } from '../Contexts/AudioContext';
-import { IconButton, Box, Stack, Slider, Button, Menu, MenuItem } from '@mui/material';
+import { IconButton, Box, Stack, Slider, Menu, MenuItem } from '@mui/material';
 import { VolumeUp, VolumeMute, MusicNote, MusicOff, Notifications, NotificationsOff, Settings } from '@mui/icons-material';
 
 const AudioControls = () => {
