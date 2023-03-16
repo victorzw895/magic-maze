@@ -54,7 +54,7 @@ During covid I had decided to build one of my favorite cooperative board games t
 - It is a cooperative game, so you win together or lose together.
 - In order to win, you need to work together with the rest of the players to move the 4 different colored pawns around the board, to:
   1. Explore and expand the board by adding new tiles
-  2. Find each pawn's corresponding weapon of their color
+  2. Find each pawn's corresponding weapon of their color. And collect all 4 at the same time.
   3. Escape through the corresponding exit of their color.
 - The game makes it hard to achieve these goals, by:
   1. Being a silent game where no one is allowed to speak to communicate directions.
