@@ -1,12 +1,22 @@
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTimer } from 'react-timer-hook';
 import { useGame } from '../Contexts/GameContext';
 import { useGameOverDocState, useWeaponsStolenDocState, useSandTimerState } from '../Contexts/FirestoreContext';
 import { setDoc } from '../utils/useFirestore';
 import { useAudio } from '../Contexts/AudioContext';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
+
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref,
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const Timer = () => {
   const { gameState, gameDispatch } = useGame();
+  const [showAlert, setShowAlert] = useState(false);
   const gameOver = useGameOverDocState();
   const flipSandTimerCount = useSandTimerState();
   const { weaponsStolen } = useWeaponsStolenDocState();
@@ -82,13 +92,32 @@ const Timer = () => {
   // for accuracy, best to move timer into firebase
   useEffect(() => {
     toggleTimer();
+    if (!flipSandTimerCount) return;
+    setShowAlert(true);
   }, [flipSandTimerCount])
 
   return (
-    <div className="timer">
-      <span>{minutes}</span>:
-      <span>{seconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}</span>
-    </div>
+    <>
+      <div className="timer">
+        <span>{minutes}</span>:
+        <span>{seconds.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false})}</span>
+      </div>
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={showAlert}
+        onClose={() => setShowAlert(false)}
+        autoHideDuration={5000}
+        key='flip-timer-alert'
+        ClickAwayListenerProps={{
+          mouseEvent: false,
+          touchEvent: false,
+        }}
+      >
+        <Alert severity="info" sx={{ width: '100%' }}>
+          Timer hit, flipping Sand Timer!
+        </Alert>
+      </Snackbar>
+    </>
   )
 }
 
