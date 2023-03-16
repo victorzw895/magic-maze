@@ -231,7 +231,17 @@ const Space = memo(({
     >
       {
         (isTimer && spaceIsDisabled) ?
-          <div style={{position: "absolute", zIndex: "2", paddingTop: "5px", textAlign: "center", width: "100%", height: "100%"}}><ImCross style={{ fontSize: "30px", color: "#795548" }} /> </div>
+          <div style={{
+            position: "absolute",
+            zIndex: "2",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: "100%",
+            height: "100%"
+          }}>
+            <ImCross style={{ fontSize: "30px", color: "#795548" }} /> 
+          </div>
             :
           <></>
       }
