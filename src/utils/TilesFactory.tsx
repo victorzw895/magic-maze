@@ -1,17 +1,6 @@
-import React, { createContext, useContext, useReducer } from 'react';
 import { direction, DBTile, Space } from '../types';
 
 import { allTiles } from '../Data/all-tiles-data';
-
-type Action = {type: 'initTile', value: DBTile} | 
-              {type: 'addTile', value: DBTile} | undefined;
-type Dispatch = (action: Action) => void;
-
-type TilesProviderProps = {children: React.ReactNode}
-
-const tilesInitialState: DBTile[] = []
-
-const TilesContext = createContext<{tilesState: DBTile[]; tilesDispatch: Dispatch} | undefined>(undefined);
 
 type directionValuesType = {
   up: number,
@@ -27,6 +16,7 @@ const directionValue: directionValuesType = {
   left: 270
 }
 
+// TODO need to make into state
 export const availableTiles = [2,3,4,5,6,7,8,9,10,11,12];
 
 availableTiles.sort(() => 0.5 - Math.random());
@@ -49,7 +39,7 @@ const rotateTileSpaces = (matrix: any) => {          // function statement
   const N = matrix.length - 1;   // use a constant
   // use arrow functions and nested map;
   const result = matrix.map((row: any, i: any) => 
-        row.map((val: any, j: any) => matrix[N - j][i])
+        row.map((_: any, j: any) => matrix[N - j][i])
   );
   matrix.length = 0;       // hold original array reference
   matrix.push(...result);  // Spread operator
@@ -65,9 +55,8 @@ const getUpdatedDirectionValue = (direction: direction, rotationValue: number) =
 }
 
 const updateSpaceDirections = (spaces: Space[][], rotationValue: number) => {
-  // console.log("updating sidewalls");
   const newSpaces = [...spaces];
-  return newSpaces.map((row, rowIndex) => row.map((col: any, colIndex) => 
+  return newSpaces.map((row) => row.map((col: any) => 
     {
       if (col.details) {
         if (col.details.sideWalls) {
@@ -123,64 +112,3 @@ export const generateTile = (newTileState: DBTile) => {
     3: tileSpaces[3]
   }};
 }
-
-const tilesReducer = (tilesState: DBTile[], action: any) => {
-
-  switch (action.type) {
-    case 'initTile': {
-      return [...tilesState, {...action.value, gridPosition: [8, 8]}];
-    }
-    case 'addTile': {
-      const newId = availableTiles.pop();
-      const tile = allTiles.find(tile => tile.id === newId?.toString()) as DBTile;
-      if (!tile) return [...tilesState];
-      const { gridPosition, placementDirection} = action.value
-      const newTile: DBTile = {...tile, gridPosition, placementDirection};
-      const tileSpaces = Object.values(newTile.spaces!)
-      const rotationValue = calculateRotation(newTile.placementDirection!, newTile.entryDirection!);
-
-      switch (rotationValue) {
-        case 90:
-          rotateTileSpaces(tileSpaces);
-          updateSpaceDirections(tileSpaces, rotationValue);
-          break; 
-        case 180:
-          rotateTileSpaces(tileSpaces);
-          rotateTileSpaces(tileSpaces);
-          updateSpaceDirections(tileSpaces, rotationValue);
-          break;
-        case 270:
-          rotateTileSpaces(tileSpaces);
-          rotateTileSpaces(tileSpaces);
-          rotateTileSpaces(tileSpaces);
-          updateSpaceDirections(tileSpaces, rotationValue);
-          break;
-        default:
-          break;
-      }
-      
-      return [...tilesState, {...newTile, rotation: rotationValue, spaces: tileSpaces}];
-    }
-    default: {
-      throw new Error(`Unhandled action type: ${action.type}`)
-    }
-  }
-}
-
-const TilesProvider = ({children}: TilesProviderProps) => {
-
-  const [tilesState, tilesDispatch] = useReducer(tilesReducer, tilesInitialState);
-  const value = {tilesState, tilesDispatch};
-
-  return <TilesContext.Provider value={value}>{children}</TilesContext.Provider>
-}
-
-const useTiles = () => {
-  const context = useContext(TilesContext)
-  if (context === undefined) {
-    throw new Error('useTiles must be used within a TilesProvider');
-  }
-  return context;
-}
-
-export { TilesProvider, useTiles };

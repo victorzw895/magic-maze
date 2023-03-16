@@ -11,7 +11,6 @@ import { useLoadingDocState, useGameStartedDocState } from '../Contexts/Firestor
 import { useAssets } from '../Contexts/AssetsContext';
 
 const Board = () => {
-  console.log('re rendering Board');
   const gameStarted = useGameStartedDocState();
   const { loadBoard } = useLoadingDocState();
   const { assets } = useAssets();

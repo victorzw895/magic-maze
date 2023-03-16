@@ -12,7 +12,7 @@ const startTiles = () => {
   return tiles;
 }
 
-const useHighlightArea = (roomId: string): [ DBTile[], () => void, () => void] => {
+const useHighlightArea = (roomId: string): [DBTile[], () => void, () => void] => {
   const [availableArea, setAvailableArea] = useState<DBTile[]>(startTiles() as DBTile[]);
 
   const getExplorationTile = (tiles: DBTile[], pawn: DBHeroPawn, pawnColIndex: number, pawnRowIndex: number) => {

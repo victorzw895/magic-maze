@@ -20,7 +20,7 @@ const Tile = ({tileIndex, tileData}: tileProps) => {
   const { setTileLoaded } = useLoadingDocState();
   const currentPlayer = useCurrentPlayerDocState();
   const playerHeldPawn = usePlayerHeldPawnDocState()
-  const weaponsStolen = useWeaponsStolenDocState();
+  const { weaponsStolen } = useWeaponsStolenDocState();
   
   return (
     <>
@@ -44,7 +44,7 @@ const Tile = ({tileIndex, tileData}: tileProps) => {
                   const highlightSpace = shouldHighlightSpace(playerHeldPawn, currentPlayer, tileData, colIndex, rowIndex);
                   const {type, details} = space;
                   const playerHeldPawnColor = playerHeldPawn?.color;
-                  const disableTeleporter = weaponsStolen.length === 4
+                  const disableTeleporter = weaponsStolen
                   const highlightTeleporter = 
                     type === 'teleporter' && 
                     !disableTeleporter &&

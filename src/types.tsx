@@ -24,11 +24,6 @@ export interface Game {
   minutesLeft: number,
   secondsLeft: number,
   gameOver: boolean,
-  // weaponsStolen: heroColor[],
-  // heroesEscaped: heroColor[]
-  // players: Player[],
-  gameStarted: boolean
-  gamePaused: boolean
 }
 
 export interface Escalator {
@@ -83,11 +78,10 @@ export interface Room {
   // minutesLeft: number,
   loadBoard: boolean,
   gameStarted: boolean,
-  gamePaused: boolean,
   gameOver: boolean,
   gameWon: boolean,
   timeLeft: number,
-  weaponsStolen: heroColor[],
+  weaponsStolen: boolean,
   heroesEscaped: heroColor[],
   players: DBPlayer[],
   updateAbilitiesCount: number,
@@ -97,7 +91,8 @@ export interface Room {
   pawns: DBPawns,
   pings: playerNumber[], // ?? add debouncer or throttle, or batch update/consume from firestore
   createdDate: Date,
-  createdDateInSeconds: number
+  createdDateInSeconds: number,
+  timerDisabledCount: number
 }
 
 
@@ -116,6 +111,7 @@ interface HeroPawnState<T> extends PawnActions {
   gridPosition: number[],
   ability: string,
   canUseAbility: boolean,
+  onWeapon: boolean,
 }
 
 export interface DBHeroPawn extends HeroPawnState<heroColor> {}

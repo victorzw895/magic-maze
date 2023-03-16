@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Room } from '../types';
-import { useGamePausedDocState, usePlayersDocState, useCurrentPlayerDocState, usePingedDocState, useLoadingDocState } from '../Contexts/FirestoreContext';
+import { usePlayersDocState, useCurrentPlayerDocState, usePingedDocState, useLoadingDocState } from '../Contexts/FirestoreContext';
 import { useGame } from '../Contexts/GameContext';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import Popover from '@mui/material/Popover';
@@ -26,7 +26,6 @@ const Pinged = () => {
   const { assets } = useAssets();
   const { setPingLoaded } = useLoadingDocState();
   const { gameState } = useGame();
-  const gamePaused = useGamePausedDocState();
   const players = usePlayersDocState();
   const currentPlayer = useCurrentPlayerDocState();
   const pinged = usePingedDocState();
@@ -127,7 +126,7 @@ const Pinged = () => {
                             disabled={dbPlayer.number === currentPlayer.number}
                             onClick={() => {
                               popupState.close()
-                              if (!gamePaused) handleClick(dbPlayer.number)
+                              handleClick(dbPlayer.number)
                             }} >
                             <ListItemIcon key={`ListItemIcon-${dbPlayer.id}`}>
                               <NotificationsIcon key={`NotificationsIcon-${dbPlayer.id}`}/>

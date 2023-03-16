@@ -36,7 +36,6 @@ const useSounds = () => {
   const [musicOn, setMusicOn] = useState<boolean>(true);
   const [soundOn, setSoundOn] = useState<boolean>(true);
   const [value, setValue] = useState<number>(100);
-  // gameAudio can play, pause. SetGameAudio is to change tracks
   const [gameAudio, setGameAudio] = useState<HTMLAudioElement | null>(null);
 
   // Game Music soundtrack useEffects
@@ -90,10 +89,11 @@ const useSounds = () => {
 
   const setVolume = (num: number) => {
     
-    if (num === 0) {
+    if (num === 0 && soundOn && musicOn) {
       setSoundOn(false);
       setMusicOn(false);
-    } else {
+    }
+    else if (!soundOn && !musicOn){
       setSoundOn(true);
       setMusicOn(true);
     };
@@ -110,8 +110,6 @@ const useSounds = () => {
     winAudio.volume = num;
     loseAudio.volume = num;
     cheeringAudio.volume = num;
-
-    console.log("volume level?", num)
   }
 
   return {
@@ -136,5 +134,7 @@ const useSounds = () => {
     setVolume
   }
 } 
+
+export type useSoundsType = ReturnType<typeof useSounds>
 
 export default useSounds;

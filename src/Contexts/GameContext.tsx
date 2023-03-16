@@ -1,27 +1,19 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { Game, direction, basicAbility, DBPlayer } from '../types';
 
-type Action = {type: 'joinRoom', value: String} | // USED
-              {type: 'toggleTimer', value: boolean} | 
-              {type: 'timeLeft', minutes: number, seconds: number} | 
-              {type: 'gameOver'} |  // USED
-              {type: 'startGame'} | // USED
-              {type: 'exitRoom'} | undefined;
+type Action = {type: 'joinRoom', value: string} |
+              {type: 'gameOver'} |
+              {type: 'exitRoom'};
 type Dispatch = (action: Action) => void;
 
 type GameProviderProps = {children: React.ReactNode}
 
 const gameInitialState: Game = {
-  // roomId: "PKHRP",
   roomId: "",
-  gameStarted: false, // TODO remove, can use values straight from DB
-  gamePaused: false, // TODO remove, can use values straight from DB
   timerRunning: false, // TODO maybe not necessary
   minutesLeft: 3,
   secondsLeft: 20,
   gameOver: false,
-  // weaponsStolen: [],
-  // heroesEscaped: []
 }
 
 // Set up player actions according to rule book
@@ -86,62 +78,12 @@ export const assignRandomActions = (players: DBPlayer[]): DBPlayer[] => {
 
 const GameContext = createContext<{gameState: Game; gameDispatch: Dispatch} | undefined>(undefined);
 
-const gameReducer = (gameState: Game, action: any) => {
+const gameReducer = (gameState: Game, action: Action) => {
   let newState = {...gameState};
 
   switch (action.type) {
-    case 'createRoom': {
-      // TESTING MORE PLAYERS
-      // const players: Player[] = [
-      //   {
-      //     name: "victor",
-      //     number: 1,
-      //     playerDirections: [],
-      //     playerPawnHeld: null,
-      //     playerAbilities: [],
-      //     pingPlayer: null,
-      //   },
-      //   {
-      //     name: "bob",
-      //     number: 2,
-      //     playerDirections: [],
-      //     playerPawnHeld: null,
-      //     playerAbilities: [],
-      //     pingPlayer: null,
-      //   },
-      //   {
-      //     name: "Yue",
-      //     number: 3,
-      //     playerDirections: [],
-      //     playerPawnHeld: null,
-      //     playerAbilities: [],
-      //     pingPlayer: null,
-      //   },
-      // ]
-      // newState.players = players;
-      newState.roomId = action.value;
-      return newState;
-    }
     case 'joinRoom': {
       newState.roomId = action.value;
-      return newState;
-    }
-    case 'play': {
-      newState.timerRunning = true;
-      return newState;
-    }
-    case 'startGame': {
-      newState.gameStarted = true;
-      return newState;
-    }
-    case 'timeLeft': {
-      newState.minutesLeft = action.minutes;
-      newState.secondsLeft = action.seconds;
-      return newState;
-    }
-    case 'toggleTimer': {
-      newState.timerRunning = action.value;
-      newState.gamePaused = !newState.gamePaused;
       return newState;
     }
     case 'gameOver': {
@@ -155,7 +97,7 @@ const gameReducer = (gameState: Game, action: any) => {
       return newState
     }
     default: {
-      throw new Error(`Unhandled action type: ${action.type}`)
+      throw new Error(`Unhandled action type`)
     }
   }
 }

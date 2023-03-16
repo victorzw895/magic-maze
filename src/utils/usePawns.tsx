@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { DBHeroPawn, Room, PlayerHeldPawn } from '../types';
+import { DBHeroPawn, Room, PlayerHeldPawn, heroColor } from '../types';
 import { pawnDefaultValues } from '../constants';
 import { usePlayerState } from '../Contexts/PlayerContext';
 import { setDoc } from '../utils/useFirestore';
@@ -10,13 +10,23 @@ const initPlayerHeldPawn = {
   gridPosition: [8, 8],
 }
 
-const usePawns = (room: Room, roomId: string): any => {
+interface UsePawns {
+  green: DBHeroPawn | undefined,
+  yellow: DBHeroPawn | undefined,
+  purple: DBHeroPawn | undefined,
+  orange: DBHeroPawn | undefined,
+  playerHeldPawn: PlayerHeldPawn,
+  onWeapons: heroColor[]
+}
+
+const usePawns = (room: Room, roomId: string): UsePawns => {
   const playerState = usePlayerState();
   const [playerHeldPawn, setPlayerHeldPawn] = useState<PlayerHeldPawn>(initPlayerHeldPawn);
   const [green, setGreen] = useState<DBHeroPawn | undefined>(undefined);
   const [yellow, setYellow] = useState<DBHeroPawn | undefined>(undefined);
   const [purple, setPurple] = useState<DBHeroPawn | undefined>(undefined);
   const [orange, setOrange] = useState<DBHeroPawn | undefined>(undefined);
+  const [onWeapons, setOnWeapons] = useState<heroColor[]>([]);
 
   const { pawns } = room;
   const { green: greenPawn, yellow: yellowPawn, orange: orangePawn, purple: purplePawn } = pawns;
@@ -88,13 +98,49 @@ const usePawns = (room: Room, roomId: string): any => {
     orangePawn.gridPosition[1]
   ])
 
+  useEffect(() => {
+    if (greenPawn.onWeapon) {
+      setOnWeapons((prev) => [...prev, 'green'])
+    }
+    else {
+      setOnWeapons((prev) => [...prev.filter(color => color !== 'green')])
+    }
+  }, [greenPawn.onWeapon])
+
+  useEffect(() => {
+    if (yellowPawn.onWeapon) {
+      setOnWeapons((prev) => [...prev, 'yellow'])
+    }
+    else {
+      setOnWeapons((prev) => [...prev.filter(color => color !== 'yellow')])
+    }
+  }, [yellowPawn.onWeapon])
+
+  useEffect(() => {
+    if (purplePawn.onWeapon) {
+      setOnWeapons((prev) => [...prev, 'purple'])
+    }
+    else {
+      setOnWeapons((prev) => [...prev.filter(color => color !== 'purple')])
+    }
+  }, [purplePawn.onWeapon])
+
+  useEffect(() => {
+    if (orangePawn.onWeapon) {
+      setOnWeapons((prev) => [...prev, 'orange'])
+    }
+    else {
+      setOnWeapons((prev) => [...prev.filter(color => color !== 'orange')])
+    }
+  }, [orangePawn.onWeapon])
 
   return {
     green,
     yellow,
     purple,
     orange,
-    playerHeldPawn
+    playerHeldPawn,
+    onWeapons
   };
 };
 

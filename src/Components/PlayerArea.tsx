@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useGame } from '../Contexts/GameContext';
-import PlayerAreaDisabled from './PlayerAreaDisabled';
 import Pinged from './Pinged';
-import { useGamePausedDocState, useCurrentPlayerDocState, useWeaponsStolenDocState, useLoadingDocState } from '../Contexts/FirestoreContext';
+import { useCurrentPlayerDocState, useWeaponsStolenDocState, useLoadingDocState } from '../Contexts/FirestoreContext';
 import { useAssets } from '../Contexts/AssetsContext';
-import { availableTiles } from '../Contexts/TilesContext';
+import { availableTiles } from '../utils/TilesFactory';
 
 interface PlayerAreaProps {
   highlightNewTileArea: () => void
@@ -16,8 +15,7 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
   const { setAbilitiesLoaded } = useLoadingDocState();
   const { gameState } = useGame();
   const currentPlayer = useCurrentPlayerDocState();
-  const gamePaused = useGamePausedDocState();
-  const weaponsStolen = useWeaponsStolenDocState();
+  const { weaponsStolen } = useWeaponsStolenDocState();
   const [assetLodedCount, setAssetLodedCount] = useState(0);
 
   useEffect(() => {
@@ -58,13 +56,14 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
                     onLoad={() => setAssetLodedCount((prev) => prev + 1)}
                     key={ability}
                     draggable={false}
-                    onClick={gamePaused || availableTiles.length === 0 ? () => {} : highlightNewTileArea} // TODO: disable if game paused
+                    onClick={availableTiles.length === 0 ? () => {} : highlightNewTileArea}
                     src={availableTiles.length === 0 ? assets[`${ability}-disabled.png`] : assets[`${ability}.png`]}
                     alt={ability} 
                     title={ability}
                     style={{
                       width: '80px',
-                      margin: '0 30px'
+                      margin: '0 30px',
+                      cursor: 'pointer',
                     }}
                       />
                 )
@@ -75,12 +74,13 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
                     onLoad={() => setAssetLodedCount((prev) => prev + 1)}
                     key={ability}
                     draggable={false}
-                    src={ability === 'teleport' && weaponsStolen.length === 4 ? assets[`${ability}-disabled.png`] : assets[`${ability}.png`]}
+                    src={ability === 'teleport' && weaponsStolen ? assets[`${ability}-disabled.png`] : assets[`${ability}.png`]}
                     alt={ability} 
                     title={ability}
                     style={{
                       width: '80px',
                       margin: '0 30px',
+                      transform: ability === 'teleport' ? 'scaleX(-1)' : 'none',
                     }}
                       />
                 )
@@ -88,11 +88,9 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
             })
           }
           <Pinged />
-          {/* TODO: when firestore gamePaused, update gameState */}
-          {gamePaused && <PlayerAreaDisabled />}
           {
               gameState.gameOver && 
-              <div className="game-paused">
+              <div className="game-over">
               <p>Game Over</p>
             </div>
           }

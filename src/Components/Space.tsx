@@ -1,9 +1,10 @@
 import { useEffect, useState, memo } from 'react';
 import { useGame } from '../Contexts/GameContext';
-import { heroColor, Escalator, SpaceTypeName } from '../types';
+import { heroColor, Escalator, SpaceTypeName, DBPlayer, basicAbility, direction, DBHeroPawn } from '../types';
 import { setDoc, getDoc } from '../utils/useFirestore';
 import isEqual from 'lodash/isEqual';
 import { useAudio } from '../Contexts/AudioContext';
+import { ImCross } from 'react-icons/im'
 
 interface SpaceProps {
   spaceType: SpaceTypeName,
@@ -58,7 +59,7 @@ const Space = memo(({
 
   const [showTeleport, setShowTeleport] = useState(false)
   const [showEscalator, setShowEscalator] = useState(false);
-  const { playSelectSound, playAchievementSound, playTeleporterSound, playExitSound, playWinSound } = useAudio();
+  const { playSelectSound, playTeleporterSound, playExitSound, playWinSound } = useAudio();
 
   // BUG: NEED TO FINE TUNE teleport and escalator
   useEffect(() => {
@@ -72,7 +73,7 @@ const Space = memo(({
         let isOccupied = false;
         const docSnap = await getDoc(gameState.roomId);
         if (docSnap.exists()) {
-          isOccupied = Object.values(docSnap.data().pawns).some((pawn: any) => {
+          isOccupied = Object.values(docSnap.data().pawns as DBHeroPawn[]).some((pawn) => {
             if (pawn.gridPosition[0] === gridPosition[0] && pawn.gridPosition[1] === gridPosition[1]) {
               if (pawn.position[0] === spacePosition[0] && pawn.position[1] === spacePosition[1]) {
                 return true;
@@ -89,7 +90,6 @@ const Space = memo(({
     })()
   }, [highlightTeleporter, colorSelected, disableTeleporter])
 
-
   useEffect(() => {
     (async () => {
       if (!isEscalator) return;
@@ -102,7 +102,7 @@ const Space = memo(({
                 let isOccupied = false;
                 const docSnap = await getDoc(gameState.roomId);
                 if (docSnap.exists()) {
-                  isOccupied = Object.values(docSnap.data().pawns).some((pawn: any) => {
+                  isOccupied = Object.values(docSnap.data().pawns as DBHeroPawn[]).some((pawn) => {
                     if (pawn.gridPosition[0] === gridPosition[0] && pawn.gridPosition[1] === gridPosition[1]) {
                       if (pawn.position[0] === spacePosition[0] && pawn.position[1] === spacePosition[1]) {
                         return true;
@@ -126,9 +126,10 @@ const Space = memo(({
   // add into movePawn click, if space is timer, pause timer!
   const movePawn = async () => {
     const docSnap = await getDoc(gameState.roomId);
-
+    
     if (docSnap.exists()) {
       const newRoomValue = {...docSnap.data()}
+      const playersArray = newRoomValue.players
 
       if (newRoomValue && newRoomValue.pawns) {
         if (!colorSelected) return;
@@ -138,6 +139,7 @@ const Space = memo(({
         newRoomValue.pawns[colorSelected].showEscalatorSpaces = [];
         newRoomValue.pawns[colorSelected].showMovableDirections = [];
         newRoomValue.pawns[colorSelected].showTeleportSpaces = null;
+        newRoomValue.pawns[colorSelected].onWeapon = false;
         newRoomValue.pawns[colorSelected].blockedPositions = {
           up: {position: null, gridPosition: null},
           down: {position: null, gridPosition: null},
@@ -145,22 +147,20 @@ const Space = memo(({
           left: {position: null, gridPosition: null},
         };
         if (isTeleporter && showTeleport) {
-          // playWarp();
           playTeleporterSound();
         }
         else if (isTimer && !spaceIsDisabled) {
           // pause and update db with pause
           newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.isDisabled = true;
-          newRoomValue.gamePaused = true;
+          newRoomValue.timerDisabledCount++ // I want the flipSandTimer to be a count
+          rotateAbilities(playersArray, newRoomValue.updateAbilitiesCount)
         }
         // Might not require weaponStolen boolean on space, weaponStolen array may be enough
         else if (hasWeapon && !spaceWeaponStolen && spaceColor === colorSelected) {
-          playAchievementSound();
-          newRoomValue.tiles[tileIndex].spaces[spacePosition[1]][spacePosition[0]].details.weaponStolen = true;
-          newRoomValue.weaponsStolen = [...newRoomValue.weaponsStolen, colorSelected]
+          newRoomValue.pawns[colorSelected].onWeapon = true;
         }
         else if (isExit && spaceColor === colorSelected) {
-          if (newRoomValue.weaponsStolen.length === 4 && !newRoomValue.heroesEscaped.includes(colorSelected)) {
+          if (newRoomValue.weaponsStolen && !newRoomValue.heroesEscaped.includes(colorSelected)) {
             newRoomValue.heroesEscaped = [...newRoomValue.heroesEscaped, colorSelected]
             playExitSound();
             // if last exit, celebration soundtrack
@@ -172,32 +172,77 @@ const Space = memo(({
               })
             }
           }
-        }
-        else {
+        } else {
           playSelectSound();
         }
 
         await setDoc(
           gameState.roomId, 
           {
-            gamePaused: newRoomValue.gamePaused,
             pawns: newRoomValue.pawns, 
             tiles: newRoomValue.tiles,
             weaponsStolen: newRoomValue.weaponsStolen,
-            heroesEscaped: newRoomValue.heroesEscaped
+            heroesEscaped: newRoomValue.heroesEscaped,
+            timerDisabledCount: newRoomValue.timerDisabledCount
           },
         )
       }
     }
   }
 
+  const rotateArray = (array: any[] ) => {
+    const newArray = array.slice(1);
+    newArray.push(array[0]);
+    return newArray;
+  }
+
+  const rotateAbilities = async (players: DBPlayer[], count: number) => {
+
+    if (players.length === 1) return;
+    else {
+      const updatedPlayers = [...players]
+      const abilitiesArray = players.map(player => player.playerAbilities);
+      const directionsArray = players.map(player => player.playerDirections);
+
+      const rotatedAbilitiesArray = rotateArray(abilitiesArray);
+      const rotatedDirectionsArray = rotateArray(directionsArray);
+
+      updatedPlayers.forEach((player, i) => {
+        player.playerAbilities = rotatedAbilitiesArray[i];
+        player.playerDirections = rotatedDirectionsArray[i];
+      })
+
+      console.log("updatedPlayers", updatedPlayers)
+      console.log("update abilities count", count)
+
+      await setDoc(gameState.roomId, {
+        players: updatedPlayers,
+        updateAbilitiesCount: count + 1
+      })
+    }
+  }
 
   return (
     <div 
-      className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}${showEscalator ? " escalator" : ""}${disableTeleporter ? " disabled-teleporter" : ""}`}
+      className={`space${showMovableArea ? " active" : ""}${showTeleport ? " teleporter" : ""}${showEscalator ? " escalator" : ""}${showEscalator ? " escalator" : ""}`}
       onClick={showMovableArea || showTeleport || showEscalator ? movePawn : () => {}}
-       // TODO: disable if game paused
     >
+      {
+        (isTimer && spaceIsDisabled) ?
+          <div style={{
+            position: "absolute",
+            zIndex: "2",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: "100%",
+            height: "100%"
+          }}>
+            <ImCross style={{ fontSize: "30px", color: "#795548" }} /> 
+          </div>
+            :
+          <></>
+      }
       <div className={`${teleporterColor}${showTeleport? ' circle-multiple' : ''}`}>
         {
           showTeleport ?
