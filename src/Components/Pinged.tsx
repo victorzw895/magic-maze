@@ -22,7 +22,6 @@ const playAlert = () => {
 }
 
 const Pinged = () => {
-  console.log('here pinged')
   const { assets } = useAssets();
   const { setPingLoaded } = useLoadingDocState();
   const { gameState } = useGame();

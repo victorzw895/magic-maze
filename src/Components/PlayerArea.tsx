@@ -1,19 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useGame } from '../Contexts/GameContext';
 import Pinged from './Pinged';
-import { useCurrentPlayerDocState, useWeaponsStolenDocState, useLoadingDocState } from '../Contexts/FirestoreContext';
+import { 
+  useCurrentPlayerDocState,
+  useWeaponsStolenDocState,
+  useLoadingDocState,
+  useAvailableTilesDocState,
+} from '../Contexts/FirestoreContext';
 import { useAssets } from '../Contexts/AssetsContext';
-import { availableTiles } from '../utils/TilesFactory';
 
 interface PlayerAreaProps {
   highlightNewTileArea: () => void
 }
 
 const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
-  console.log('here player area')
   const { assets } = useAssets();
   const { setAbilitiesLoaded } = useLoadingDocState();
   const { gameState } = useGame();
+  const availableTiles = useAvailableTilesDocState();
   const currentPlayer = useCurrentPlayerDocState();
   const { weaponsStolen } = useWeaponsStolenDocState();
   const [assetLodedCount, setAssetLodedCount] = useState(0);

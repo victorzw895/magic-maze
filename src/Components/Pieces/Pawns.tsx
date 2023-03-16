@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Room, DBHeroPawn, DBTile } from '../../types';
+import { Room, DBHeroPawn } from '../../types';
 import { setDoc, getDoc } from '../../utils/useFirestore';
 import { 
   useTilesDocState,
@@ -17,7 +17,7 @@ import Pawn from './Pawn';
 const Pawns = () => {
   const { gameState } = useGame();
   const currentPlayer = useCurrentPlayerDocState();
-  const tiles: DBTile[] = useTilesDocState();
+  const tiles = useTilesDocState();
   const heroesEscaped = useHeroesEscapedDocState();
 
   useEffect(() => {

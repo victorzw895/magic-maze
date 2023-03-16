@@ -27,7 +27,10 @@ const NewTileArea = memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
 
     if (docSnap.exists()) {
       const room = docSnap.data() as Room;
-      const tile = generateTile(newTile);
+
+      const newTileId = room.availableTiles.pop();
+      const tile = generateTile(newTile, newTileId);
+
       const newPawns = room.pawns;
       Object.values(newPawns).forEach((pawn: DBHeroPawn) => {
         if (pawn.playerHeld) {
@@ -41,7 +44,8 @@ const NewTileArea = memo(({tile, clearHighlightAreas}: NewTileAreaProps) => {
       await setDoc(
         gameState.roomId, 
         {
-          tiles: [...room.tiles, tile],
+          availableTiles: room.availableTiles,
+          tiles: tile ? [...room.tiles, tile] : [room.tiles],
           pawns: newPawns
         },
       )

@@ -11,7 +11,6 @@ import { usePlayerDispatch } from '../Contexts/PlayerContext';
 import { playerNumber } from '../types';
 
 const WaitingRoom = () => {
-  console.log('re render waiting room')
   const { gameState, gameDispatch } = useGame();
   const [open, setOpen] = useState<boolean>(false)
   const handleOpen = () => setOpen(true);
