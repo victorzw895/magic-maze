@@ -1,6 +1,7 @@
 import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { Room } from '../types';
-import { setDoc } from '../utils/useFirestore';
+import { updateDoc } from '../utils/useFirestore';
+import { arrayUnion } from 'firebase/firestore';
 import { useAssets } from '../Contexts/AssetsContext';
 import { usePlayerState } from '../Contexts/PlayerContext';
 import { downloadAssets } from '../utils/useFirestore';
@@ -44,9 +45,9 @@ const useLoading =
       if (!tileLoaded || !pawnsLoaded || !objectivesLoaded || !abilitiesLoaded) return;
       if (room.players.length > 1 && !pingLoaded) return;
       
-      await setDoc(roomId, 
+      await updateDoc(roomId, 
         { 
-          playersReady: [...room.playersReady, playerState?.id],
+          playersReady: arrayUnion(playerState?.id),
         }
       )
       setRoomLoaded(true)

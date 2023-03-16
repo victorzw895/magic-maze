@@ -1,5 +1,10 @@
 import { Room } from '../types';
-import { setDoc as setDocument, doc as document, getDoc as getDocument } from "firebase/firestore"; 
+import { 
+  setDoc as setDocument,
+  doc as document,
+  getDoc as getDocument,
+  updateDoc as updateDocument,
+} from "firebase/firestore"; 
 import { getDownloadURL, ref } from "firebase/storage";
 import { gamesRef, storage } from "../Firestore";
 import { useDocumentData } from 'react-firebase-hooks/firestore'
@@ -14,6 +19,13 @@ export const doc = (roomId: string) => document(gamesRef, roomId);
 
 export const useDocData = (roomId: string): [...rest: any] => {
   return useDocumentData(roomId ? doc(roomId) : null, {initialValue: dbInitialState});
+};
+
+export const updateDoc = async (roomId: string, data: any) => {
+  await updateDocument(
+    doc(roomId), 
+    data,
+  )
 };
 
 export const setDoc = async (roomId: string, data: any) => {

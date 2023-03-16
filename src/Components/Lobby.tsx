@@ -42,17 +42,17 @@ const Lobby = () => {
 
     // save Room Code
     gameDispatch({type: "joinRoom", value: newGameCode});
-
+    
     // create new player
     const {player, dbPlayer}: PlayerFactoryType = PlayerFactory(playerName, 0)
+
+    // save player id Locally
+    playerDispatch({type: "setPlayer", value: player});
 
     await setDoc(newGameCode, {
       ...roomDefaultValues,
       players: [dbPlayer],
     })
-
-    // save player id Locally
-    playerDispatch({type: "setPlayer", value: player});
   }
 
   const joinRoom = async () => {
@@ -80,14 +80,15 @@ const Lobby = () => {
 
       gameDispatch({type: "joinRoom", value: existingRoomCode});
       
+      // save player id locally
+      playerDispatch({type: "setPlayer", value: player});
+      
       await setDoc(existingRoomCode, 
         {
           ...roomFound,
           players: playersInRoom
         },
       )
-      // save player id locally
-      playerDispatch({type: "setPlayer", value: player});
     }
     else if (!roomFound) {
       setFailJoinRoomMessage("Room code not found");
