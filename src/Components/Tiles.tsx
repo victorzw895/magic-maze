@@ -1,10 +1,9 @@
 import Tile from './Tile';
-import { DBTile } from '../types';
 import './Board.scss';
 import { useTilesDocState } from '../Contexts/FirestoreContext';
 
 const Tiles = () => {
-  const tiles: DBTile[] = useTilesDocState();
+  const tiles = useTilesDocState();
   
   return (
     <>

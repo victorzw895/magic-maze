@@ -78,6 +78,10 @@ export const pawnDefaultValues = {
   showEscalatorSpaces: [],
 }
 
+const availableTiles = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+availableTiles.sort(() => 0.5 - Math.random());
+
 export const roomDefaultValues: Room = {
   playersReady: [],
   players: [],
@@ -91,6 +95,7 @@ export const roomDefaultValues: Room = {
   weaponsStolen: false,
   heroesEscaped: [],
   timeLeft: 200,
+  availableTiles,
   tiles: [],
   pawns: {
     green: {

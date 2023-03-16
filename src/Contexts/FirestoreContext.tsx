@@ -24,6 +24,7 @@ const GreenPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const YellowPawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const PurplePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
 const OrangePawnDocContext = createContext<DBHeroPawn | undefined>(undefined);
+const AvailableTilesDocContext = createContext<number[] | undefined>(undefined);
 const TilesDocContext = createContext<DBTile[] | undefined>(undefined);
 const PlayersDocContext = createContext<DBPlayer[] | undefined>(undefined);
 const CurrentPlayerDocContext = createContext<DBPlayer | undefined>(undefined);
@@ -39,7 +40,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
   const [weaponsStolen, setWeaponsStolen] = useState(false);
   const [gameOver, gameWon] = useGameStates(room);
   const [roomLoaded, loadBoard, onPawnsLoaded, onObjectivesLoaded, setTileLoaded, setAbilitiesLoaded, setPingLoaded] = useLoading(room, gameState.roomId);
-  const [tiles, flipSandTimerCount] = useTiles(room);
+  const [tiles, availableTiles, flipSandTimerCount] = useTiles(room);
   const [players, currentPlayer, allPlayersReady] = usePlayer(room);
   const pawns = usePawns(room, gameState.roomId);
   const {green, yellow, purple, orange, playerHeldPawn, onWeapons} = pawns;
@@ -76,6 +77,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
       <SandTimerContext.Provider value={flipSandTimerCount}>
       <GameOverDocContext.Provider value={gameOver}>
       <GameWonDocContext.Provider value={gameWon}>
+        <AvailableTilesDocContext.Provider value={availableTiles}>
         <TilesDocContext.Provider value={tiles}>
           <PlayersDocContext.Provider value={players}>
             <CurrentPlayerDocContext.Provider value={currentPlayer}>
@@ -99,6 +101,7 @@ const FirestoreProvider = ({children}: DBProviderProps) => {
             </CurrentPlayerDocContext.Provider>
           </PlayersDocContext.Provider>
         </TilesDocContext.Provider>
+        </AvailableTilesDocContext.Provider>
       </GameWonDocContext.Provider>
       </GameOverDocContext.Provider>
       </SandTimerContext.Provider>
@@ -180,6 +183,14 @@ const usePlayerHeldPawnDocState = () => {
   return context;
 }
 
+const useAvailableTilesDocState = () => {
+  const context = useContext(AvailableTilesDocContext)
+  if (context === undefined) {
+    throw new Error('useAvailableTilesDocState must be used within a AvailableTilesDocContext');
+  }
+  return context;
+}
+
 const useTilesDocState = () => {
   const context = useContext(TilesDocContext)
   if (context === undefined) {
@@ -244,6 +255,7 @@ export {
   useYellowDocState,
   usePurpleDocState,
   useOrangeDocState,
+  useAvailableTilesDocState,
   useTilesDocState,
   usePlayersDocState,
   useCurrentPlayerDocState,

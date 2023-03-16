@@ -1,4 +1,4 @@
-import { Room, DBHeroPawn, DBTile } from '../../types';
+import { Room, DBHeroPawn } from '../../types';
 import { tileWallSize } from '../../constants';
 import { useGame } from '../../Contexts/GameContext';
 import { getDoc } from '../../utils/useFirestore';
@@ -23,7 +23,7 @@ const Pawn = ({pawnData}: pawnProps) => {
   const { gameState } = useGame();
 
   const currentPlayer = useCurrentPlayerDocState();
-  const tiles: DBTile[] = useTilesDocState();
+  const tiles = useTilesDocState();
 
   const toggleMovableSpaces = async () => {
     const docSnap = await getDoc(gameState.roomId);

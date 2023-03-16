@@ -16,11 +16,6 @@ const directionValue: directionValuesType = {
   left: 270
 }
 
-// TODO need to make into state
-export const availableTiles = [2,3,4,5,6,7,8,9,10,11,12];
-
-availableTiles.sort(() => 0.5 - Math.random());
-
 const calculateRotation = (placementDirection: direction, entryDirection: direction) => {
   let placementDirectionValue = directionValue[placementDirection];
   let entrySideValue = directionValue[entryDirection];
@@ -76,9 +71,9 @@ const updateSpaceDirections = (spaces: Space[][], rotationValue: number) => {
   ))
 }
 
-export const generateTile = (newTileState: DBTile) => {
-  const newId = availableTiles.pop();
-  const tile = allTiles.find(tile => tile.id === newId?.toString()) as DBTile;
+export const generateTile = (newTileState: DBTile, newId?: number) => {
+  if (!newId) return;
+  const tile = allTiles.find(tile => tile.id === newId.toString()) as DBTile;
   if (!tile) return;
   const { gridPosition, placementDirection} = newTileState
   const newTile: DBTile = {...tile, gridPosition, placementDirection};

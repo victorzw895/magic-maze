@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 import { DBTile, Room } from '../types';
 
-const useTiles = (room: Room): [DBTile[], number] => {
+const useTiles = (room: Room): [DBTile[], number[], number] => {
   const [tiles, setTiles] = useState<DBTile[]>([]);
+  const [availableTiles, setAvailableTiles] = useState<number[]>([]);
   const [flipSandTimerCount, setFlipSandTimerCount] = useState<number>(0);
+
+  useEffect(() => {
+    setAvailableTiles(room.availableTiles);
+  }, [room.availableTiles.length])
 
   useEffect(() => {
     setTiles(room.tiles);
@@ -13,7 +18,7 @@ const useTiles = (room: Room): [DBTile[], number] => {
     setFlipSandTimerCount(room.timerDisabledCount)
   }, [room.timerDisabledCount])
 
-  return [tiles, flipSandTimerCount];
+  return [tiles, availableTiles, flipSandTimerCount];
 };
 
 export default useTiles;

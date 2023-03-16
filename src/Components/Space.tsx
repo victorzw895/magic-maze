@@ -212,9 +212,6 @@ const Space = memo(({
         player.playerDirections = rotatedDirectionsArray[i];
       })
 
-      console.log("updatedPlayers", updatedPlayers)
-      console.log("update abilities count", count)
-
       await setDoc(gameState.roomId, {
         players: updatedPlayers,
         updateAbilitiesCount: count + 1

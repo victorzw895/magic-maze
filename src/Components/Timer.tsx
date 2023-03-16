@@ -74,7 +74,6 @@ const Timer = () => {
 
   const toggleTimer = () => {
     const restartTime = startSeconds - ((minutes * 60) + seconds);
-    console.log("restart time", restartTime)
     if (restartTime === startSeconds) {
       start();
     } else {
@@ -114,7 +113,7 @@ const Timer = () => {
         }}
       >
         <Alert severity="info" sx={{ width: '100%' }}>
-          Timer hit, flipping Sand Timer!
+          Timer hit, flipping Sand Timer and rotating Abilities!
         </Alert>
       </Snackbar>
     </>
