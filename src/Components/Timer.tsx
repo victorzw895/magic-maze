@@ -15,7 +15,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 });
 
 const Timer = () => {
-  const { gameState, gameDispatch } = useGame();
+  const { gameState } = useGame();
   const [showAlert, setShowAlert] = useState(false);
   const gameOver = useGameOverDocState();
   const flipSandTimerCount = useSandTimerState();
@@ -58,7 +58,6 @@ const Timer = () => {
     pause,
     restart
   } = useTimer({ expiryTimestamp: time, onExpire: async () => {
-    gameDispatch({type: "gameOver"})
     await setDoc(gameState.roomId, {
       gameOver: true,
       gameWon: false,

@@ -20,10 +20,6 @@ export interface SandTimer {
 
 export interface Game {
   roomId: string,
-  timerRunning: boolean
-  minutesLeft: number,
-  secondsLeft: number,
-  gameOver: boolean,
 }
 
 export interface Escalator {

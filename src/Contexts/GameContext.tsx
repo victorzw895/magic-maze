@@ -2,7 +2,6 @@ import React, { createContext, useContext, useReducer } from 'react';
 import { Game, direction, basicAbility, DBPlayer } from '../types';
 
 type Action = {type: 'joinRoom', value: string} |
-              {type: 'gameOver'} |
               {type: 'exitRoom'};
 type Dispatch = (action: Action) => void;
 
@@ -10,17 +9,7 @@ type GameProviderProps = {children: React.ReactNode}
 
 const gameInitialState: Game = {
   roomId: "",
-  timerRunning: false, // TODO maybe not necessary
-  minutesLeft: 3,
-  secondsLeft: 20,
-  gameOver: false,
 }
-
-// Set up player actions according to rule book
-const directions: direction[] = ["up", "right", "down", "left"];
-const secondSetDirections: direction[] = ["left", "right", "down", "up"];
-const players3Set = [["up", "right"], "down", "left"];
-const abilities: basicAbility[] = ["escalator", "explore", "teleport"];
 
 const randomize = (array: any[]) => {
   return array.sort(() => {
@@ -29,9 +18,19 @@ const randomize = (array: any[]) => {
 }
 
 export const assignRandomActions = (players: DBPlayer[]): DBPlayer[] => {
+  // Set up player actions according to rule book
+  const directions: direction[] = ["up", "right", "down", "left"];
+  const secondSetDirections: direction[] = ["left", "right", "down", "up"];
+  const players3Set = [["up", "right"], "down", "left"];
+  const abilities: basicAbility[] = ["escalator", "explore", "teleport"];
+  
   const randomPlayerOrder = randomize(players);
   
   return randomPlayerOrder.map(player => {
+    console.log('player before reset', player)
+    player.playerDirections = [];
+    player.playerAbilities = [];
+    console.log('player after reset', player)
     if (randomPlayerOrder.length < 4) {
       if (randomPlayerOrder.length === 3) {
         player.playerDirections.push(...players3Set.splice(0, 1).flat(1))
@@ -72,6 +71,7 @@ export const assignRandomActions = (players: DBPlayer[]): DBPlayer[] => {
     else {
       player.playerDirections.push(...secondSetDirections.splice(0, 1))
     }
+    console.log('player after assigning actions', player)
     return player
   })  
 }
@@ -84,12 +84,6 @@ const gameReducer = (gameState: Game, action: Action) => {
   switch (action.type) {
     case 'joinRoom': {
       newState.roomId = action.value;
-      return newState;
-    }
-    case 'gameOver': {
-      newState.minutesLeft = 0;
-      newState.secondsLeft = 0;
-      newState.gameOver = true;
       return newState;
     }
     case 'exitRoom': {

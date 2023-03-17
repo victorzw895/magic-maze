@@ -24,7 +24,7 @@ const useLoading =
   const [abilitiesLoaded, setAbilitiesLoaded] = useState<boolean>(false);
   const [pingLoaded, setPingLoaded] = useState<boolean>(false);
   const [roomLoaded, setRoomLoaded] = useState(false);
-  const { setAssets } = useAssets();
+  const { assets: existingAssets, setAssets } = useAssets();
 
   const onPawnsLoaded = after(4, () => setPawnsLoaded(true));
   const onObjectivesLoaded = after(4, () => setObjectivesLoaded(true));
@@ -34,6 +34,7 @@ const useLoading =
       if (!room.loadBoard) return;
       
       setLoadBoard(room.loadBoard);
+      if (existingAssets) return;
       const assets = await downloadAssets();
       setAssets(assets);
     })()

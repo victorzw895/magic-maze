@@ -4,6 +4,7 @@ import {
   doc as document,
   getDoc as getDocument,
   updateDoc as updateDocument,
+  deleteDoc as deleteDocument,
 } from "firebase/firestore"; 
 import { getDownloadURL, ref } from "firebase/storage";
 import { gamesRef, storage } from "../Firestore";
@@ -38,6 +39,10 @@ export const setDoc = async (roomId: string, data: any) => {
 
 export const getDoc = async (roomId: string) => {
   return await getDocument(doc(roomId));
+}
+
+export const deleteDoc = async (roomId: string) => {
+  await deleteDocument(doc(roomId));
 }
 
 const downloadAsset = (file: string) => {
