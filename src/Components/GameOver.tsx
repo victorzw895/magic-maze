@@ -3,22 +3,19 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import { usePlayerDispatch } from '../Contexts/PlayerContext';
-import { useGameOverDocState, useGameWonDocState } from '../Contexts/FirestoreContext';
-import { useGame } from '../Contexts/GameContext';
+import { 
+  useGameOverDocState,
+  useGameWonDocState,
+  usePlayersDocState,
+  useCurrentPlayerDocState,
+ } from '../Contexts/FirestoreContext';
+import { useGame, assignRandomActions } from '../Contexts/GameContext';
 import { useAudio } from '../Contexts/AudioContext';
-// import cheeringSound from '../assets/cheering.wav'; // download file from firestore storage instead
-// import loseSound from '../assets/lose.wav'; // download file from firestore storage instead
-
-// const playLose = () => {
-//   const audio = new Audio(loseSound);
-//   audio.play();
-// }
-
-// const playCheering = () => {
-//   const audio = new Audio(cheeringSound);
-//   audio.play();
-// }
+import { setDoc } from 'firebase/firestore'
+import { doc } from '../utils/useFirestore';
+import { roomDefaultValues } from '../constants';
+import { allTiles } from '../Data/all-tiles-data';
+import { pawnDBInitialState } from '../utils/PawnFactory';
 
 const style = {
   position: 'absolute',
@@ -33,10 +30,11 @@ const style = {
 };
 
 const GameOver = () => {
-  const playerDispatch = usePlayerDispatch();
-  const {gameDispatch} = useGame();
+  const {gameState} = useGame();
   const gameOver = useGameOverDocState();
   const gameWon = useGameWonDocState();
+  const players = usePlayersDocState()
+  const currentPlayer = useCurrentPlayerDocState();
   const { setMusicOn, soundOn, playCheeringSound, playLoseSound } = useAudio();
 
   useEffect(() => {
@@ -50,9 +48,21 @@ const GameOver = () => {
   }, [gameOver, gameWon])
 
   const handleClick = async () => {
-    playerDispatch({type: 'setPlayer', value: null});
-    gameDispatch({type: "exitRoom"});
-    // delete doc or reset doc
+    const dbPlayers = assignRandomActions(players)
+    const firstTile = allTiles.find(tile => tile.id === "1a");
+    const initTile = {
+      ...firstTile,
+      gridPosition: [8, 8]
+    }
+
+    setDoc(doc(gameState.roomId), {
+      ...roomDefaultValues,
+      players: dbPlayers, 
+      tiles: [initTile],
+      pawns: pawnDBInitialState,
+      loadBoard: true,
+      updateAbilitiesCount: 1,
+    })
   }
 
   return (
@@ -72,7 +82,13 @@ const GameOver = () => {
                 <Typography id="modal-won-description" sx={{ mt: 2 }}>
                   You did it! You and your teammates managed to successfully steal all the weapons and escape!
                 </Typography>
-                <Button style={{marginTop: '20px'}} onClick={handleClick}>Play Again</Button>
+                {currentPlayer.number === 1 ? 
+                  <Button style={{marginTop: '20px'}} onClick={handleClick}>Play Again</Button>
+                    :
+                  <Typography id="modal-play-again" sx={{ mt: 2 }}>
+                    Wait for Game Host to press Play Again, to try again.
+                  </Typography>
+                }
               </Box>
             </Modal>
               :
@@ -89,7 +105,13 @@ const GameOver = () => {
                   You and your teammates failed to steal all the weapons and escape in time.
                   Try again!
                 </Typography>
-                <Button style={{marginTop: '20px'}} onClick={handleClick}>Play Again</Button>
+                {currentPlayer.number === 1 ? 
+                  <Button style={{marginTop: '20px'}} onClick={handleClick}>Play Again</Button>
+                    :
+                  <Typography id="modal-play-again" sx={{ mt: 2 }}>
+                    Wait for Game Host to press Play Again, to try again.
+                  </Typography>
+                }
               </Box>
             </Modal>
           :

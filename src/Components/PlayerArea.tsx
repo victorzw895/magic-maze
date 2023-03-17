@@ -16,7 +16,6 @@ interface PlayerAreaProps {
 const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
   const { assets } = useAssets();
   const { setAbilitiesLoaded } = useLoadingDocState();
-  const { gameState } = useGame();
   const availableTiles = useAvailableTilesDocState();
   const currentPlayer = useCurrentPlayerDocState();
   const { weaponsStolen } = useWeaponsStolenDocState();
@@ -92,12 +91,6 @@ const PlayerArea = ({highlightNewTileArea} : PlayerAreaProps) => {
             })
           }
           <Pinged />
-          {
-              gameState.gameOver && 
-              <div className="game-over">
-              <p>Game Over</p>
-            </div>
-          }
         </>
       }
     </div>

@@ -7,6 +7,7 @@ import {
   useTilesDocState,
   useCurrentPlayerDocState,
   useLoadingDocState,
+  useGameOverDocState
 } from '../../Contexts/FirestoreContext';
 import { getDisplacementValue } from '../../Helpers/TileMethods';
 import { useAssets } from '../../Contexts/AssetsContext';
@@ -19,7 +20,7 @@ const Pawn = ({pawnData}: pawnProps) => {
   const { assets } = useAssets();
   const { onPawnsLoaded } = useLoadingDocState();
   const { color } = pawnData;
-
+  const gameOver = useGameOverDocState();
   const { gameState } = useGame();
 
   const currentPlayer = useCurrentPlayerDocState();
@@ -52,7 +53,7 @@ const Pawn = ({pawnData}: pawnProps) => {
           }}>
           <div 
             className={`pawn ${color}`} 
-            onClick={gameState.gameOver ? () => {} : toggleMovableSpaces}
+            onClick={gameOver ? () => {} : toggleMovableSpaces}
             style={{
               gridColumnStart: pawnData?.position[0] + 1,
               gridRowStart: pawnData?.position[1] + 1,
