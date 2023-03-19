@@ -1,6 +1,8 @@
-import { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { ExplorationSpace, DBTile, DBHeroPawn, Room } from '../types';
 import { getDoc } from '../utils/useFirestore';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
 const startTiles = () => {
   const tiles = []
@@ -12,7 +14,16 @@ const startTiles = () => {
   return tiles;
 }
 
-const useHighlightArea = (roomId: string): [DBTile[], () => void, () => void] => {
+
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref,
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+const useHighlightArea = (roomId: string): [DBTile[], () => void, () => void, boolean, Dispatch<SetStateAction<boolean>>] => {
+  const [showAlert, setShowAlert] = useState(false);
   const [availableArea, setAvailableArea] = useState<DBTile[]>(startTiles() as DBTile[]);
 
   const getExplorationTile = (tiles: DBTile[], pawn: DBHeroPawn, pawnColIndex: number, pawnRowIndex: number) => {
@@ -43,6 +54,8 @@ const useHighlightArea = (roomId: string): [DBTile[], () => void, () => void] =>
             if (tileExists) return
             return {gridPosition: [currentTile.gridPosition[0] + 1, currentTile.gridPosition[1]], placementDirection: spaceDetails.exploreDirection}
           }
+        } else {
+          setShowAlert(true);
         }
       }
     }
@@ -80,7 +93,7 @@ const useHighlightArea = (roomId: string): [DBTile[], () => void, () => void] =>
     setAvailableArea(resetAreas as DBTile[]);
   }, [])
 
-  return [availableArea, highlightNewTileArea, clearHighlightAreas];
+  return [availableArea, highlightNewTileArea, clearHighlightAreas, showAlert, setShowAlert];
 };
 
 export default useHighlightArea;
