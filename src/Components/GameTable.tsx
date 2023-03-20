@@ -1,4 +1,4 @@
-import { useRef, ReactNode } from 'react';
+import React, { useRef, ReactNode, useState } from 'react';
 import NewTileArea from './NewTileArea';
 import PlayerArea from './PlayerArea';
 import { useGame } from '../Contexts/GameContext';
@@ -7,13 +7,22 @@ import useHighlightArea from '../utils/useHighlightArea';
 import { useGameStartedDocState } from '../Contexts/FirestoreContext';
 import Objectives from './Objectives';
 import AudioControls from './AudioControls';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
 const GameTable = ({timer, children}: {timer: ReactNode, children: ReactNode}) => {
   console.log('game table re render')
   const draggableNodeRef = useRef(null);
   const { gameState } = useGame();
   const gameStarted = useGameStartedDocState();
-  const [availableArea, highlightNewTileArea, clearHighlightAreas] = useHighlightArea(gameState.roomId);
+  const [availableArea, highlightNewTileArea, clearHighlightAreas, showAlert, setShowAlert] = useHighlightArea(gameState.roomId);
+
+  const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+    props,
+    ref,
+  ) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
 
   return (
     <>
@@ -38,6 +47,21 @@ const GameTable = ({timer, children}: {timer: ReactNode, children: ReactNode}) =
         </div>
       </Draggable>
       <PlayerArea highlightNewTileArea={highlightNewTileArea} />
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={showAlert}
+        onClose={() => setShowAlert(false)}
+        autoHideDuration={5000}
+        key='alert'
+        ClickAwayListenerProps={{
+          mouseEvent: false,
+          touchEvent: false,
+        }}
+      >
+        <Alert severity="error" sx={{ width: '100%' }}>
+          "The colour of the pawn does not match the exploration space!"
+        </Alert>
+      </Snackbar>
     </>
   );
 };
