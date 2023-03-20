@@ -16,7 +16,6 @@ const GameTable = ({timer, children}: {timer: ReactNode, children: ReactNode}) =
   const { gameState } = useGame();
   const gameStarted = useGameStartedDocState();
   const [availableArea, highlightNewTileArea, clearHighlightAreas, showAlert, setShowAlert] = useHighlightArea(gameState.roomId);
-  const [alertMessage, setAlertMessage] = useState("")
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
     props,
@@ -60,7 +59,7 @@ const GameTable = ({timer, children}: {timer: ReactNode, children: ReactNode}) =
         }}
       >
         <Alert severity="error" sx={{ width: '100%' }}>
-          "The colour of the pawn does not match the exploration space"
+          "The colour of the pawn does not match the exploration space!"
         </Alert>
       </Snackbar>
     </>
