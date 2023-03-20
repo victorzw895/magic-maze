@@ -165,7 +165,7 @@ const Lobby = () => {
         ""
       }
         <Snackbar open={openToast} autoHideDuration={5000} onClose={handleToastClose}>
-          <Alert onClose={handleToastClose} severity="success" sx={{ width: '100%' }}>
+          <Alert onClose={handleToastClose} severity="success" sx={{ width: '100%' }} variant="filled">
             Success! Deleted {expiredDocsCount} games. 
           </Alert>
         </Snackbar>        
@@ -176,7 +176,7 @@ const Lobby = () => {
           {
             promptCode ? 
               <>
-                <> { failJoinRoomMessage !== "" ? <Alert severity="warning" style={{marginTop: "20px"}}>{failJoinRoomMessage}</Alert> : "" }</>
+                <> { failJoinRoomMessage !== "" ? <Alert severity="warning" style={{marginTop: "20px"}}>{failJoinRoomMessage}</Alert> : "" } </>
                 <TextField margin="normal" size="small" type="text" variant="filled" label="Enter Room Code" onChange={_handleRoomCode} value={existingRoomCode}></TextField>
                 <Stack spacing={2} direction="row" justifyContent="center" style={{margin: "20px 0"}}>
                   <Button variant="contained" size="small" disableElevation onClick={joinRoom}>Join</Button>
