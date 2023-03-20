@@ -1,9 +1,14 @@
+import React from 'react';
 import { roomDefaultValues } from '../constants';
 import { useWeaponsStolenDocState, useLoadingDocState } from '../Contexts/FirestoreContext';
 import { useGame } from '../Contexts/GameContext';
 import { setDoc } from '../utils/useFirestore';
 import { useAssets } from '../Contexts/AssetsContext';
 import { useAudio } from '../Contexts/AudioContext';
+// import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import { Alert, AlertTitle } from '@mui/material';
+import { Forward } from '@mui/icons-material';
+
 
 const objectives = Object.values(roomDefaultValues.pawns).map((pawn) => pawn.color);
 
@@ -20,6 +25,12 @@ const StealWeapons = () => {
     })
     playAchievementSound();
   }
+  // const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  //   props,
+  //   ref,
+  // ) {
+  //   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  // });
 
   return (
     <>
@@ -38,14 +49,24 @@ const StealWeapons = () => {
             )
           })
             :
-          <img 
-            onClick={stealWeaponsHandler}
-            className={`objective steal`}
-            key={`steal-weapons`}
-            draggable={false}
-            src={assets['steal.png']} 
-            alt={`steal-weapons`} 
-          />
+            <>
+            {/* <h4>It's time to steal the weapons! Click on the below to collect the weapons escape</h4> */}
+            <Alert icon={ <Forward fontSize='inherit'/> } sx={{ width: '100%', verticalAlign: "middle" }} variant="filled">
+              <AlertTitle>
+                Click to steal the weapons! 
+              </AlertTitle>
+              Vortex has been disabled
+              
+            </Alert>
+            <img 
+              onClick={stealWeaponsHandler}
+              className={`objective steal`}
+              key={`steal-weapons`}
+              draggable={false}
+              src={assets['steal.png']} 
+              alt={`steal-weapons`} 
+            />
+          </>
       }
     </>
   )

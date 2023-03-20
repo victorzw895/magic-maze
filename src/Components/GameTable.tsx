@@ -1,4 +1,4 @@
-import React, { useRef, ReactNode } from 'react';
+import React, { useRef, ReactNode, useState } from 'react';
 import NewTileArea from './NewTileArea';
 import PlayerArea from './PlayerArea';
 import { useGame } from '../Contexts/GameContext';
@@ -16,6 +16,7 @@ const GameTable = ({timer, children}: {timer: ReactNode, children: ReactNode}) =
   const { gameState } = useGame();
   const gameStarted = useGameStartedDocState();
   const [availableArea, highlightNewTileArea, clearHighlightAreas, showAlert, setShowAlert] = useHighlightArea(gameState.roomId);
+  const [alertMessage, setAlertMessage] = useState("")
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
     props,
