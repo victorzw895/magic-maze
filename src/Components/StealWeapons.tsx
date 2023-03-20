@@ -25,12 +25,6 @@ const StealWeapons = () => {
     })
     playAchievementSound();
   }
-  // const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
-  //   props,
-  //   ref,
-  // ) {
-  //   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  // });
 
   return (
     <>
@@ -51,12 +45,12 @@ const StealWeapons = () => {
             :
             <>
             {/* <h4>It's time to steal the weapons! Click on the below to collect the weapons escape</h4> */}
-            <Alert icon={ <Forward fontSize='inherit'/> } sx={{ width: '100%', verticalAlign: "middle" }} variant="filled">
+            <Alert icon={ <Forward fontSize='inherit'/> } sx={{ width: '100%', verticalAlign: "middle", fontSize: "11px" }} variant="filled" >
               <AlertTitle>
                 Click to steal the weapons! 
               </AlertTitle>
-              Vortex has been disabled
-              
+              Vortex will been disabled
+
             </Alert>
             <img 
               onClick={stealWeaponsHandler}
